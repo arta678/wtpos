@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Jurnal Umum</title>
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
+<style>
+  tr.jurnal-row:hover { background:#f1f5ff; cursor:pointer }
+  .modal-lg { max-width: 800px }
+</style>
+</head>
+<body>
+
+<div class="container-fluid mt-3">
+
+  <h4 class="mb-3">📒 Jurnal Umum</h4>
+
+  <!-- FILTER -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <input type="date" id="tgl_awal" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <input type="date" id="tgl_akhir" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <button id="btnFilter" class="btn btn-primary">Filter</button>
+    </div>
+  </div>
+
+  <!-- TABEL JURNAL -->
+  <div class="table-responsive">
+    <table class="table table-sm table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th>Tanggal</th>
+          <th>Sumber</th>
+          <th>Keterangan</th>
+          <th class="text-right">Debit</th>
+          <th class="text-right">Kredit</th>
+        </tr>
+      </thead>
+      <tbody id="tblJurnal"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL DETAIL -->
+<div class="modal fade" id="modalDetail" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Detail Jurnal</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <table class="table table-sm table-bordered">
+          <thead class="thead-light">
+            <tr>
+              <th>Akun</th>
+              <th class="text-right">Debit</th>
+              <th class="text-right">Kredit</th>
+            </tr>
+          </thead>
+          <tbody id="tblDetail"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+const tblJurnal = document.getElementById("tblJurnal");
+const tblDetail = document.getElementById("tblDetail");
+const tgl_awal = document.getElementById("tgl_awal");
+const tgl_akhir = document.getElementById("tgl_akhir");
+const btnFilter = document.getElementById("btnFilter");
+
+// default tanggal hari ini
+const today = new Date().toISOString().slice(0,10);
+tgl_awal.value = today;
+tgl_akhir.value = today;
+
+// format rupiah
+function fmt(n){
+  return (n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
+// ================= LOAD JURNAL =================
+async function loadJurnal() {
+
+  tblJurnal.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+
+  const { data, error } = await db
+    .from("tb_jurnal")
+    .select(`
+      id_jurnal,
+      tanggal,
+      sumber,
+      keterangan,
+      tb_jurnal_detail (
+        debit,
+        kredit
+      )
+    `)
+    .gte("tanggal", tgl_awal.value)
+    .lte("tanggal", tgl_akhir.value)
+    .order("tanggal", { ascending:false });
+
+  if (error) {
+    tblJurnal.innerHTML = `<tr><td colspan="5">Gagal load jurnal</td></tr>`;
+    return;
+  }
+
+  tblJurnal.innerHTML = "";
+
+  data.forEach(j => {
+    const totalDebit = j.tb_jurnal_detail.reduce((s,d)=>s+(d.debit||0),0);
+    const totalKredit = j.tb_jurnal_detail.reduce((s,d)=>s+(d.kredit||0),0);
+
+    const tr = document.createElement("tr");
+    tr.className = "jurnal-row";
+    tr.dataset.id = j.id_jurnal;
+
+    tr.innerHTML = `
+      <td>${j.tanggal}</td>
+      <td>${j.sumber}</td>
+      <td>${j.keterangan}</td>
+      <td class="text-right">${fmt(totalDebit)}</td>
+      <td class="text-right">${fmt(totalKredit)}</td>
+    `;
+
+    // DOUBLE CLICK → DETAIL
+    tr.addEventListener("dblclick", () => {
+      loadDetailJurnal(j.id_jurnal);
+    });
+
+    tblJurnal.appendChild(tr);
+  });
+}
+
+btnFilter.addEventListener("click", loadJurnal);
+
+// ================= DETAIL JURNAL =================
+async function loadDetailJurnal(idJurnal){
+
+  tblDetail.innerHTML = `<tr><td colspan="3">Loading...</td></tr>`;
+
+  const { data, error } = await db
+    .from("tb_jurnal_detail")
+    .select(`
+      kode_akun,
+      debit,
+      kredit,
+      tb_akun ( nama_akun )
+    `)
+    .eq("id_jurnal", idJurnal);
+
+  if (error) {
+    tblDetail.innerHTML = `<tr><td colspan="3">Gagal load detail</td></tr>`;
+    return;
+  }
+
+  tblDetail.innerHTML = "";
+
+  data.forEach(d => {
+    tblDetail.innerHTML += `
+      <tr>
+        <td>${d.kode_akun} - ${d.tb_akun?.nama_akun || ""}</td>
+        <td class="text-right">${fmt(d.debit)}</td>
+        <td class="text-right">${fmt(d.kredit)}</td>
+      </tr>
+    `;
+  });
+
+  $("#modalDetail").modal("show");
+}
+
+// ================= INIT =================
+loadJurnal();
+
+</script>
+</body>
+</html>

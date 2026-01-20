@@ -1,0 +1,105 @@
+
+/* Hilangkan scroll bawaan browser */
+html, body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+body {
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Helvetica Neue",
+               Arial, sans-serif;
+}
+
+/* Topbar tetap di atas, tidak ikut scroll */
+.navbar.topbar {
+    position: sticky !important;
+    top: 0;
+    z-index: 1020;
+}
+
+/* Konten scroll, scrollbarnya disembunyikan */
+#content-wrapper {
+    height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+#content-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.navbar {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+.navbar .nav-link {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+.navbar img {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.container-fluid {
+    margin-top: 60px !important;
+}
+
+.dropdown-item.is-active {
+    font-weight: bold;
+}
+.icon-svg {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1); /* supaya putih */
+}
+
+/* ==============================
+   Quick Search Navbar
+   ============================== */
+#quickSearchInput {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+#quickSearchInput:focus {
+    font-weight: 1000;
+    font-size: 20px;
+}
+/*font default*/
+@font-face {
+  font-family: "Nunito";
+  src: url("../vendor/fonts/nunito/Nunito-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("../vendor/fonts/nunito/Nunito-Italic-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+.action-icon:hover {
+  opacity: 0.8;
+  transform: scale(1.5);
+}
+/*ukuran scortcut*/
+.shortcut-icon svg {
+  width: 25px;
+  height: 25px;
+  display: block;
+}
+
+.shortcut-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

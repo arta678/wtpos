@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+        .dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.table thead th {
+    background: linear-gradient(to bottom, #f5f5f5, #ededee);
+    color: #7789bf;
+    font-weight: 600;
+    border-bottom: 2px solid #ffffff;
+}
+.card-body {
+    padding-bottom: 0 !important;
+}
+.card-body nav {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* HANYA BARIS DATA (ISI TABEL) */
+.table-tight tbody td {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    line-height: 1.15;
+    vertical-align: middle;
+}
+.action-icon {
+    cursor: pointer;
+    padding: 2px;
+}
+tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+.table-noselect,
+.table-noselect * {
+    user-select: none;
+    -webkit-user-select: none; /* Chrome, Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Edge lama */
+}
+td[contenteditable]{
+  /*background:#fff;*/
+  cursor:default; 
+}
+td[contenteditable]:focus{
+  outline:none;
+  background:#fff8e1;
+}
+td.changed{
+  background:#e3f2fd !important;
+}
+.table thead th{
+  background:#f5f6fa;
+}
+.text-mono{
+  font-family:monospace;
+}
+.hl {
+  background: #fff3cd;   /* kuning lembut */
+  padding: 0 2px;
+  border-radius: 2px;
+}
+/* Harga ECERAN lebih tebal */
+td[data-level="eceran"]{
+  font-weight: 700;   /* bold */
+}
+td[data-level="eceran"]:focus{
+  font-weight: 800;
+}
+
+/* INPUT FILTER AKTIF */
+.filter-active {
+  background-color: #fff8e1 !important;
+}
+
+</style>
+</head>
+
+<body id="page-top">
+    <div id="navbar"></div>
+    <div id="wrapper">
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="container-fluid">
+                    <div id="shortcut"></div>
+                    <div class="card shadow mb-4">
+<div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
+  <h6 class="m-0 font-weight-bold text-primary">Harga Produk</h6>
+
+<div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+
+  <!-- FILTER MEREK -->
+  <div class="position-relative" style="width:140px">
+    <input id="filter_merek"
+           class="form-control form-control-sm"
+           placeholder="Merek"
+           autocomplete="off">
+    <div id="dd_filter_merek" class="dropdown-menu"></div>
+  </div>
+
+  <!-- FILTER KATEGORI -->
+  <div class="position-relative" style="width:140px">
+    <input id="filter_kategori"
+           class="form-control form-control-sm"
+           placeholder="Kategori"
+           autocomplete="off">
+    <div id="dd_filter_kategori" class="dropdown-menu"></div>
+  </div>
+
+  <!-- SEARCH PRODUK (ENTER) -->
+  <input type="text"
+         id="qProduk"
+         class="form-control form-control-sm"
+         placeholder="Cari Produk"
+         style="width:140px">
+
+  <button class="btn btn-sm btn-primary" onclick="simpanHarga()">Simpan</button>
+</div>
+
+</div>
+                    <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap ">
+                        <table class="table table-hover table-sm table-bordered table-tight table-noselect">
+                          <thead>
+                          <tr>
+                            <th class="text-center" width="50px">Kode</th>
+                            <th class="text-center" >Nama</th>
+                            <th class="text-center" width="150px">Merek</th>
+                            <th class="text-center" width="150px">Kategori</th>
+                            <th class="text-center" width="90px">HPP</th>
+                            <th class="text-center" width="90px">Eceran</th>
+                            <th class="text-center" width="90px">Grosir</th>
+                            <th class="text-center" width="100px">Toko</th>
+                            <th class="text-center" width="80px">Margin</th>
+                          </tr>
+                          </thead>
+                            <tbody id="tbHarga"></tbody>
+                        </table>
+                        <nav>
+                            <ul class="pagination justify-content-center" id="pagination">
+                                <li class="page-item"><a class="page-link" href="#" onclick="prevPage()">&laquo;</a></li>
+                                <li class="page-item disabled"><a class="page-link" href="#">Halaman <span id="page-number">1</span></a></li>
+                                <li class="page-item"><a class="page-link" href="#" onclick="nextPage()">&raquo;</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+let cacheProduk = [];
+let page = 1;
+const perPage = 10;
+let totalRows = 0;
+let totalPages = 1;
+let filterMerekId = null;
+let filterKategoriId = null;
+   // ================= HELPER =================
+function fmt(n){
+  return (n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+function toNum(s){
+  return parseFloat((s||"").toString().replace(/\./g,'')) || 0;
+}
+function margin(hpp,jual){
+  if(!hpp) return "0.0%";
+  return (((jual-hpp)/hpp)*100).toFixed(1)+"%";
+}
+function highlight(text, q) {
+  if (!q) return text;
+
+  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`(${esc})`, "ig");
+
+  return text.replace(re, `<span class="hl">$1</span>`);
+}
+function updateFilterStyle(inputId, isActive) {
+  const el = document.getElementById(inputId);
+  el.classList.toggle("filter-active", isActive);
+}
+function getQueryParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+// ================= LOAD DATA =================
+async function loadHarga(){
+
+  const q = norm(document.getElementById("qProduk").value);
+  const isFiltering =
+  !!q ||
+  !!filterMerekId ||
+  !!filterKategoriId;
+  let query = db
+    .from("tb_produk")
+    .select(`
+      id_produk,
+      kode_produk,
+      nama_produk,
+      hpp_awal,
+      tb_merek(nama_merek),
+      tb_kategori(nama_kategori),
+      tb_harga_produk!left(level, harga)
+    `, { count: "exact" })
+    .order("nama_produk");
+
+    if (filterMerekId) {
+      query = query.eq("id_merek", filterMerekId);
+    }
+
+    if (filterKategoriId) {
+      query = query.eq("id_kategori", filterKategoriId);
+    }
+
+  // 🔍 SEARCH: KODE + NAMA
+    if (q) {
+    const keywords = q.split(/\s+/).filter(Boolean);
+
+    keywords.forEach(k => {
+      query = query.or(
+        `kode_produk.ilike.%${k}%,nama_produk.ilike.%${k}%`
+      );
+    });
+
+  } else {
+    // 📄 pagination hanya jika tidak search
+    const from = (page - 1) * perPage;
+    const to   = from + perPage - 1;
+    query = query.range(from, to);
+  }
+// 
+  const { data: produkList, error, count } = await query;
+
+  if (error) {
+    console.error(error);
+    alert("Gagal load harga");
+    return;
+  }
+  const { data: hppList, error: hppErr } = await db
+  .from("v_hpp_terakhir")
+  .select("id_produk, hpp_beli");
+
+  if (hppErr) {
+    console.error("Gagal load HPP:", hppErr);
+  }
+  const hppMap = {};
+(hppList || []).forEach(h => {
+  hppMap[h.id_produk] = h.hpp_beli;
+});
+
+
+  if (error) {
+    console.error(error);
+    alert("Gagal load harga");
+    return;
+  }
+
+  renderTabel(produkList || [], hppMap);
+
+  // 🔢 pagination UI
+    if (isFiltering) {
+      document.getElementById("pagination").style.display = "none";
+    } else {
+      totalPages = Math.ceil(count / perPage);
+      updatePagination();
+      document.getElementById("pagination").style.display = "flex";
+    }
+    updateFilterStyle("filter_merek", !!filterMerekId);
+    updateFilterStyle("filter_kategori", !!filterKategoriId);
+    updateFilterStyle("qProduk",document.getElementById("qProduk").value.trim() !== "");
+
+}
+
+function applyMarginStyle(tr, hpp, eceran) {
+  const eceranCell = tr.querySelector('[data-level="eceran"]');
+  const marginCell = tr.children[8];
+
+  const m = hpp > 0 ? ((eceran - hpp) / hpp) * 100 : 0;
+
+  // reset
+  eceranCell.classList.remove("text-danger","text-warning");
+  marginCell.classList.remove("text-danger","text-warning","text-muted");
+
+  // JUAL < HPP
+  if (eceran < hpp && hpp > 0) {
+    eceranCell.classList.add("text-danger");
+  }
+
+  // JUAL = HPP
+  if (eceran === hpp && hpp > 0) {
+    eceranCell.classList.add("text-warning");
+  }
+
+  // MARGIN < 0
+  if (m < 0) {
+    marginCell.classList.add("text-danger");
+  }
+}
+
+
+function renderTabel(list, hppMap){
+
+  const q = norm(document.getElementById("qProduk").value);
+
+  document.getElementById("tbHarga").innerHTML =
+    list.map(p => {
+
+      const hargaList = p.tb_harga_produk || [];
+      const harga = { eceran:0, grosir:0, toko:0 };
+
+      hargaList.forEach(h => {
+        harga[h.level] = h.harga;
+      });
+
+const hpp =
+  hppMap?.[p.id_produk] ??
+  p.hpp_awal ??
+  0;
+
+      const kode = highlight(p.kode_produk || "", q);
+      const nama = highlight(p.nama_produk || "", q);
+
+      return `
+<tr data-id="${p.id_produk}">
+  <td>${kode}</td>
+  <td>${nama}</td>
+  <td>${p.tb_merek?.nama_merek || ""}</td>
+  <td>${p.tb_kategori?.nama_kategori || ""}</td>
+
+  <td class="text-right text-muted">${fmt(hpp)}</td>
+
+  <td class="text-right" contenteditable data-level="eceran">
+    ${fmt(harga.eceran)}
+  </td>
+
+  <td class="text-right" contenteditable data-level="grosir">
+    ${fmt(harga.grosir)}
+  </td>
+
+  <td class="text-right" contenteditable data-level="toko">
+    ${fmt(harga.toko)}
+  </td>
+
+  <td class="text-right">${margin(hpp, harga.eceran)}</td>
+</tr>`;
+    }).join("");
+    setTimeout(() => {
+  document.querySelectorAll("#tbHarga tr").forEach(tr => {
+    const hpp = toNum(tr.children[4].innerText);
+    const eceran = toNum(
+      tr.querySelector('[data-level="eceran"]')?.innerText
+    );
+
+    applyMarginStyle(tr, hpp, eceran);
+  });
+}, 0);
+
+}
+
+function nextPage() {
+  if (page >= totalPages) return;
+  page++;
+  loadHarga();
+}
+
+function prevPage() {
+  if (page <= 1) return;
+  page--;
+  loadHarga();
+}
+
+function updatePagination() {
+  document.getElementById("page-number").innerText = page;
+
+  document.querySelector("#pagination li:first-child")
+    .classList.toggle("disabled", page <= 1);
+
+  document.querySelector("#pagination li:last-child")
+    .classList.toggle("disabled", page >= totalPages);
+}
+
+function setupDropdown(inputId, dropdownId, table, idField, nameField, onSelect){
+  const input = document.getElementById(inputId);
+  const dd = document.getElementById(dropdownId);
+
+input.addEventListener("input", async () => {
+  const q = input.value.trim();
+  if (q.length < 2) {
+      dd.classList.remove("show");
+      return;
+  }
+
+  // ⛔ jika filter sudah aktif & user sedang menghapus → jangan munculkan dropdown
+  if ((inputId === "filter_merek" && filterMerekId) ||
+      (inputId === "filter_kategori" && filterKategoriId)) {
+
+    if (q.length < 2) {
+      dd.classList.remove("show");
+      return;
+    }
+  }
+
+  if (!q) {
+    dd.classList.remove("show");
+    return;
+  }
+
+  const { data } = await db
+    .from(table)
+    .select(`${idField}, ${nameField}`)
+    .ilike(nameField, `%${q}%`)
+    .limit(8);
+
+  if (!data?.length) {
+    dd.classList.remove("show");
+    return;
+  }
+
+  dd.innerHTML = data.map(r =>
+    `<div class="dropdown-item" data-id="${r[idField]}">${r[nameField]}</div>`
+  ).join("");
+
+  dd.classList.add("show");
+});
+
+  dd.addEventListener("click", e => {
+    const item = e.target.closest(".dropdown-item");
+    if (!item) return;
+
+    input.value = item.innerText;
+    dd.classList.remove("show");
+
+    onSelect(item.dataset.id);
+    updateFilterStyle(inputId, true); 
+  });
+}
+
+function commitHargaCell(td) {
+  // format rupiah
+  const raw = td.innerText.replace(/\D/g,"");
+  const val = toNum(raw);
+  td.innerText = fmt(val);
+
+  const tr = td.closest("tr");
+  if (!tr) return;
+
+  const hpp = toNum(tr.children[4].innerText);
+  const eceran = toNum(
+    tr.querySelector('[data-level="eceran"]')?.innerText
+  );
+
+  // update margin text
+  const marginCell = tr.children[8];
+  const m = hpp > 0 ? ((eceran - hpp) / hpp) * 100 : 0;
+  marginCell.innerText = m.toFixed(1) + "%";
+
+  // update warna
+  applyMarginStyle(tr, hpp, eceran);
+
+  // tandai berubah
+  td.classList.add("changed");
+}
+
+function selectAllContent(el) {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+
+// ================= FORMAT + TRACK CHANGE =================
+// 1️⃣ Saat mengetik: BIARKAN SAJA (JANGAN SET innerText)
+document.addEventListener("input", e => {
+  if(!e.target.matches("td[contenteditable]")) return;
+  e.target.classList.add("changed");
+});
+
+document.addEventListener("keydown", e => {
+  if (!e.target.matches("td[contenteditable]")) return;
+
+  if (e.key === "Enter") {
+    e.preventDefault();   // ⛔ cegah baris baru
+
+    const td = e.target;
+
+    commitHargaCell(td);
+
+    // opsional: blur supaya konsisten
+    td.blur();
+  }
+});
+
+
+document.addEventListener("blur", e => {
+  if(!e.target.matches("td[contenteditable]")) return;
+
+  // ===== FORMAT RUPIAH =====
+  const raw = e.target.innerText.replace(/\D/g,"");
+  const val = toNum(raw);
+  e.target.innerText = fmt(val);
+
+  // ===== AMBIL BARIS =====
+  const tr = e.target.closest("tr");
+  if (!tr) return;
+
+  const hpp = toNum(tr.children[4].innerText); // kolom HPP
+  const eceranCell = tr.querySelector('[data-level="eceran"]');
+  const eceran = toNum(eceranCell?.innerText);
+
+  const marginCell = tr.children[8]; 
+
+  // ===== UPDATE MARGIN =====
+  const m = hpp > 0 ? ((eceran - hpp) / hpp) * 100 : 0;
+  marginCell.innerText = m.toFixed(1) + "%";
+
+  // ===== RESET WARNA =====
+  eceranCell.classList.remove("text-danger","text-warning");
+  marginCell.classList.remove("text-danger", "text-muted", "text-warning");
+  eceranCell.title = "";
+
+  // 🔴 JUAL < HPP
+  if (eceran < hpp && hpp > 0) {
+    eceranCell.classList.add("text-danger");
+    eceranCell.title = "Harga jual di bawah HPP";
+
+  // 🟠 JUAL = HPP
+  } else if (eceran === hpp && hpp > 0) {
+    eceranCell.classList.add("text-warning");
+    eceranCell.title = "Harga jual sama dengan HPP (tidak ada margin)";
+  }
+
+  // 🔴 MARGIN < 0
+  if (m < 0) {
+    marginCell.classList.add("text-danger");
+  }
+
+}, true);
+
+// 3️⃣ Saat paste: hanya angka
+document.addEventListener("paste", e => {
+  if(!e.target.matches("td[contenteditable]")) return;
+
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData)
+    .getData("text")
+    .replace(/\D/g,"");
+
+  document.execCommand("insertText", false, text);
+});
+
+function norm(s){
+  return (s || "")
+    .toLowerCase()
+    .replace(/\u00a0/g, " ")   // NBSP dari CSV
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+document.getElementById("qProduk").addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    e.target.value = "";
+    page = 1;
+    loadHarga();
+    return;
+  }
+
+  if (e.key !== "Enter") return;
+  e.preventDefault();
+
+  page = 1;
+  loadHarga();
+});
+
+document.getElementById("filter_merek").addEventListener("input", e => {
+  if (e.target.value.trim() === "" && filterMerekId !== null) {
+    filterMerekId = null;
+    updateFilterStyle("filter_merek", false); // ⚪ NONAKTIF
+    page = 1;
+    loadHarga();
+  }
+});
+
+document.getElementById("filter_kategori").addEventListener("input", e => {
+  if (e.target.value.trim() === "" && filterKategoriId !== null) {
+    filterKategoriId = null;
+    updateFilterStyle("filter_kategori", false); // ⚪ NONAKTIF
+    page = 1;
+    loadHarga();
+  }
+});
+
+
+document.addEventListener("click", e => {
+  if (
+    !e.target.closest(".position-relative") &&
+    !e.target.closest(".dropdown")
+  ) {
+    document
+      .querySelectorAll(".dropdown-menu.show")
+      .forEach(dd => dd.classList.remove("show"));
+  }
+});
+
+
+["filter_merek", "filter_kategori"].forEach(id => {
+  const el = document.getElementById(id);
+
+  el.addEventListener("focus", () => {
+    if (el.value.trim() !== "") {
+      el.select();          // ✅ SELECT ALL
+    }
+  });
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.matches('td[contenteditable]')) return;
+
+  selectAllContent(e.target);
+});
+
+document.addEventListener("focus", e => {
+  if (!e.target.matches('td[contenteditable]')) return;
+
+  selectAllContent(e.target);
+}, true);
+
+
+
+
+
+// ================= SAVE =================
+async function simpanHarga(){
+  const rows=[];
+
+  document.querySelectorAll("td.changed").forEach(td=>{
+    const tr=td.closest("tr");
+    rows.push({
+      id_produk: tr.dataset.id,
+      level: td.dataset.level,
+      harga: toNum(td.innerText)
+    });
+  });
+
+  if(!rows.length){
+    alert("Tidak ada perubahan");
+    return;
+  }
+
+  const { error } = await db
+    .from("tb_harga_produk")
+    .upsert(rows,{
+      onConflict:"id_produk,level"
+    });
+
+  if(error){
+    alert("Gagal menyimpan");
+    console.error(error);
+    return;
+  }
+
+  document.querySelectorAll(".changed")
+    .forEach(td=>td.classList.remove("changed"));
+
+  alert("Harga berhasil disimpan");
+}
+
+// ================= INIT =================
+const quickQ = getQueryParam("q");
+
+if (quickQ) {
+  const input = document.getElementById("qProduk");
+  input.value = quickQ;
+
+  updateFilterStyle("qProduk", true); // 🟡 kuning lembut
+  page = 1;
+}
+
+loadHarga();
+setupDropdown(
+  "filter_merek",
+  "dd_filter_merek",
+  "tb_merek",
+  "id_merek",
+  "nama_merek",
+  id => {
+    filterMerekId = id;
+    page = 1;
+    loadHarga();
+  }
+);
+
+setupDropdown(
+  "filter_kategori",
+  "dd_filter_kategori",
+  "tb_kategori",
+  "id_kategori",
+  "nama_kategori",
+  id => {
+    filterKategoriId = id;
+    page = 1;
+    loadHarga();
+  }
+);
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #4d5061  !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.card-body {
+    padding-bottom: 10px !important;
+}
+
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+    <div id="wrapper">
+<!-- CONTENT -->
+  <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+  <div class="card shadow mb-4"> 
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <!-- JUDUL -->
+      <h6 class="m-0 font-weight-bold text-primary">Tambah Mitra</h6>
+      <!-- TOMBOL -->
+      <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="statusDropdownBtn" data-toggle="dropdown">Aktif</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#" onclick="setStatus(true); return false;">Aktif</a>
+                    <a class="dropdown-item" href="#" onclick="setStatus(false); return false;">Nonaktif</a>
+                </div>
+            </div>
+
+            <!-- INPUT TERSIMPAN (WAJIB ADA) -->
+            <input type="hidden" id="aktif" value="true" form="formMitra">
+
+            <button type="submit" form="formMitra" class="btn btn-primary btn-sm">Simpan</button>
+            <a href="h_mitra_tab.html" class="btn btn-secondary btn-sm">Kembali</a>
+      </div>
+    </div>
+    <div class="card-body">
+    <form id="formMitra">
+        <div class="row">
+            <!-- KOLUMEN 1 -->
+            <div class="col-md-4 form-horizontal">
+                <div class="form-group">
+                  <label>Kode</label>
+                  <input type="text" id="kode_mitra" class="form-control form-control-sm">
+                </div>
+                <div class="form-group">
+                  <label>Nama Mitra</label>
+                  <input type="text" id="nama_mitra" class="form-control form-control-sm" required>
+                </div>
+                <div class="form-group">
+                    <label>Jenis Mitra</label>
+                        <select id="jenis_mitra" class="form-control form-control-sm">
+                          <option value="customer">Customer</option>
+                          <option value="supplier">Supplier</option>
+                          <option value="both">Customer & Supplier</option>
+                        </select>
+                </div>
+                <div class="form-group">
+                <label>Grup Mitra</label>
+                    <select id="id_grup_mitra" class="form-control form-control-sm">
+                      <option value="">-- Pilih Grup --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Level Harga</label>
+                    <select id="level_harga" class="form-control form-control-sm">
+                      <option value="eceran">Eceran</option>
+                      <option value="grosir">Grosir</option>
+                      <option value="toko">Toko</option>
+                    </select>
+                </div>
+
+            </div>
+            <!-- KOLUMEN 2 -->
+            <div class="col-md-4 form-horizontal">
+                <div class="form-group">
+                    <label>No HP</label>
+                    <input type="text" id="no_hp" class="form-control form-control-sm">
+                </div>
+                <div class="form-group">
+                    <label>T. Pembelian</label>
+                    <select id="termin_pembelian" class="form-control form-control-sm">
+                      <option value="cash">Cash</option>
+                      <option value="credit">Credit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hari</label>
+                    <input type="number" id="tempo_pembelian" class="form-control form-control-sm" value="0">
+                </div>
+                <div class="form-group">
+                    <label>T. Penjualan</label>
+                    <select id="termin_penjualan" class="form-control form-control-sm">
+                      <option value="cash">Cash</option>
+                      <option value="credit">Credit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hari</label>
+                    <input type="number" id="tempo_penjualan" class="form-control form-control-sm" value="0">
+                </div>
+            </div>
+              <!-- KOLUMEN 3 -->
+            <div class="col-md-4 form-horizontal">
+                <div class="form-group">
+                    <label>Akun Piutang</label>
+                    <select id="akun_piutang" class="form-control form-control-sm"></select>
+                </div>
+                <div class="form-group">
+                    <label>Akun Hutang</label>
+                    <select id="akun_hutang" class="form-control form-control-sm"></select>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea id="alamat" class="form-control form-control-sm" placeholder="Alamat..."></textarea>
+                </div>
+            </div>
+    </form>
+  </div>
+</div>
+
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+// LOAD GRUP MITRA
+async function loadGrupMitra() {
+    const cache = sessionStorage.getItem("grup_mitra");
+    const dd = document.getElementById("id_grup_mitra");
+
+    if (cache) {
+        dd.innerHTML = cache;
+        return;
+    }
+
+    const { data } = await db
+        .from("tb_grup_mitra")
+        .select("id_grup_mitra, nama_grup")
+        .eq("aktif", true)
+        .order("nama_grup");
+
+    let html = `<option value="">-- Pilih Grup --</option>`;
+    data.forEach(g => {
+        html += `<option value="${g.id_grup_mitra}">${g.nama_grup}</option>`;
+    });
+
+    dd.innerHTML = html;
+    sessionStorage.setItem("grup_mitra", html);
+}
+
+function setStatus(isActive) {
+    const btn = document.getElementById("statusDropdownBtn");
+    const input = document.getElementById("aktif");
+
+    input.value = isActive ? "true" : "false";
+    btn.textContent = isActive ? "Aktif" : "Nonaktif";
+
+    btn.classList.remove("btn-success", "btn-danger");
+    btn.classList.add(isActive ? "btn-success" : "btn-danger");
+}
+
+// LOAD AKUN PIUTANG & HUTANG
+async function loadAkunMitra() {
+    const cache = sessionStorage.getItem("akun_mitra");
+    const ddPiutang = document.getElementById("akun_piutang");
+    const ddHutang  = document.getElementById("akun_hutang");
+
+    if (cache) {
+        const html = JSON.parse(cache);
+        ddPiutang.innerHTML = html.piutang;
+        ddHutang.innerHTML  = html.hutang;
+        ddPiutang.value = "120002";
+        ddHutang.value  = "210002";
+        return;
+    }
+
+    const { data } = await db
+        .from("tb_akun")
+        .select("kode_akun, nama_akun")
+        .order("kode_akun");
+
+    let piutangHTML = "";
+    let hutangHTML  = "";
+
+    data.forEach(a => {
+        const opt = `<option value="${a.kode_akun}">${a.kode_akun} - ${a.nama_akun}</option>`;
+        piutangHTML += opt;
+        hutangHTML  += opt;
+    });
+
+    ddPiutang.innerHTML = piutangHTML;
+    ddHutang.innerHTML  = hutangHTML;
+
+    sessionStorage.setItem("akun_mitra", JSON.stringify({
+        piutang: piutangHTML,
+        hutang: hutangHTML
+    }));
+
+    ddPiutang.value = "120002";
+    ddHutang.value  = "210002";
+}
+
+
+
+let isSubmitting = false;
+
+document.getElementById("formMitra").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!validateTerminTempo()) return; // 🔥 TAMBAH INI
+
+    if (isSubmitting) return;
+    isSubmitting = true;
+
+    const namaInput = document.getElementById("nama_mitra");
+    const nama = namaInput.value.trim();
+
+    // VALIDASI WAJIB
+    if (!nama) {
+        alert("❌ Nama mitra wajib diisi");
+        namaInput.focus();
+        isSubmitting = false;
+        return;
+    }
+
+    // VALIDASI DUPLIKAT (CASE-INSENSITIVE)
+    if (await isNamaMitraExist(nama)) {
+        alert(`❌ Nama mitra "${nama}" sudah terdaftar`);
+        namaInput.classList.add("input-error");
+        namaInput.focus();
+        isSubmitting = false;
+        return;
+    }
+
+    namaInput.classList.remove("input-error");
+
+
+    try {
+        const payload = {
+            kode_mitra: document.getElementById("kode_mitra").value.trim() || null,
+            nama_mitra: document.getElementById("nama_mitra").value.trim(),
+            jenis_mitra: document.getElementById("jenis_mitra").value,
+            id_grup_mitra: document.getElementById("id_grup_mitra").value || null,
+            level_harga: document.getElementById("level_harga").value,
+
+            termin_pembelian: document.getElementById("termin_pembelian").value,
+            tempo_pembelian: parseInt(document.getElementById("tempo_pembelian").value || 0),
+
+            termin_penjualan: document.getElementById("termin_penjualan").value,
+            tempo_penjualan: parseInt(document.getElementById("tempo_penjualan").value || 0),
+
+            akun_piutang: document.getElementById("akun_piutang").value,
+            akun_hutang: document.getElementById("akun_hutang").value,
+
+            no_hp: document.getElementById("no_hp").value.trim(),
+            alamat: document.getElementById("alamat").value.trim(),
+            aktif: document.getElementById("aktif").value === "true"
+        };
+        const { error } = await db.from("tb_mitra").insert([payload]);
+        if (error) throw error;
+
+        alert("✅ Mitra berhasil disimpan!");
+        localStorage.setItem("mitra_filter", "all");
+        localStorage.setItem("mitra_page", "1");
+Object.keys(sessionStorage)
+  .filter(k => k.startsWith("mitra:all:"))
+  .forEach(k => sessionStorage.removeItem(k));
+
+        resetFormMitra();
+    } catch (err) {
+        alert("❌ Gagal menyimpan mitra: " + err.message);
+    } finally {
+        isSubmitting = false;
+    }
+});
+
+async function generateKodeMitra() {
+    const { data, error } = await db.rpc("gen_kode_mitra");
+
+    if (error) {
+        console.error("Gagal generate kode mitra:", error);
+        return;
+    }
+
+    document.getElementById("kode_mitra").value = data;  // tampilkan ke input
+}
+
+
+// ==========================
+// LOGIKA TERMIN PEMBELIAN
+// ==========================
+document.getElementById("termin_pembelian").addEventListener("change", function () {
+    const tempo = document.getElementById("tempo_pembelian");
+
+    if (this.value === "cash") {
+        tempo.value = 0;
+        tempo.disabled = true;
+    } else {
+        tempo.disabled = false;
+        tempo.value = 30;
+        tempo.focus();
+        tempo.select();
+    }
+});
+
+
+// ==========================
+// LOGIKA TERMIN PENJUALAN
+// ==========================
+document.getElementById("termin_penjualan").addEventListener("change", function () {
+    const tempo = document.getElementById("tempo_penjualan");
+
+    if (this.value === "cash") {
+        tempo.value = 0;
+        tempo.disabled = true;
+    } else {
+        tempo.disabled = false;
+        tempo.value = 30;
+        tempo.focus();
+        tempo.select();
+    }
+});
+
+// ==========================
+// SET DEFAULT SAAT HALAMAN DIBUKA
+// ==========================
+function initTempoTermin() {
+    // pembelian
+    const terminB = document.getElementById("termin_pembelian");
+    const tempoB  = document.getElementById("tempo_pembelian");
+
+    if (terminB.value === "cash") {
+        tempoB.value = 0;
+        tempoB.disabled = true;
+    }
+
+    // penjualan
+    const terminJ = document.getElementById("termin_penjualan");
+    const tempoJ  = document.getElementById("tempo_penjualan");
+
+    if (terminJ.value === "cash") {
+        tempoJ.value = 0;
+        tempoJ.disabled = true;
+    }
+}
+
+// ==========================================
+// VALIDASI TERMIN & TEMPO (ADD & EDIT)
+// ==========================================
+function validateTerminTempo() {
+
+    // PEMBELIAN
+    if (termin_pembelian.value === "credit") {
+        const v = +tempo_pembelian.value || 0;
+        if (v <= 0) {
+            alert("Tempo pembelian wajib diisi jika termin Credit");
+            tempo_pembelian.disabled = false;
+            tempo_pembelian.focus();
+            tempo_pembelian.select();
+            return false;
+        }
+    } else {
+        
+    }
+
+    // PENJUALAN
+    if (termin_penjualan.value === "credit") {
+        const v = +tempo_penjualan.value || 0;
+        if (v <= 0) {
+            alert("Tempo penjualan wajib diisi jika termin Credit");
+            tempo_penjualan.disabled = false;
+            tempo_penjualan.focus();
+            tempo_penjualan.select();
+            return false;
+        }
+    } else {
+        
+    }
+
+    return true;
+}
+
+
+const urlParams = new URLSearchParams(window.location.search);
+const jenis = urlParams.get("jenis");
+
+if (jenis) {
+    const jenisSelect = document.getElementById("jenis_mitra");
+    jenisSelect.value = jenis; // set otomatis
+
+    // Jika supplier → default termin pembelian = credit, dll (optional)
+    // bisa tambahkan logika tambahan di sini sesuai kebutuhan
+}
+
+(function () {
+    const form = document.getElementById("formMitra");
+
+    function getFocusable() {
+        return Array.from(
+            form.querySelectorAll(
+                "input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled])"
+            )
+        );
+    }
+
+form.addEventListener("keydown", function (e) {
+    // JIKA CTRL + ENTER → BIARKAN GLOBAL HANDLER
+    if (e.ctrlKey && e.key === "Enter") {
+        return; // ⛔ jangan lanjut navigasi
+    }
+
+    if (e.key !== "Enter") return;
+
+    const focusable = getFocusable();
+    const index = focusable.indexOf(e.target);
+    if (index === -1) return;
+
+    // TEXTAREA: Enter normal
+    if (e.target.tagName === "TEXTAREA") return;
+
+    e.preventDefault();
+
+    // SHIFT + ENTER → KEMBALI
+    if (e.shiftKey) {
+        const prev = focusable[index - 1];
+        if (prev) {
+            prev.focus();
+            prev.select?.();
+        }
+        return;
+    }
+
+    // ENTER → LANJUT
+    const next = focusable[index + 1];
+    if (next) {
+        next.focus();
+        next.select?.();
+    }
+});
+})();
+
+document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "Enter") {
+        const openDropdown = document.querySelector('.dropdown-menu.show');
+        if (openDropdown) return; // jangan submit saat pilih menu
+        const form = document.getElementById("formMitra");
+        if (form) {
+            e.preventDefault();
+            form.requestSubmit();
+        }
+    }
+});
+
+function resetFormMitra() {
+    const form = document.getElementById("formMitra");
+
+    // reset input native
+    form.reset();
+
+    // reset status dropdown
+    setStatus(true);
+
+    // reset termin (biar disabled benar)
+    initTempoTermin();
+
+    // regenerate kode mitra
+    generateKodeMitra();
+
+    // fokus ulang
+    document.getElementById("nama_mitra").focus();
+}
+
+async function isNamaMitraExist(nama) {
+    const namaNorm = nama.trim();
+
+    if (!namaNorm) return false;
+
+    const { data, error } = await db
+        .from("tb_mitra")
+        .select("id_mitra")
+        .ilike("nama_mitra", namaNorm) // case-insensitive
+        .limit(1);
+
+    if (error) {
+        console.error("Cek duplikat gagal:", error);
+        return false;
+    }
+
+    return data.length > 0;
+}
+(async function initPage() {
+    document.getElementById("nama_mitra").focus();
+
+    // Query Supabase paralel
+    await Promise.all([
+        loadGrupMitra(),
+        loadAkunMitra()
+    ]);
+
+    // RPC paling akhir
+    generateKodeMitra();
+
+    // Setup default
+    initTempoTermin();
+    setStatus(true);
+
+    // Fokus input
+    
+})();
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.table thead th {
+    background: linear-gradient(to bottom, #f5f5f5, #ededee);
+    color: #7789bf;
+    font-weight: 600;
+    border-bottom: 2px solid #ffffff;
+}
+.card-body {
+    padding-bottom: 0 !important;
+}
+.card-body nav {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* HANYA BARIS DATA (ISI TABEL) */
+.table-tight tbody td {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    line-height: 1.15;
+    vertical-align: middle;
+}
+.action-icon {
+    cursor: pointer;
+    padding: 2px;
+}
+tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+<div id="wrapper">
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+    <div class="card shadow mb-4"> 
+      <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
+          <h6 class="m-0 font-weight-bold text-primary">Mitra Grup</h6>
+          <span id="offlineBadge" class="badge badge-warning d-none">Offline</span>
+          <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" style="width: 80px; text-align: left;" type="button" id="filterStatusBtn" data-toggle="dropdown">Semua</button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#" onclick="setFilterStatus('all')">Semua</a>
+                        <a class="dropdown-item" href="#" onclick="setFilterStatus('active')">Aktif</a>
+                        <a class="dropdown-item" href="#" onclick="setFilterStatus('nonactive')">Nonaktif</a>
+                    </div>
+                </div>
+              <input type="text" id="cari_grup_mitra" class="form-control form-control-sm" placeholder="Cari Mitra Grup..." style="max-width: 200px;">
+              <div class="dropdown">
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">Tambah</button>
+                  <div class="dropdown-menu shadow border-0" aria-labelledby="dropdownTambahHeader">
+                      <a class="dropdown-item" href="h_mitra_add.html?jenis=customer">Customer</a>
+                      <a class="dropdown-item" href="h_mitra_add.html?jenis=supplier">Supplier</a>
+                      <a class="dropdown-item" href="h_mitra_grup_add.html">Mitra Grup</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <table class="table table-hover table-sm table-bordered table-tight">
+            <thead>
+                <tr>
+                    <th>Nama Grup</th>
+                    <th width="50px">Aktif</th>
+                    <th width="100px" style="text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyData"></tbody>
+        </table>
+        <nav>
+          <ul class="pagination justify-content-center" id="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" onclick="prevPage()">&laquo;</a>
+          </li>
+
+          <li class="page-item disabled">
+              <a class="page-link" href="#">
+                Halaman <span id="page-number">1</span>
+            </a>
+        </li>
+
+        <li class="page-item">
+          <a class="page-link" href="#" onclick="nextPage()">&raquo;</a>
+      </li>
+  </ul>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+/* ===============================
+   KONFIGURASI
+================================ */
+const perPage = 10;
+let page = 1;
+let totalPages = 1;
+let lastCount = 0;
+let filterStatus = "all"; // all | active | nonactive
+let allGrup = [];
+
+/* ===============================
+   CACHE
+================================ */
+function clearCacheGrup() {
+    localStorage.removeItem("cache_grup_mitra_all");
+}
+
+/* ===============================
+   FILTER STATUS
+================================ */
+function setFilterStatus(status) {
+    filterStatus = status;
+    page = 1;
+
+    const label =
+        status === "active" ? "Aktif" :
+        status === "nonactive" ? "Nonaktif" :
+        "Semua";
+
+    document.getElementById("filterStatusBtn").innerText = label;
+    loadGrup();
+}
+
+/* ===============================
+   LOAD DATA (CACHE → DB)
+================================ */
+async function loadGrup() {
+
+    const q = document.getElementById("cari_grup_mitra")
+        .value.trim().toLowerCase();
+
+    // 1️⃣ LOAD CACHE INSTAN
+    const cache = localStorage.getItem("cache_grup_mitra_all");
+    if (cache) {
+        allGrup = JSON.parse(cache);
+        applyFilterGrup(q);
+
+        if (!navigator.onLine) return;
+    }
+
+    // 2️⃣ FETCH DB
+    const { data, error } = await db
+        .from("tb_grup_mitra")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    allGrup = data;
+    localStorage.setItem("cache_grup_mitra_all", JSON.stringify(data));
+    applyFilterGrup(q);
+}
+
+/* ===============================
+   APPLY FILTER + PAGINATION
+================================ */
+function applyFilterGrup(q) {
+
+    let result = allGrup;
+
+    // filter status
+    if (filterStatus === "active") {
+        result = result.filter(r => r.aktif === true);
+    } else if (filterStatus === "nonactive") {
+        result = result.filter(r => r.aktif === false);
+    }
+
+    // search
+    if (q) {
+        result = result.filter(r =>
+            (r.nama_grup || "").toLowerCase().includes(q) ||
+            (r.keterangan || "").toLowerCase().includes(q)
+        );
+    }
+
+    // pagination
+    lastCount = result.length;
+    totalPages = Math.ceil(lastCount / perPage) || 1;
+
+    if (page > totalPages) page = totalPages;
+    if (page < 1) page = 1;
+
+    const start = (page - 1) * perPage;
+    const end   = start + perPage;
+
+    renderGrup(result.slice(start, end));
+    updatePagination();
+}
+
+/* ===============================
+   RENDER TABEL
+================================ */
+function renderGrup(list) {
+    const tbody = document.getElementById("tbodyData");
+
+    if (!list.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center text-muted py-3">
+                    Tidak ada data
+                </td>
+            </tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(g => `
+      <tr class="barisdata">
+        <td>${g.nama_grup}</td>
+
+        <!-- STATUS AKTIF -->
+        <td class="text-center ${g.aktif ? 'text-primary' : 'text-danger'}"
+            title="${g.aktif ? 'Aktif' : 'Nonaktif'}">
+          ${g.aktif ? ICON_CHECK : ICON_SILANG}
+        </td>
+
+        <!-- AKSI -->
+        <td class="text-center">
+          <span class="action-icon text-dark mr-2"
+                title="Edit"
+                onclick="goEdit('${g.id_grup_mitra}')">
+            ${ICON_EDIT}
+          </span>
+
+          <span class="action-icon text-dark"
+                title="Hapus"
+                onclick="hapusGrup('${g.id_grup_mitra}')">
+            ${ICON_DELETE}
+          </span>
+        </td>
+      </tr>
+    `).join("");
+
+}
+
+/* ===============================
+   PAGINATION
+================================ */
+function nextPage() {
+    if (page >= totalPages) return;
+    page++;
+    applyFilterGrup(
+        document.getElementById("cari_grup_mitra").value.trim().toLowerCase()
+    );
+}
+
+function prevPage() {
+    if (page <= 1) return;
+    page--;
+    applyFilterGrup(
+        document.getElementById("cari_grup_mitra").value.trim().toLowerCase()
+    );
+}
+
+function updatePagination() {
+    document.getElementById("page-number").innerText = page;
+
+    document.querySelector("#pagination li:first-child")
+        .classList.toggle("disabled", page <= 1);
+
+    document.querySelector("#pagination li:last-child")
+        .classList.toggle("disabled", page >= totalPages);
+}
+
+/* ===============================
+   DELETE (SOFT)
+================================ */
+async function hapusGrup(id) {
+    if (!confirm("Nonaktifkan grup ini?")) return;
+
+    const { error } = await db
+        .from("tb_grup_mitra")
+        .update({ aktif: false })
+        .eq("id_grup_mitra", id);
+
+    if (error) {
+        alert("Gagal menonaktifkan grup");
+        return;
+    }
+
+    clearCacheGrup(); // 🔥 penting
+    loadGrup();
+}
+
+/* ===============================
+   NAVIGASI
+================================ */
+function goEdit(id) {
+    location.href = "h_mitra_grup_edit.html?id=" + id;
+}
+
+/* ===============================
+   EVENT
+================================ */
+document.getElementById("cari_grup_mitra")
+    .addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            page = 1;
+            loadGrup();
+        }
+    });
+
+/* ===============================
+   INIT
+================================ */
+loadGrup();
+</script>
+
+</body>
+</html>

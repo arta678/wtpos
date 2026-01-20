@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+
+/* ================== DROPDOWN AUTOCOMPLETE ================== */
+.dropdown-menu.show {
+  display: block;
+  max-height: 200px;
+  overflow-y: auto;
+  cursor: pointer;
+}
+
+.dropdown-item.active-highlight {
+  background-color: #4d5061 !important;
+  color: #fff !important;
+}
+
+/* dropdown supplier mengikuti lebar input */
+#dropdown_supplier {
+  left: 0 !important;
+  right: 0 !important;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ================== VALIDASI ================== */
+.input-error {
+  border: 1px solid #dc3545 !important;
+  box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+
+/* ================== TABEL ================== */
+#tbl input.form-control-sm,
+#tbl select.form-control-sm {
+  border-radius: 7px !important;
+}
+
+/* ================== SHORTCUT MENU ================== */
+.shortcut-menu {
+  gap: 10px;
+  margin-top: 45px !important;
+}
+
+.shortcut-item {
+  width: 55px;
+  text-align: center;
+  text-decoration: none !important;
+}
+
+.shortcut-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #444;
+}
+
+/* ================== LAYOUT ================== */
+.gap-2 > * {
+  margin-left: 6px;
+}
+
+.card-body {
+  padding-bottom: 10px !important;
+}
+
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+    <div id="wrapper">
+<!-- CONTENT -->
+  <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+  <div class="card shadow mb-4"> 
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <!-- JUDUL -->
+      <h6 class="m-0 font-weight-bold text-primary">Tambah Pembayaran</h6>
+        <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-sm btn-primary" onclick="simpanPembayaran()">Simpan</button>
+            <a href="h_pembelian_tab.html" class="btn btn-secondary btn-sm">Kembali</a>
+        </div>
+    </div>
+    <div class="card-body">
+          <form id="form">
+            <div class="form-row">
+              <div>
+                <!-- <small>Kode</small> -->
+                <input type="hidden" id="kode">
+              </div>
+              <div class="col-md-2 mb-2">
+                <!-- <small>Tanggal</small> -->
+                <input type="date" id="tanggal" class="form-control form-control-sm">
+              </div>
+
+              <div class="col-md-3 mb-2 position-relative">
+                <input type="text" id="supplier" class="form-control form-control-sm" placeholder="Cari Supplier...">
+                <div id="dropdown_supplier" class="dropdown-menu w-100"></div>
+                <input type="hidden" id="id_supplier">
+              </div>
+
+
+              <div class="col-md-6 mb-2">
+              <button type="button" class="btn btn-sm btn-primary" id="btnPilihHutang" disabled onclick="openPopupHutang()">Pilih Hutang</button>
+                <button type="button" class="btn btn-sm btn-secondary">Pilih Akun</button>
+                <button type="button" class="btn btn-sm btn-secondary">Pilih Retur</button>
+                <button type="button" class="btn btn-sm btn-secondary">Pilih FCN</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="tambahKas()">Metode Bayar</button>
+              </div>
+            </div>
+            <div class="table-responsive mt-2">
+              <table class="table table-sm  table-borderless" id="tbl">
+                <thead class="table-secondary">
+                   <tr>
+                    <th width="20"></th>
+                    <th>No Pembelian</th>
+                    <th>Tipe</th>
+                    <th width="150px">Tanggal</th>
+                    <th width="150px">Jatuh Tempo</th>
+                    <th width="50%">Jumlah Bayar</th>
+                  </tr>
+                </thead>
+                <tbody id="tbBayar"></tbody>
+              </table>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-9">
+
+              </div>
+              <div class="col-md-3">
+                <table class="table table-borderless table-sm">
+                  <tbody>
+                    <tr>
+                      <td class="text-right">Total Bayar</td>
+                      <td class="text-right" id="totalBayar">0</td>
+                    </tr>
+                    <tr>
+                      <td class="text-right small" width="120px">
+                        <select class="form-control form-control-sm akun-kas" id="kas_default"></select>
+                      </td>
+                      <td>
+                        <input class="form-control form-control-sm text-right font-weight-bold" value="0" id="jumlah_bayar" type="text">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="p-0">
+                        <table class="table table-sm table-borderless mb-0">
+                          <tbody id="tbKas"></tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-right font-weight-bold">Sisa</td>
+                      <td class="text-right font-weight-bold" id="sisaHutang">0</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </form>
+      </div>
+    </div>
+<!-- ================ MODAL PILIH HUTANG ================= -->
+<div class="modal" id="modalHutang">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<div class="modal-header">
+  <h6 class="modal-title">Pilih Hutang</h6>
+</div>
+
+<div class="modal-body">
+<table class="table table-sm table-bordered">
+<thead class="thead-light">
+<tr>
+  <th class="text-right" width="120px">No Pembelian</th>
+  <th class="text-right">Tanggal</th>
+  <th class="text-right">Jatuh Tempo</th>
+  <th class="text-right">Total</th>
+  <th class="text-right">Terbayar</th>
+  <th class="text-right">Sisa</th>
+  <th></th>
+</tr>
+</thead>
+<tbody id="tbHutang"></tbody>
+</table>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary btn-sm" onclick="ambilHutang()">Pilih</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script src="js/setting_akun.js"></script>
+<script>
+// ================== HELPER ==================
+function fmt(n){
+  return (n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+function toNum(s){
+  return parseFloat((s||"").toString().replace(/\./g,'')) || 0;
+}
+// ================== AUTO LOAD SUPPLIER DARI URL ==================
+let MODE_AUTO = false;
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(location.search);
+  const idMitra = params.get("id_mitra");
+  const autoHutang = params.get("auto_hutang");
+
+  if (!idMitra) return;
+
+  // 1️⃣ Ambil supplier
+  const { data: sup } = await db
+    .from("tb_mitra")
+    .select("id_mitra, nama_mitra")
+    .eq("id_mitra", idMitra)
+    .single();
+
+  if (!sup) return;
+
+  supplier.value = sup.nama_mitra;
+  id_supplier.value = sup.id_mitra;
+  btnPilihHutang.disabled = false;
+  if (autoHutang && autoHutang !== "undefined") {
+    MODE_AUTO = true;
+    await new Promise(r => requestAnimationFrame(r));
+    await ambilHutangLangsung(autoHutang);
+  }
+  else {
+    openPopupHutang();
+  }
+});
+
+async function ambilHutangLangsung(idHutang){
+  const { data: h } = await db
+    .from("tb_hutang")
+    .select(`
+      id_hutang,
+      total,
+      sisa,
+      jatuh_tempo,
+      tb_pembelian:id_pembelian (
+        kode_pembelian,
+        tanggal
+      )
+    `)
+    .eq("id_hutang", idHutang)
+    .single();
+
+  if (!h || !h.tb_pembelian) return;
+
+  tbBayar.innerHTML = `
+    <tr>
+      <td class="text-center">
+        <span class="action-icon text-dark"
+              onclick="this.closest('tr').remove(); hitungTotal()">
+          ${ICON_SILANG}
+        </span>
+      </td>
+      <td>${h.tb_pembelian.kode_pembelian}</td>
+      <td>Hutang</td>
+      <td>${h.tb_pembelian.tanggal}</td>
+      <td>${h.jatuh_tempo || "-"}</td>
+      <td>
+        <input class="form-control form-control-sm text-right bayar"
+               data-id="${h.id_hutang}"
+               data-max="${h.sisa}"
+               value="${fmt(h.sisa)}">
+      </td>
+    </tr>
+  `;
+
+  const input = tbBayar.querySelector(".bayar");
+  formatRupiahInput(input);
+  hitungTotal();
+}
+
+
+// ================== STATE ==================
+const DEFAULT_KASBANK_KODE = "KS01"; // samakan dengan pembelian
+let kasbankMap = {};    // id_kasbank => kode_akun
+let kasbankLoaded = false;
+let kasbankList = [];  // simpan data kasbank (optional)
+// let timerSupplier;
+let supplierItems = [];
+let supplierIndex = -1;
+let timerSupplier = null;
+
+// ================== AUTOCOMPLETE SUPPLIER ==================
+supplier.addEventListener("input", () => {
+  clearTimeout(timerSupplier);
+  supplierIndex = -1;
+
+  const q = supplier.value.trim();
+  if (q.length < 2) {
+    dropdown_supplier.classList.remove("show");
+    return;
+  }
+
+  timerSupplier = setTimeout(loadSupplier, 250);
+});
+
+async function loadSupplier() {
+  const q = supplier.value.trim();
+
+  const { data, error } = await db
+    .from("tb_mitra")
+    .select("id_mitra, nama_mitra")
+    .ilike("nama_mitra", `%${q}%`)
+    .eq("aktif", true)
+    .limit(20);
+
+  dropdown_supplier.innerHTML = "";
+  supplierItems = [];
+  supplierIndex = -1;
+
+  if (error || !data || !data.length) {
+    dropdown_supplier.innerHTML =
+      `<div class="dropdown-item text-muted">Tidak ada</div>`;
+    dropdown_supplier.classList.add("show");
+    return;
+  }
+
+  data.forEach(m => {
+    const a = document.createElement("a");
+    a.className = "dropdown-item";
+    a.href = "#";
+    a.textContent = m.nama_mitra;
+
+    a.onclick = e => {
+      e.preventDefault();
+      pilihSupplier(m.id_mitra, m.nama_mitra);
+    };
+
+    dropdown_supplier.appendChild(a);
+  });
+
+  supplierItems = Array.from(
+    dropdown_supplier.querySelectorAll(".dropdown-item")
+  );
+
+  dropdown_supplier.classList.add("show");
+}
+
+supplier.addEventListener("keydown", e => {
+  if (!dropdown_supplier.classList.contains("show")) return;
+  if (!supplierItems.length) return;
+
+  if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (e.key === "ArrowDown") {
+    supplierIndex = (supplierIndex + 1) % supplierItems.length;
+    updateSupplierHighlight();
+  }
+
+  if (e.key === "ArrowUp") {
+    supplierIndex =
+      (supplierIndex - 1 + supplierItems.length) % supplierItems.length;
+    updateSupplierHighlight();
+  }
+
+  if (e.key === "Enter" && supplierIndex >= 0) {
+    supplierItems[supplierIndex].click();
+  }
+
+  if (e.key === "Escape") {
+  dropdown_supplier.classList.remove("show");
+  supplierIndex = -1;
+}
+});
+
+function updateSupplierHighlight() {
+  supplierItems.forEach(el =>
+    el.classList.remove("active-highlight")
+  );
+
+  if (supplierIndex >= 0 && supplierItems[supplierIndex]) {
+    const el = supplierItems[supplierIndex];
+    el.classList.add("active-highlight");
+    el.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function pilihSupplier(id, nama) {
+  supplier.value = nama;
+  id_supplier.value = id;
+  dropdown_supplier.classList.remove("show");
+  btnPilihHutang.disabled = false;
+
+  tbBayar.innerHTML = "";
+  tbKas.innerHTML = "";
+  totalBayar.innerText = "0";
+
+  if (!MODE_AUTO) {
+    openPopupHutang();
+  }
+}
+
+
+document.addEventListener("click", e=>{
+  if (!supplier.contains(e.target) &&
+      !dropdown_supplier.contains(e.target)) {
+    dropdown_supplier.classList.remove("show");
+  }
+});
+
+function totalKas(){
+  let total = 0;
+
+  // kas default (kas utama)
+  const def = toNum(jumlah_bayar.value);
+  if (def > 0) total += def;
+
+  // kas tambahan (HANYA dari tbKas)
+  document.querySelectorAll("#tbKas .kas").forEach(i=>{
+    total += toNum(i.value);
+  });
+
+  return total;
+}
+
+document.addEventListener("DOMContentLoaded", loadSettingAkun);
+async function simpanPembayaran() {
+  try {
+    // ================= VALIDASI =================
+    if (!settingReady) {
+      alert("Setting akun belum siap");
+      return;
+    }
+
+    if (!SETTING_AKUN.hutang_beli) {
+      alert("Setting akun hutang usaha belum diatur");
+      return;
+    }
+
+    if (!id_supplier.value) {
+      alert("Supplier belum dipilih");
+      return;
+    }
+
+    const bayarInputs = document.querySelectorAll(".bayar");
+    if (!bayarInputs.length) {
+      alert("Belum ada hutang yang dibayar");
+      return;
+    }
+
+    if (adaKasBelumDipilih()) {
+      alert("Masih ada kas / bank yang belum dipilih");
+      return;
+    }
+
+    const totalBayarVal = toNum(
+      document.getElementById("totalBayar").innerText
+    );
+    const totalKasVal = totalKas();
+
+    if (totalKasVal <= 0) {
+      alert("Jumlah pembayaran belum diisi");
+      return;
+    }
+
+    if (totalKasVal !== totalBayarVal) {
+      alert("Total kas harus sama dengan total bayar");
+      return;
+    }
+
+    const tgl = tanggal.value;
+    const kasDetail = getKasDetail();
+    const namaSupplier = supplier.value.trim();
+    const totalText = fmt(totalBayarVal);
+
+    // ================= 1. INSERT JURNAL =================
+    const keteranganJurnal = `Pembayaran ${namaSupplier} : ${totalText}`;
+    const { data: jurnal, error: errJurnal } = await db
+      .from("tb_jurnal")
+      .insert({
+        tanggal: tgl,
+        sumber: "supplier",
+        id_source: id_supplier.value,
+        keterangan: keteranganJurnal
+      })
+      .select()
+      .single();
+
+    if (errJurnal) throw errJurnal;
+
+    // ================= 2. JURNAL DETAIL =================
+    const jurnalDetail = [];
+
+    // DEBIT : HUTANG USAHA
+    jurnalDetail.push({
+      id_jurnal: jurnal.id_jurnal,
+      kode_akun: SETTING_AKUN.hutang_beli,
+      debit: totalKasVal,
+      kredit: 0,
+      keterangan: "Pembayaran hutang"
+    });
+
+    // KREDIT : KAS / BANK
+    kasDetail.forEach(k => {
+      jurnalDetail.push({
+        id_jurnal: jurnal.id_jurnal,
+        kode_akun: k.kode_akun,
+        debit: 0,
+        kredit: k.jumlah,
+        keterangan: "Pembayaran hutang"
+      });
+    });
+
+    const { error: errDetail } = await db
+      .from("tb_jurnal_detail")
+      .insert(jurnalDetail);
+
+    if (errDetail) throw errDetail;
+
+    // ================= 3. BAYAR HUTANG =================
+    const bayarRows = [];
+
+    bayarInputs.forEach(input => {
+      const jumlah = toNum(input.value);
+      if (jumlah <= 0) return;
+
+      bayarRows.push({
+        id_hutang: input.dataset.id,
+        tanggal: tgl,
+        jumlah: jumlah
+      });
+    });
+
+    const { error: errBayar } = await db
+      .from("tb_hutang_bayar")
+      .insert(bayarRows);
+
+    if (errBayar) throw errBayar;
+
+    // ================= 4. UPDATE SISA HUTANG =================
+    for (const input of bayarInputs) {
+      const idHutang = input.dataset.id;
+      const bayar = toNum(input.value);
+
+      const { data: hutang, error } = await db
+        .from("tb_hutang")
+        .select("total, sisa")
+        .eq("id_hutang", idHutang)
+        .single();
+
+      if (error) throw error;
+
+      const sisaBaru = hutang.sisa - bayar;
+
+      await db
+        .from("tb_hutang")
+        .update({
+          sisa: sisaBaru,
+          status: sisaBaru <= 0 ? "lunas" : "open"
+        })
+        .eq("id_hutang", idHutang);
+    }
+    // ================= 5. INSERT MUTASI KAS / BANK =================
+    for (const k of kasDetail) {
+
+      // ambil kode kasbank dari id
+      const { data: kb, error: kbErr } = await db
+        .from("tb_kasbank")
+        .select("kode")
+        .eq("id_kasbank", k.id_kasbank)
+        .single();
+
+      if (kbErr || !kb) {
+        throw new Error("Kas / Bank tidak valid");
+      }
+
+      await db.from("tb_kasbank_mutasi").insert([{
+        tanggal: tgl,
+        kode_kasbank: kb.kode,
+        jenis: "kredit",                // uang keluar
+        jumlah: k.jumlah,
+        keterangan: `Pembayaran hutang ${namaSupplier}`,
+        ref_tabel: "tb_hutang_bayar",
+        ref_id: jurnal.id_jurnal        // atau bisa id_source lain
+      }]);
+    }
+
+    // ================= SELESAI =================
+    alert("Pembayaran hutang berhasil disimpan");
+    location.href = "h_pembelian_tab.html";
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal menyimpan pembayaran hutang");
+  }
+}
+
+// ================== POPUP HUTANG ==================
+async function openPopupHutang() {
+  tbHutang.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
+
+  const { data, error } = await db
+    .from("tb_hutang")
+    .select(`
+      id_hutang,
+      total,
+      sisa,
+      jatuh_tempo,
+      tb_pembelian:id_pembelian (
+        kode_pembelian,
+        tanggal
+      )
+    `)
+    .eq("status", "open")
+    .eq("id_mitra", id_supplier.value);
+
+if (error || !data || !data.length) {
+  tbHutang.innerHTML = `
+    <tr>
+      <td colspan="7" class="text-center text-muted py-4">
+        ✅ Supplier ini tidak memiliki hutang
+      </td>
+    </tr>
+  `;
+
+  $("#modalHutang").modal("show");
+  return;
+}
+
+
+  tbHutang.innerHTML = "";
+
+  data.forEach(h => {
+    // SAFETY CHECK (optional tapi bagus)
+    if (!h.tb_pembelian) return;
+
+    tbHutang.innerHTML += `
+      <tr>
+        <td class="text-right">${h.tb_pembelian.kode_pembelian}</td>
+        <td class="text-right">${h.tb_pembelian.tanggal}</td>
+        <td class="text-right">${h.jatuh_tempo || "-"}</td>
+        <td class="text-right">${fmt(h.total)}</td>
+        <td class="text-right">${fmt(h.total - h.sisa)}</td>
+        <td class="text-right text-danger">${fmt(h.sisa)}</td>
+        <td class="text-center">
+          <input type="checkbox"
+            data-id_hutang="${h.id_hutang}"
+            data-sisa="${h.sisa}"
+            data-kode="${h.tb_pembelian.kode_pembelian}"
+            data-tanggal="${h.tb_pembelian.tanggal}"
+            data-jatuh_tempo="${h.jatuh_tempo}">
+        </td>
+      </tr>
+    `;
+  });
+
+  $("#modalHutang").modal("show");
+}
+
+function ambilHutang() {
+  document.querySelectorAll("#tbHutang input:checked").forEach(c => {
+    if (document.querySelector(`.bayar[data-id="${c.dataset.id_hutang}"]`)) return;
+
+    tbBayar.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td class="text-center">
+          <span class="action-icon text-dark"
+                title="Hapus"
+                onclick="this.closest('tr').remove(); hitungTotal()">
+            ${ICON_SILANG}
+          </span>
+        </td>
+        <td>${c.dataset.kode}</td>
+        <td>Hutang</td>
+        <td>${c.dataset.tanggal}</td>
+        <td>${c.dataset.jatuh_tempo || "-"}</td>
+        <td>
+          <input class="form-control form-control-sm text-right bayar"
+                 data-id="${c.dataset.id_hutang}"
+                 data-max="${c.dataset.sisa}"
+                 value="${fmt(c.dataset.sisa)}">
+        </td>
+      </tr>
+    `);
+
+    const lastBayar = tbBayar.querySelector("tr:last-child .bayar");
+    formatRupiahInput(lastBayar);
+  });
+
+  $("#modalHutang").modal("hide");
+  hitungTotal();
+}
+
+
+// ================== TOTAL ==================
+function hitungTotal(){
+  let totalHutang = 0;
+
+  document.querySelectorAll(".bayar").forEach(i=>{
+    totalHutang += toNum(i.value);
+  });
+
+  // tampilkan total hutang
+  totalBayar.innerText = fmt(totalHutang);
+
+  // 🔥 AUTO ISI KAS UTAMA (TAPI TETAP BISA DIEDIT)
+  if (!jumlah_bayar.dataset.manual) {
+    jumlah_bayar.value = fmt(totalHutang);
+  }
+
+  hitungSisaHutang();
+}
+
+document.addEventListener("input", e=>{
+  if(e.target.classList.contains("bayar")){
+    const max = toNum(e.target.dataset.max);
+    const val = toNum(e.target.value);
+
+    if (val > max) {
+      e.target.value = fmt(max);
+    }
+
+    hitungTotal();
+  }
+});
+
+async function loadKasBank(){
+  if (kasbankLoaded) return;
+  kasbankLoaded = true;
+
+  const { data, error } = await db
+    .from("tb_kasbank")
+    .select("id_kasbank, kode, nama_rekening, kode_akun")
+    .eq("aktif", true)
+    .order("nama_rekening");
+
+  if (error) {
+    alert("Gagal load kas/bank");
+    return;
+  }
+
+  kasbankList = data || [];
+  kasbankMap = {};
+
+  kasbankList.forEach(k => {
+    kasbankMap[k.id_kasbank] = k.kode_akun;
+  });
+
+  // isi kas default
+  const sel = document.getElementById("kas_default");
+  sel.innerHTML = `<option value="">Pilih Kas / Bank</option>`;
+  kasbankList.forEach(k=>{
+    sel.innerHTML += `<option value="${k.id_kasbank}">${k.nama_rekening}</option>`;
+  });
+
+  // auto pilih kas utama
+  const def = kasbankList.find(k => k.kode === DEFAULT_KASBANK_KODE);
+  if (def) sel.value = def.id_kasbank;
+}
+
+// ================== KAS ========
+function tambahKas(){
+  if (!document.querySelector(".bayar")) {
+    alert("Pilih hutang terlebih dahulu");
+    return;
+  }
+
+  let opt = `<option value="">Pilih</option>`;
+  kasbankList.forEach(k=>{
+    opt += `<option value="${k.id_kasbank}">${k.nama_rekening}</option>`;
+  });
+
+  tbKas.insertAdjacentHTML("beforeend", `
+    <tr>
+      <td width="120px">
+        <select class="form-control form-control-sm akun-kas">
+          ${opt}
+        </select>
+      </td>
+          <td width="20">
+        <i class="fas fa-trash text-secondary"
+           onclick="this.closest('tr').remove(); hitungSisaHutang()"></i>
+      </td>
+      <td>
+        <input class="form-control form-control-sm text-right kas" value="0">
+      </td>
+
+    </tr>
+  `);
+
+  // ✅ INI KUNCINYA
+  const lastKas = tbKas.querySelector("tr:last-child .kas");
+  formatRupiahInput(lastKas);
+}
+
+function getKasDetail(){
+  const list = [];
+
+  // kas default
+  const defKas = document.getElementById("kas_default").value;
+  const defJumlah = toNum(jumlah_bayar.value);
+  if (defKas && defJumlah > 0) {
+    list.push({
+      id_kasbank: defKas,
+      kode_akun: kasbankMap[defKas],
+      jumlah: defJumlah
+    });
+  }
+
+  // kas tambahan
+  document.querySelectorAll("#tbKas tr").forEach(tr=>{
+    const idKas = tr.querySelector(".akun-kas")?.value;
+    const jml = toNum(tr.querySelector(".kas")?.value);
+    if (idKas && jml > 0) {
+      list.push({
+        id_kasbank: idKas,
+        kode_akun: kasbankMap[idKas],
+        jumlah: jml
+      });
+    }
+  });
+
+  return list;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("tanggal").value = today;
+});
+function autoSelectOnFocus(el){
+  if(!el) return;
+  el.addEventListener("focus", () => {
+    setTimeout(() => el.select(), 10);
+  });
+  el.addEventListener("click", () => {
+    setTimeout(() => el.select(), 10);
+  });
+}
+
+function hitungSisaHutang(){
+  const totalHutang = toNum(totalBayar.innerText);
+  const totalKasVal = totalKas();
+
+  const sisa = totalHutang - totalKasVal;
+  sisaHutang.innerText = fmt(Math.max(sisa, 0));
+  if (sisa > 0) {
+    sisaHutang.classList.add("text-danger");
+    sisaHutang.classList.remove("font-weight-bold");
+  } else {
+    sisaHutang.classList.remove("text-danger");
+    sisaHutang.classList.add("font-weight-bold");
+  }
+
+}
+
+function adaKasBelumDipilih(){
+  // kas utama
+  if (!document.getElementById("kas_default").value) return true;
+
+  // kas tambahan
+  for (const tr of document.querySelectorAll("#tbKas tr")) {
+    const sel = tr.querySelector(".akun-kas");
+    const val = toNum(tr.querySelector(".kas")?.value);
+
+    if (val > 0 && !sel.value) {
+      sel.classList.add("input-error");
+      return true;
+    } else {
+      sel.classList.remove("input-error");
+    }
+  }
+
+  return false;
+}
+
+function formatRupiahInput(el){
+  if (!el) return;
+
+  el.addEventListener("input", () => {
+    // ambil angka asli (hapus titik)
+    let raw = el.value.replace(/\D/g, "");
+
+    if (raw === "") {
+      el.value = "";
+      return;
+    }
+
+    // format ribuan
+    el.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", loadKasBank);
+document.addEventListener("DOMContentLoaded", () => {
+  const jb = document.getElementById("jumlah_bayar");
+  if (!jb) return;
+
+  // 🔥 format rupiah realtime
+  formatRupiahInput(jb);
+
+  // 🔥 setiap ketik → hitung sisa hutang
+  jb.addEventListener("input", () => {
+    hitungSisaHutang();
+  });
+});
+document.addEventListener("input", e => {
+  if (
+    e.target.id === "jumlah_bayar" ||
+    e.target.classList.contains("kas")
+  ) {
+    hitungSisaHutang();
+  }
+});
+jumlah_bayar.addEventListener("input", () => {
+  jumlah_bayar.dataset.manual = "1";
+});
+
+document.addEventListener("focusin", e => {
+  if (
+    e.target.classList.contains("bayar") ||
+    e.target.classList.contains("kas")
+  ) {
+    setTimeout(() => e.target.select(), 0);
+  }
+});
+
+document.addEventListener("click", e => {
+  if (
+    e.target.classList.contains("bayar") ||
+    e.target.classList.contains("kas")
+  ) {
+    setTimeout(() => e.target.select(), 0);
+  }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.classList.contains("bayar")) {
+    e.preventDefault();
+    jumlah_bayar.focus();
+    jumlah_bayar.select();
+  }
+});
+
+autoSelectOnFocus(supplier);
+autoSelectOnFocus(document.getElementById("jumlah_bayar"));
+</script>
+</body>
+</html>

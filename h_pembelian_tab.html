@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.table thead th {
+    background: linear-gradient(to bottom, #f5f5f5, #ededee);
+    color: #7789bf;
+    font-weight: 600;
+    border-bottom: 2px solid #ffffff;
+}
+.card-body {
+    padding-bottom: 0 !important;
+}
+.card-body nav {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* HANYA BARIS DATA (ISI TABEL) */
+.table-tight tbody td {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    line-height: 1.15;
+    vertical-align: middle;
+}
+.action-icon {
+    cursor: pointer;
+    padding: 2px;
+}
+tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+<div id="wrapper">
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+    <div class="card shadow mb-4"> 
+<div class="card-header py-2">
+  <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+    <!-- KIRI -->
+    <div class="d-flex align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary mr-3">Daftar Pembelian</h6>
+      <span id="offlineBadge" class="badge badge-warning d-none">Offline</span>
+    </div>
+
+    <!-- KANAN -->
+    <div class="d-flex align-items-center flex-wrap mt-2 mt-md-0">
+      <!-- FILTER JENIS -->
+      <div class="dropdown mr-2 mb-2">
+        <button class="btn btn-light btn-sm dropdown-toggle"
+                style="width: 90px; text-align: left;"
+                id="filterFilterTermin"
+                data-toggle="dropdown">
+          Termin
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#" onclick="setFilterTermin('all')">Semua</a>
+          <a class="dropdown-item" href="#" onclick="setFilterTermin('cash')">Cash</a>
+          <a class="dropdown-item" href="#" onclick="setFilterTermin('credit')">Creadit
+          </a>
+        </div>
+      </div>
+      <div class="dropdown mr-2 mb-2">
+        <button class="btn btn-light btn-sm dropdown-toggle" style="width: 110px; text-align: left;" id="filterLunasBtn" data-toggle="dropdown">Status
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#" onclick="setFilterLunas('close')">Lunas</a>  
+          <a class="dropdown-item" href="#" onclick="setFilterLunas('open')">Belum Lunas</a>
+          
+        </div>
+      </div>
+      <div class="mr-0 mb-2">
+        <div class="form-check form-check-inline mb-0">
+          <input class="form-check-input" type="checkbox" id="date_aktif" title="Aktifkan filter tanggal" checked>
+        </div>
+      </div>
+      <!-- FILTER TANGGAL -->
+      <div class="mr-2 mb-2">
+        <input type="date" id="from" class="form-control form-control-sm">
+      </div>
+      <div class="mr-2 mb-2">
+        <input type="date" id="to" class="form-control form-control-sm">
+      </div>
+
+
+
+      <!-- SEARCH SUPPLIER-->
+      <div class="mr-2 mb-2">
+        <input type="text" id="cari_supplier" class="form-control form-control-sm" placeholder="Cari Mitra..." style="width: 130px;">
+      </div>
+      <!-- SEARCH PRODUK-->
+      <div class="mr-2 mb-2">
+        <input type="hidden" id="cari_Produk" class="form-control form-control-sm" placeholder="Cari Produk..." style="width: 130px;">
+      </div>
+      <div class="mr-3 mb-2">
+        <button class="btn btn-primary btn-sm" onclick="isSearching=false; loadList();">Refresh</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <table class="table table-hover table-sm table-bordered table-tight">
+      <thead class="table-sm" >
+        <tr>
+            <th width="120px">Kode</th>
+            <th width="120px">Tanggal</th>
+            <th width="400px">Supplier</th>
+            <th width="100px">Total</th>
+            <th width="100px">Terbayar</th>
+            <th width="100px">Sisa</th>
+            <th width="110px">Status</th>
+            <th style="text-align:right;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table>
+        <nav>
+          <ul class="pagination justify-content-center" id="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" onclick="prevPage()">&laquo;</a>
+          </li>
+          <li class="page-item disabled">
+              <a class="page-link" href="#">Page <span id="page-number">1</span></a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#" onclick="nextPage()">&raquo;</a>
+      </li>
+  </ul>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+/* ================== STATE ================== */
+let filterTermin = "all";
+let filterLunas  = "all";
+let allRows = [];          // data hasil filter
+let page = 1;
+const perPage = 10;        // samakan dengan jurnal
+let totalPages = 1;
+let isSearching = false;
+
+/* ================== ELEMENT ================== */
+const chkDate = document.getElementById("date_aktif");
+const inpFrom = document.getElementById("from");
+const inpTo   = document.getElementById("to");
+const inpSupplier = document.getElementById("cari_supplier");
+const inpProduk   = document.getElementById("cari_Produk");
+const pagination = document.getElementById("pagination");
+
+/* ================== DATE HELPER ================== */
+function todayISO(){
+  return new Date().toISOString().slice(0,10);
+}
+function daysAgoISO(n){
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0,10);
+}
+
+/* ================== INIT DATE DEFAULT ================== */
+chkDate.checked = true;
+inpFrom.value = daysAgoISO(7);
+inpTo.value   = todayISO();
+
+function syncDateUI(){
+  if (chkDate.checked) {
+    inpFrom.removeAttribute("disabled");
+    inpTo.removeAttribute("disabled");
+
+    // ⬅️ penting: isi default jika kosong
+    if (!inpFrom.value) inpFrom.value = daysAgoISO(7);
+    if (!inpTo.value)   inpTo.value   = todayISO();
+
+  } else {
+    inpFrom.value = "";
+    inpTo.value   = "";
+    inpFrom.setAttribute("disabled","disabled");
+    inpTo.setAttribute("disabled","disabled");
+  }
+}
+
+syncDateUI();
+chkDate.addEventListener("change", syncDateUI);
+
+/* ================== FILTER BUTTON ================== */
+function setFilterTermin(val){
+  filterTermin = val;
+  document.getElementById("filterFilterTermin").innerText =
+    val === "all" ? "Termin" : val.toUpperCase();
+}
+
+function setFilterLunas(val){
+  filterLunas = val;
+  document.getElementById("filterLunasBtn").innerText =
+    val === "open" ? "Belum Lunas" :
+    val === "close" ? "Lunas" : "Status";
+}
+
+/* ================== FORMAT ================== */
+function fmt(n){
+  return n==null ? '' : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
+/* ================== LOAD LIST ================== */
+async function loadList(){
+  const qSupplier = inpSupplier.value.trim().toLowerCase();
+  // const qProduk   = inpProduk.value.trim().toLowerCase();
+  const from      = inpFrom.value;
+  const to        = inpTo.value;
+
+let query = db
+  .from('tb_pembelian')
+  .select(`
+    *,
+    tb_mitra(nama_mitra),
+    tb_hutang(
+      sisa,
+      status
+    )
+  `)
+  .order('created_at', { ascending: false });
+
+  // tanggal
+  if(chkDate.checked){
+    if(from) query = query.gte('tanggal', from);
+    if(to)   query = query.lte('tanggal', to);
+  }
+
+  // termin
+  if(filterTermin !== "all"){
+    query = query.eq("termin", filterTermin);
+  }
+
+  const { data, error } = await query;
+
+  const tb = document.getElementById('tb');
+  tb.innerHTML = '';
+
+  if(error){
+    tb.innerHTML = `<tr><td colspan="8" class="text-danger">${error.message}</td></tr>`;
+    return;
+  }
+
+  if(!data || data.length===0){
+    tb.innerHTML = `<tr><td colspan="8" class="text-muted text-center">Tidak ada</td></tr>`;
+    return;
+  }
+
+  // FILTER MANUAL (AMAN + STATUS LUNAS AKURAT)
+  const filtered = data.filter(r => {
+    const nama = (r.tb_mitra?.nama_mitra || '').toLowerCase();
+    if (qSupplier && !nama.includes(qSupplier)) return false;
+
+    // hitung sisa hutang
+    const hutang = r.tb_hutang?.[0];
+
+    const sisa =
+      r.termin === "cash"
+        ? 0
+        : (hutang?.sisa ?? 0);
+
+    const terbayar =
+      r.termin === "cash"
+        ? r.grand_total
+        : (r.grand_total - sisa);
+
+    // filter status lunas / belum
+    if (filterLunas === "open" && sisa <= 0) return false;
+    if (filterLunas === "close" && sisa > 0) return false;
+
+    return true;
+  });
+
+isSearching = !!inpSupplier.value.trim();
+allRows = filtered;
+page = 1;
+renderPage();
+}
+
+function renderPage() {
+  const tb = document.getElementById("tb");
+  tb.innerHTML = "";
+
+  if (!allRows.length) {
+    tb.innerHTML = `<tr><td colspan="8" class="text-muted text-center">Tidak ada</td></tr>`;
+    return;
+  }
+  totalPages = Math.ceil(allRows.length / perPage);
+  if (isSearching || totalPages <= 1) {
+    pagination.style.display = "none";
+  } else {
+    pagination.style.display = "flex";
+  }
+  if (page > totalPages) page = totalPages;
+  if (page < 1) page = 1;
+
+  const start = (page - 1) * perPage;
+  const slice = isSearching
+  ? allRows
+  : allRows.slice(start, start + perPage);
+
+slice.forEach(r => {
+  const hutang = r.tb_hutang?.[0];
+
+  const sisa =
+    r.termin === "cash"
+      ? 0
+      : (hutang?.sisa ?? 0);
+
+  const terbayar =
+    r.termin === "cash"
+      ? r.grand_total
+      : (r.grand_total - sisa);
+
+  tb.innerHTML += `
+    <tr class="barisdata">
+      <td>${r.kode_pembelian}</td>
+      <td>${r.tanggal}</td>
+      <td>${r.tb_mitra?.nama_mitra || '-'}</td>
+
+      <td class="text-right">${fmt(r.grand_total)}</td>
+      <td class="text-right text-success">${fmt(terbayar)}</td>
+
+      <td class="text-right ${sisa > 0 ? 'text-danger' : 'text-muted'}">
+        ${fmt(sisa)}
+      </td>
+
+      <td class="text-right">
+        ${sisa === 0 ? 'Lunas' : 'Belum Lunas'}
+      </td>
+
+      <!-- AKSI -->
+      <td class="text-right">
+        <a href="h_pembelian_edit.html?id=${r.id_pembelian}"
+           class="text-dark action-icon"
+           title="Edit Pembelian">
+          ${ICON_EDIT}
+        </a>
+      </td>
+    </tr>
+  `;
+});
+
+  document.getElementById("page-number").innerText = page;
+}
+
+function prevPage() {
+  if (page > 1) {
+    page--;
+    renderPage();
+  }
+}
+
+function nextPage() {
+  if (page < totalPages) {
+    page++;
+    renderPage();
+  }
+}
+/* ================== EVENT ================== */
+inpSupplier.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    isSearching = inpSupplier.value.trim() !== "";
+    page = 1;
+    loadList();
+  }
+});
+
+inpProduk.addEventListener('keydown', e=>{
+  if(e.key === 'Enter') loadList();
+});
+
+inpSupplier.addEventListener("input", () => {
+  if (!inpSupplier.value.trim()) {
+    isSearching = false;
+    page = 1;
+    loadList();
+  }
+});
+
+/* ================== LOAD AWAL ================== */
+loadList();
+</script>
+</body>
+</html>

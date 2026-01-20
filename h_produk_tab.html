@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+        .dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.table thead th {
+    background: linear-gradient(to bottom, #f5f5f5, #ededee);
+    color: #7789bf;
+    font-weight: 600;
+    border-bottom: 2px solid #ffffff;
+}
+.card-body {
+    padding-bottom: 0 !important;
+}
+.card-body nav {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* HANYA BARIS DATA (ISI TABEL) */
+.table-tight tbody td {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    line-height: 1.15;
+    vertical-align: middle;
+}
+.action-icon {
+    cursor: pointer;
+    padding: 2px;
+}
+tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+.table-noselect,
+.table-noselect * {
+    user-select: none;
+    -webkit-user-select: none; /* Chrome, Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Edge lama */
+}
+</style>
+</head>
+
+<body id="page-top">
+    <div id="navbar"></div>
+    <div id="wrapper">
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="container-fluid">
+                    <div id="shortcut"></div>
+                    <div class="card shadow mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
+                            <h6 class="m-0 font-weight-bold text-primary">Produk</h6>
+                            <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterStatusBtn" data-toggle="dropdown" style="width: 80px; text-align: left;">Semua</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#" onclick="setFilterStatus('all')">Semua</a>
+                                        <a class="dropdown-item" href="#" onclick="setFilterStatus('active')">Aktif</a>
+                                        <a class="dropdown-item" href="#" onclick="setFilterStatus('nonactive')">Nonaktif</a>
+                                    </div>
+                                </div>
+                                <input type="text" id="cari_produk" class="form-control form-control-sm" placeholder="Cari Produk..." style="max-width: 200px;">
+                                <div class="dropdown ">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">Tambah</button>
+                                    <div class="dropdown-menu shadow border-0" aria-labelledby="dropdownTambahHeader">
+                                        <a class="dropdown-item" href="h_produk_add.html">Produk</a>
+                                        <a class="dropdown-item" href="h_merek_add.html">Merek</a>
+                                        <a class="dropdown-item" href="h_kategori_add.html">Kategori</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap ">
+                            <table class="table table-hover table-sm table-bordered table-tight table-noselect">
+                                <thead>
+                                    <tr>
+                                        <th width="50px">Kode</th>
+                                        <th>Nama</th>
+                                        <th width="150px">Merek</th>
+                                        <th width="150px">Kategori</th>
+                                        <th width="50px">Aktif</th>
+                                        <th width="100px" style="text-align: center;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel_produk"></tbody>
+                            </table>
+                            <nav>
+                                <ul class="pagination justify-content-center" id="pagination">
+                                    <li class="page-item"><a class="page-link" href="#" onclick="prevPage()">&laquo;</a></li>
+                                    <li class="page-item disabled"><a class="page-link" href="#">Halaman <span id="page-number">1</span></a></li>
+                                    <li class="page-item"><a class="page-link" href="#" onclick="nextPage()">&raquo;</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+    <script>
+    // Pagination + search (perPage = 5)
+    localStorage.removeItem("produk_page");
+    let filterStatus = "all"; // all | active | nonactive
+    let page = parseInt(localStorage.getItem("produk_page") || "1");
+    const perPage = 10;
+    let totalPages = 1;
+    let totalRows = 0;
+    let isSearching = false;
+
+function getCacheKey() {
+  return `produk:${filterStatus}:page:${page}`;
+}
+
+function getCachedPage() {
+  const raw = sessionStorage.getItem(getCacheKey());
+  return raw ? JSON.parse(raw) : null;
+}
+
+function setCachedPage(data, count) {
+  sessionStorage.setItem(
+    getCacheKey(),
+    JSON.stringify({ data, count })
+  );
+}
+
+function clearProdukCache() {
+  Object.keys(sessionStorage)
+    .filter(k => k.startsWith("produk:"))
+    .forEach(k => sessionStorage.removeItem(k));
+}
+
+
+async function loadProduk() {
+
+  // 1️⃣ Ambil nilai search
+  const q = document.getElementById("cari_produk").value.trim().toLowerCase();
+  const keywords = q.split(/\s+/).filter(Boolean);
+
+  // 2️⃣ Tentukan mode search
+  isSearching = keywords.length > 0;
+
+  // 3️⃣ HITUNG RANGE PAGINATION
+  const from = (page - 1) * perPage;
+  const to   = from + perPage - 1;
+
+  // ============================
+  // 🚀 CEK CACHE DI SINI (WAJIB)
+  // ============================
+  if (!isSearching) {
+    const cached = getCachedPage();
+    if (cached) {
+      totalRows  = cached.count;
+      totalPages = Math.ceil(totalRows / perPage);
+
+      renderTabel(cached.data);
+      updatePagination();
+
+      document.getElementById("pagination").style.display =
+        totalPages > 1 ? "flex" : "none";
+
+      return; // ⛔ STOP, JANGAN QUERY SUPABASE
+    }
+  }
+
+  // ============================
+  // 4️⃣ BARU QUERY SUPABASE
+  // ============================
+  let dataQuery = db
+    .from("tb_produk")
+    .select(`
+      id_produk,
+      kode_produk,
+      nama_produk,
+      aktif,
+      tb_kategori ( nama_kategori ),
+      tb_merek ( nama_merek )
+    `, { count: "exact" })
+    .order("created_at", { ascending: false });
+
+  if (!isSearching) {
+    dataQuery = dataQuery.range(from, to);
+  }
+
+  if (filterStatus === "active") {
+    dataQuery = dataQuery.eq("aktif", true);
+  }
+  if (filterStatus === "nonactive") {
+    dataQuery = dataQuery.eq("aktif", false);
+  }
+
+  if (keywords.length > 0) {
+    keywords.forEach(k => {
+      dataQuery = dataQuery.ilike("nama_produk", `%${k}%`);
+    });
+  }
+
+  const { data, count, error } = await dataQuery;
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // ============================
+  // 5️⃣ SIMPAN KE CACHE (DI SINI)
+  // ============================
+  if (!isSearching) {
+    setCachedPage(data || [], count || 0);
+  }
+
+  totalRows  = count || 0;
+  totalPages = Math.ceil(totalRows / perPage);
+
+  if (page > totalPages) page = totalPages || 1;
+  if (page < 1) page = 1;
+
+  renderTabel(data || []);
+  updatePagination();
+
+  document.getElementById("pagination").style.display =
+    isSearching ? "none" : (totalPages > 1 ? "flex" : "none");
+}
+
+
+    // =========================
+    // RENDER TABEL (DIPISAH)
+    // =========================
+    function renderTabel(list) {
+        if (!list || list.length === 0) {
+            document.getElementById("tabel_produk").innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted py-3">
+                    Tidak ada data ditemukan
+                </td>
+            </tr>`;
+            return;
+        }
+
+        document.getElementById("tabel_produk").innerHTML = list.map(p => `
+        <tr class="barisdata">
+          <td>${p.kode_produk}</td>
+          <td>${p.nama_produk}</td>
+          <td>${p.tb_merek?.nama_merek || ""}</td>
+          <td>${p.tb_kategori?.nama_kategori || ""}</td>
+
+          <!-- STATUS AKTIF -->
+          <td class="text-center">
+            <span class="${p.aktif ? 'text-primary' : 'text-danger'}"
+                  title="${p.aktif ? 'Aktif' : 'Nonaktif'}">
+              ${p.aktif ? ICON_CHECK : ICON_SILANG}
+            </span>
+          </td>
+
+          <!-- AKSI -->
+          <td class="text-center">
+            <span class="text-dark action-icon mr-2"
+                  title="Edit"
+                  onclick="goEdit('${p.id_produk}')">
+              ${ICON_EDIT}
+            </span>
+
+            <span class="text-dark action-icon"
+                  title="Hapus"
+                  onclick="hapusProduk('${p.id_produk}')">
+              ${ICON_DELETE}
+            </span>
+          </td>
+        </tr>
+        `).join("");
+
+    }
+
+
+function setFilterStatus(status) {
+  filterStatus = status;
+  clearProdukCache(); // ⬅️ TAMBAHKAN INI
+
+  const txt =
+    status === "active" ? "Aktif" :
+    status === "nonactive" ? "Nonaktif" :
+    "Semua";
+
+  document.getElementById("filterStatusBtn").innerText = txt;
+
+  page = 1;
+  loadProduk();
+}
+
+
+document.getElementById("cari_produk")
+  .addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      page = 1;
+      loadProduk();
+    }
+  });
+
+    function goEdit(id) {
+        localStorage.setItem("produk_page", page);
+        location.href = "h_produk_edit.html?id=" + id;
+    }
+
+        async function hapusProduk(id) {
+          if (!confirm("Yakin ingin menghapus produk?")) return;
+
+          const { error } = await db.from("tb_produk").delete().eq("id_produk", id);
+          if (error) {
+            alert("Gagal menghapus");
+            return;
+          }
+
+          clearProdukCache(); // ⬅️ GANTI KE INI
+          loadProduk();
+        }
+
+function nextPage() {
+  if (page >= totalPages) return;
+  page++;
+  loadProduk();
+}
+
+function prevPage() {
+  if (page <= 1) return;
+  page--;
+  loadProduk();
+}
+
+function updatePagination() {
+  document.getElementById("page-number").innerText = page;
+
+  document.querySelector("#pagination li:first-child")
+    .classList.toggle("disabled", page <= 1);
+
+  document.querySelector("#pagination li:last-child")
+    .classList.toggle("disabled", page >= totalPages);
+}
+
+
+    loadProduk();
+    </script>
+</body>
+
+</html>

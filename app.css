@@ -1,0 +1,276 @@
+/* === GLOBAL === */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6f8;
+}
+
+/* === NAVBAR === */
+.navbar {
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
+  padding: 2px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;     /* memperbaiki posisi menu */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* === MENU LEVEL 1 === */
+.nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 28px;
+}
+
+.nav-item a {
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  padding: 4px 0;
+  display: inline-block;
+  transition: color .15s ease;
+}
+
+.nav-item a:hover {
+  color: #0077cc;
+}
+
+/* === DROPDOWN === */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  min-width: 180px;
+  padding: 6px 0;     /* modern sedikit */
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 20;
+}
+
+.dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+/* item dalam dropdown */
+.dropdown-menu li {
+  list-style: none;
+}
+
+.dropdown-menu li a {
+  display: block;
+  padding: 6px 12px;
+  color: #333;
+  text-decoration: none;
+  transition: background .15s;
+}
+
+.dropdown-menu li a:hover {
+  background: #eef4ff;
+  color: #0077cc;
+}
+
+/* === SUBMENU (LEVEL 2) === */
+.dropdown-sub {
+  position: relative;
+}
+
+.dropdown-menu.sub {
+  top: 0;
+  left: 180px;
+  display: none;
+  min-width: 180px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  z-index: 30;
+}
+
+.dropdown-sub:hover > .dropdown-menu.sub {
+  display: block;
+}
+
+/* === BREADCRUMB === */
+.breadcrumb {
+  padding: 12px 20px;
+  font-size: 14px;
+  background: transparent;
+  border-bottom: none;
+  color: #666;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #0077cc;
+}
+
+/* === CONTENT WRAPPER === */
+.content-wrapper {
+  padding: 0 20px;
+}
+
+.action-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* SEARCH INPUT */
+.search-input {
+  padding: 6px 10px;
+  width: 120px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4a92ff;
+  box-shadow: 0 0 4px rgba(74,145,255,0.4);
+}
+
+/* TAMBAH BARU */
+.btn-add {
+  background: #4a6cf7;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-add:hover {
+  background: #3858d6;
+}
+
+/* TABLE */
+.table-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+table th,
+table td {
+  border: 1px solid #e5e5e5;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead {
+  background: #f1f3f7;
+}
+
+thead th {
+  padding: 4px 8px;
+  color: #555;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+
+/* BODY */
+tbody td {
+  padding: 2px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+  background: #ccc;
+}
+
+/* ICON CHECK */
+.icon-check {
+  width: 18px;
+  height: 18px;
+  fill: #2e7df6;
+}
+
+/* ICON BUTTONS */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.icon-btn {
+  background: #eef1f7;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.icon-btn:hover {
+  background: #d9deeb;
+}
+
+.icon {
+  width: 14px;         /* sebelumnya 18px */
+  height: 14px;
+}
+.card-container {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  padding: 15px 20px;
+  border-radius: 8px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.pagination-box {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin-top: 8px; /* lebih kecil */
+}
+
+.pagination-panel {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;      /* lebih kecil */
+  overflow: hidden;
+  background: #fff;
+}
+
+.page-btn-slim {
+  padding: 4px 10px;       /* lebih kecil */
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #4a6cf7;
+  font-size: 14px;         /* lebih kecil */
+  line-height: 1;
+}
+
+.page-btn-slim:hover {
+  background: #f0f0f0;
+}
+
+.page-info {
+  padding: 4px 18px;       /* lebih kecil */
+  color: #555;
+  font-size: 14px;         /* lebih kecil */
+  border-left: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
+  line-height: 1.1;
+}

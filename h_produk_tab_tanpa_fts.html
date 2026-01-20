@@ -1,0 +1,322 @@
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            <meta name="description" content="">
+            <meta name="author" content="">
+
+            <title>Aplikasi Wiguna Teknik</title>
+
+            <!-- Custom fonts for this template-->
+            <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+            <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+            <!-- Custom styles for this template-->
+            <link href="css/sb-admin-2.min.css" rel="stylesheet">
+            <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.table thead th {
+    background: linear-gradient(to bottom, #f5f5f5, #ededee);
+    color: #7789bf;
+    font-weight: 600;
+    border-bottom: 2px solid #ffffff;
+}
+
+
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+<div id="wrapper">
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+    <div class="card shadow mb-4"> 
+      <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
+          <h6 class="m-0 font-weight-bold text-primary">Daftar Produk</h6>
+          <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+              <input type="text" id="cari_produk" class="form-control form-control-sm" placeholder="Cari Produk..." style="max-width: 200px;">
+              <div class="dropdown">
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">Tambah</button>
+                  <div class="dropdown-menu shadow border-0" aria-labelledby="dropdownTambahHeader">
+                      <a class="dropdown-item" href="h_produk_add.html">Produk</a>
+                      <a class="dropdown-item" href="h_merek_add.html">Merek</a>
+                      <a class="dropdown-item" href="h_kategori_add.html">Kategori</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <table class="table table-hover table-sm table-bordered">
+          <thead>
+            <tr>
+              <th width="50px">Kode</th>
+              <th>Produk</th>
+              <th width="150px">Merek</th>
+              <th width="150px">Kategori</th>
+              <th width="50px">Aktif</th>
+              <th width="100px" style="text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tabel_produk"></tbody>
+        </table>
+        <nav>
+          <ul class="pagination justify-content-center" id="pagination">
+            <li class="page-item"><a class="page-link" href="#" onclick="prevPage()">&laquo;</a></li>
+            <li class="page-item disabled"><a class="page-link" href="#">Halaman <span id="page-number">1</span></a></li>
+            <li class="page-item"><a class="page-link" href="#" onclick="nextPage()">&raquo;</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script>
+async function loadNavbar() {
+    const navEl = document.getElementById("navbar");
+
+    // jika sudah tersimpan, langsung pakai → instant
+    if (localStorage.getItem("navbar")) {
+        navEl.innerHTML = localStorage.getItem("navbar");
+        navEl.classList.add("loaded");
+    }
+
+    // selalu fetch versi terbaru (background)
+    const res = await fetch("navbar.html");
+    const html = await res.text();
+    localStorage.setItem("navbar", html);
+
+    // update tampilan navbar
+    navEl.innerHTML = html;
+    navEl.classList.add("loaded");
+
+    // load bootstrap
+    var script = document.createElement("script");
+    script.src = "vendor/bootstrap/js/bootstrap.bundle.min.js";
+    document.body.appendChild(script);
+}
+async function loadShortcut() {
+    const el = document.getElementById("shortcut");
+
+    // tampilkan instan jika sudah ada cache
+    if (localStorage.getItem("shortcut_html")) {
+        el.innerHTML = localStorage.getItem("shortcut_html");
+    }
+
+    // fetch versi terbaru di background
+    const res = await fetch("shortcut.html");
+    const html = await res.text();
+    localStorage.setItem("shortcut_html", html);
+
+    el.innerHTML = html;
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+  // Pagination + search (perPage = 5)
+  let page = parseInt(localStorage.getItem("produk_page") || "1");
+  const perPage = 5;
+  let lastCount = 0;
+
+  async function loadProduk() {
+    const q = document.getElementById("cari_produk").value.trim();
+    const start = (page-1)*perPage;
+    const end = start + perPage -1;
+
+      let query = db.from("tb_produk")
+        .select("id_produk,kode_produk,nama_produk,id_merek,id_kategori,aktif")
+        .order("kode_produk", { ascending: true })
+        .range(start, end);
+
+      // 🔥 Jika tidak sedang mencari → tampilkan hanya produk aktif
+      if (q === "") {
+        query = query.eq("aktif", true);
+      }
+
+      // 🔥 Jika sedang mencari → tampilkan semua produk yang cocok
+      if (q !== "") {
+        query = query.ilike("nama_produk", `%${q}%`);
+      }
+
+    const { data, error } = await query;
+    if (error) { console.error(error); return; }
+    lastCount = (data||[]).length;
+
+    // For showing brand/category names we can fetch mapping (small optimization)
+    // Fetch brands & categories mapping in parallel
+    const brandIds = [...new Set(data.map(d=>d.id_merek).filter(Boolean))];
+    const catIds = [...new Set(data.map(d=>d.id_kategori).filter(Boolean))];
+
+    const [brandsRes, catsRes] = await Promise.all([
+      brandIds.length ? db.from("tb_merek").select("id_merek,nama_merek").in("id_merek", brandIds) : { data: [] },
+      catIds.length ? db.from("tb_kategori").select("id_kategori,nama_kategori").in("id_kategori", catIds) : { data: [] }
+    ]);
+    const brandsMap = (brandsRes.data||[]).reduce((s,i)=>{ s[i.id_merek]=i.nama_merek; return s; }, {});
+    const catsMap = (catsRes.data||[]).reduce((s,i)=>{ s[i.id_kategori]=i.nama_kategori; return s; }, {});
+
+    document.getElementById("tabel_produk").innerHTML =
+      (data||[]).map(p => `
+        <tr>
+          <td>${p.kode_produk||""}</td>
+          <td>${p.nama_produk||""}</td>
+          <td>${brandsMap[p.id_merek]||""}</td>
+          <td>${catsMap[p.id_kategori]||""}</td>
+              <td class="text-center">
+          ${
+            p.aktif
+              ? `<i class="fas fa-check text-primary"></i>` 
+              : `<i class="fas fa-times text-danger"></i>`
+          }
+        </td>
+<td class="text-center">
+    <button class="btn btn-sm btn-light"
+            onclick="goEdit('${p.id_produk}')"
+            title="Edit Produk">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="btn btn-sm btn-light"
+            onclick="hapusProduk('${p.id_produk}')"
+            title="Hapus Produk">
+        <i class="fas fa-trash"></i>
+    </button>
+</td>
+
+        </tr>
+      `).join("");
+
+    updatePagination();
+    localStorage.removeItem("produk_page");
+  }
+
+  async function hapusProduk(id) {
+    if (!confirm("Yakin ingin menghapus produk?")) return;
+    const { error } = await db.from("tb_produk").delete().eq("id_produk", id);
+    if (error) { alert("Gagal menghapus"); console.error(error); return; }
+    loadProduk();
+  }
+
+  function goEdit(id) {
+    localStorage.setItem("produk_page", page);
+    location.href = "h_produk_edit.html?id="+id;
+  }
+
+  function nextPage() { if (lastCount < perPage) return; page++; loadProduk(); }
+  function prevPage() { if (page===1) return; page--; loadProduk(); }
+  function updatePagination() {
+    document.getElementById("page-number").innerText = page;
+    document.querySelector("#pagination li:first-child").classList.toggle("disabled", page===1);
+    document.querySelector("#pagination li:last-child").classList.toggle("disabled", lastCount < perPage);
+  }
+
+  // search debounce
+  let timer = null;
+  document.getElementById("cari_produk").addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(()=>{ page=1; loadProduk(); }, 350);
+  });
+
+  loadProduk();
+
+</script>
+
+</body>
+</html>

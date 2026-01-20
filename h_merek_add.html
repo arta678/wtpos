@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style> 
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #4d5061  !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.card-body {
+    padding-bottom: 10px !important;
+}
+
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+#alertBox {
+    position: sticky;
+    top: 70px;        /* sesuaikan tinggi navbar */
+    z-index: 1050;
+}
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+    <div id="wrapper">
+<!-- CONTENT -->
+  <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+<div class="container-fluid">  
+  <div id="shortcut"></div>
+  <div class="card shadow mb-4"> 
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <!-- JUDUL -->
+      <h6 class="m-0 font-weight-bold text-primary">Tambah Merek</h6>
+      <!-- TOMBOL -->
+      <div class="d-flex gap-2">
+          <button type="submit" form="formTambahMerek" class="btn btn-primary btn-sm">Simpan</button>
+          <a href="h_merek_tab.html" class="btn btn-secondary btn-sm">Kembali</a>
+      </div>
+    </div>
+    <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <form id="formTambahMerek">
+                        <div class="mb-3">
+                            <label class="form-label">Kode Merek</label>
+                            <input type="text" class="form-control" id="kode_merek" placeholder="AUTO">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Merek</label>
+                            <input type="text" class="form-control" id="nama_merek" required>
+                        </div>
+                        <!-- <button class="btn btn-primary" type="submit">Simpan</button> -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+async function cekMerekSudahAda(nama) {
+    const { data, error } = await db
+        .from("tb_merek")
+        .select("id_merek")
+        .ilike("nama_merek", nama)
+        .limit(1);
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return data.length > 0;
+}
+
+document.getElementById("formTambahMerek").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!navigator.onLine) {
+        alert("Mode offline — tidak bisa menyimpan");
+        return;
+    }
+
+    const kode = kode_merek.value.trim();
+    const nama = nama_merek.value.trim();
+
+    if (!nama) {
+        alert("Nama Merek wajib diisi");
+        return;
+    }
+
+    // CEK DUPLIKAT
+    if (await cekMerekSudahAda(nama)) {
+        alert(`Merek "${nama}" sudah ada`);
+        return;
+    }
+
+    const { error } = await db.from("tb_merek").insert([{
+        kode_merek: kode || null,
+        nama_merek: nama,
+        aktif: true
+    }]);
+
+    if (error) {
+        alert("Gagal menyimpan");
+        console.error(error);
+        return;
+    }
+
+    localStorage.removeItem("cache_merek_all");
+    alert("SUKSES!");
+    formTambahMerek.reset();
+    nama_merek.focus();
+});
+
+    document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "Enter") {
+        e.preventDefault();
+
+        // cari tombol simpan yang terhubung ke form
+        const btn = document.querySelector(
+            'button[type="submit"][form]'
+        );
+
+        // jangan submit jika tombol disabled
+        if (btn && !btn.disabled) {
+            btn.click();
+        }
+    }
+});
+
+    document.getElementById("nama_merek").focus();
+</script>
+
+</body>
+</html>

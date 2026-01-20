@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+        .dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+</style>
+</head>
+
+<body id="page-top" class="sidebar-toggled">
+    <div id="wrapper">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">WIGUNA T</div>
+            </a>
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+            <hr class="sidebar-divider">
+            <li class="nav-item active">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-database"></i>
+                    <span>Data</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="h_produk_tab.html">Produk</a>
+                        <a class="collapse-item" href="h_merek_tab.html">Merek</a>
+                        <a class="collapse-item" href="h_kategori_tab.html">Kategori Produk</a>
+                        <a class="collapse-item" href="#">Daftar Harga</a>
+                        <a class="collapse-item" href="#">Stok Produk</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-cart-arrow-down"></i>
+                    <span>Transaksi</span>
+                </a>
+                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="#">Pembelian</a>
+                        <a class="collapse-item" href="#">Penjualan</a>
+                        <a class="collapse-item" href="#">Orderan Produk</a>
+                        <a class="collapse-item" href="#">Retur</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collap_mitra_bisnis" aria-expanded="true" aria-controls="collap_mitra_bisnis">
+                    <i class="fas fa-users"></i>
+                    <span>Mitra Bisnis</span>
+                </a>
+                <div id="collap_mitra_bisnis" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="h_mitra_tab_customer.html">Customer</a>
+                        <a class="collapse-item" href="h_mitra_tab_supplier.html">Supplier</a>
+                        <a class="collapse-item" href="h_mitra_tab_grup.html">Grup Mitra Bisnis</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collap_laporan" aria-expanded="true" aria-controls="collap_laporan">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Laporan</span>
+                </a>
+                <div id="collap_laporan" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="#">Pembelian</a>
+                        <a class="collapse-item" href="#">Penjualan</a>
+                        <a class="collapse-item" href="#">Stok</a>
+                    </div>
+                </div>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+        <!-- CONTENT -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <!-- Topbar Search -->
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+                        <!-- Nav Item - Alerts -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <!-- Counter - Alerts -->
+                                <span class="badge badge-danger badge-counter">3+</span>
+                            </a>
+                            <!-- Dropdown - Alerts -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                                <h6 class="dropdown-header">
+                                    Alerts Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 12, 2019</div>
+                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-donate text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 7, 2019</div>
+                                        $290.29 has been deposited into your account!
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-exclamation-triangle text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 2, 2019</div>
+                                        Spending Alert: We've noticed unusually high spending for your account.
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            </div>
+                        </li>
+                        <!-- Nav Item - Messages -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <!-- Counter - Messages -->
+                                <span class="badge badge-danger badge-counter">7</span>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Message Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="img/undraw_profile_1.svg" alt="...">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
+                                            problem I've been having.</div>
+                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="img/undraw_profile_2.svg" alt="...">
+                                        <div class="status-indicator"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">I have the photos that you ordered last month, how
+                                            would you like them sent to you?</div>
+                                        <div class="small text-gray-500">Jae Chun · 1d</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="img/undraw_profile_3.svg" alt="...">
+                                        <div class="status-indicator bg-warning"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">Last month's report looks great, I am very happy with
+                                            the progress so far, keep up the good work!</div>
+                                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="...">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
+                                            told me that people say this to all dogs, even if they aren't good...</div>
+                                        <div class="small text-gray-500">Chicken the Dog · 2w</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+                        </li>
+                        <div class="topbar-divider d-none d-sm-block"></div>
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Settings
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Activity Log
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="container-fluid">
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="h_produk_tab.html">Produk</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="h_merek_tab.html">Merek</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="h_kategori_tab.html">Kategori</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="h_harga_tab.html">Daftar Harga</a>
+                        </li>
+                    </ul>
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <form id="form">
+                                <div class="form-row">
+                                    <div class="col-md-3 mb-2">
+                                        <label>Kode</label>
+                                        <input id="kode" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label>Tanggal</label>
+                                        <input type="date" id="tanggal" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Supplier (Mitra)</label>
+                                        <input id="cari_mitra" class="form-control" placeholder="Cari supplier (≥3 huruf)">
+                                        <div id="dd_mitra" class="dropdown-menu w-100"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-3 mb-2">
+                                        <label>Termin</label>
+                                        <select id="termin" class="form-control">
+                                            <option value="cash">CASH</option>
+                                            <option value="credit">CREDIT</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <label>Tempo (hari)</label>
+                                        <input id="tempo" type="number" min="0" class="form-control" value="0">
+                                    </div>
+                                    <div class="col-md-7 mb-2">
+                                        <label>Keterangan</label>
+                                        <input id="keterangan" class="form-control">
+                                    </div>
+                                </div>
+                                <hr>
+                                <!-- input item -->
+                                <div class="form-row align-items-end">
+                                    <div class="col-md-4 mb-2">
+                                        <label>Produk / Item</label>
+                                        <input id="cari_item" class="form-control" placeholder="Cari produk (≥2)">
+                                        <div id="dd_item" class="dropdown-menu w-100"></div>
+                                    </div>
+                                    <div class="col-md-1 mb-2"><label>Qty</label><input id="qty" class="form-control" type="number" min="0.01" step="0.01" value="1"></div>
+                                    <div class="col-md-2 mb-2"><label>Satuan</label><input id="satuan" class="form-control"></div>
+                                    <div class="col-md-2 mb-2"><label>Harga</label><input id="harga" class="form-control"></div>
+                                    <div class="col-md-2 mb-2"><label>Diskon item (Rp)</label><input id="diskon_item" class="form-control" value="0"></div>
+                                    <div class="col-md-1 mb-2"><button id="addItem" type="button" class="btn btn-primary btn-block">Tambah</button></div>
+                                </div>
+                                <div class="table-responsive mt-2">
+                                    <table class="table table-sm table-bordered" id="tbl">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Item</th>
+                                                <th width="90">Qty</th>
+                                                <th width="90">Satuan</th>
+                                                <th width="120">Harga</th>
+                                                <th width="120">Diskon</th>
+                                                <th width="120">Subtotal</th>
+                                                <th width="50">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless table-sm">
+                                            <tr>
+                                                <td class="text-right small">Sub Total</td>
+                                                <td class="text-right" id="subTxt">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-right small">Diskon Total (Rp)</td>
+                                                <td><input id="diskon_total" class="form-control form-control-sm text-right" value="0"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-right small">Biaya Lain (Rp)</td>
+                                                <td><input id="biaya_lain" class="form-control form-control-sm text-right" value="0"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-right font-weight-bold">Grand Total</td>
+                                                <td class="text-right font-weight-bold" id="grandTxt">0</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <button id="btnSave" class="btn btn-primary">Simpan (Ctrl+Enter)</button>
+                                    <a href="h_pembelian_tab.html" class="btn btn-secondary ml-2">Batal</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="modalTambahMerek" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Tambah Merek Baru</h5>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <label>Kode</label>
+                                    <input type="text" id="kode_merek_baru" class="form-control mb-3" placeholder="AUTO">
+                                    <label>Nama Merek</label>
+                                    <input type="text" id="nama_merek_baru" class="form-control">
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="btnSimpanMerekBaru" class="btn btn-primary" onclick="simpanMerekBaru()">Simpan</button>
+                                    <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="modalTambahKategori" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Tambah Kategori Baru</h5>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <label>Kode</label>
+                                    <input type="text" id="kode_kategori_baru" class="form-control mb-3" placeholder="AUTO">
+                                    <label>Nama Kategori</label>
+                                    <input type="text" id="nama_kategori_baru" class="form-control">
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="btnSimpanKategoriBaru" class="btn btn-primary" onclick="simpanKategoriBaru()">Simpan</button>
+                                    <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script src="vendor/jquery/jquery.min.js"></script>
+                <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+                <script src="js/sb-admin-2.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                <script src="js/db_supabase.js"></script>
+                <script>
+                // helper
+                function fmt(n) { return (n == null || n === 0) ? '0' : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+                function toNum(s) { return parseFloat((s || '').toString().replace(/\./g, '')) || 0; }
+
+                function fmtInput(el) { el.addEventListener('input', () => el.value = el.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')); }
+
+                // elements
+                const kode = document.getElementById('kode');
+                const tanggal = document.getElementById('tanggal');
+                const cari_mitra = document.getElementById('cari_mitra');
+                const dd_mitra = document.getElementById('dd_mitra');
+                const termin = document.getElementById('termin');
+                const tempo = document.getElementById('tempo');
+                const keterangan = document.getElementById('keterangan');
+
+                const cari_item = document.getElementById('cari_item');
+                const dd_item = document.getElementById('dd_item');
+                const qty = document.getElementById('qty');
+                const satuan = document.getElementById('satuan');
+                const harga = document.getElementById('harga');
+                const diskon_item = document.getElementById('diskon_item');
+                const addItem = document.getElementById('addItem');
+                const tbl = document.querySelector('#tbl tbody');
+
+                const subTxt = document.getElementById('subTxt');
+                const diskon_total = document.getElementById('diskon_total');
+                const biaya_lain = document.getElementById('biaya_lain');
+                const grandTxt = document.getElementById('grandTxt');
+                const btnSave = document.getElementById('btnSave');
+
+                fmtInput(harga);
+                fmtInput(diskon_item);
+                fmtInput(diskon_total);
+                fmtInput(biaya_lain);
+                tanggal.value = new Date().toISOString().slice(0, 10);
+
+                // state
+                let items = [];
+                let selectedMitra = null;
+
+                // generate kode BL0000001
+                async function genKode() {
+                    const { data } = await db.from('tb_pembelian').select('kode_pembelian').order('created_at', { ascending: false }).limit(1);
+                    let next = 1;
+                    if (data && data.length) {
+                        const k = data[0].kode_pembelian || '';
+                        next = (parseInt(k.replace(/\D/g, '')) || 0) + 1;
+                    }
+                    kode.value = 'BL' + String(next).padStart(7, '0');
+                }
+                genKode();
+
+                // MITRA search
+                let timerM = null,
+                    mitraIdx = -1;
+                cari_mitra.addEventListener('input', function() {
+                    selectedMitra = null;
+                    this.dataset.id = '';
+                    clearTimeout(timerM);
+                    const kw = this.value.trim();
+                    if (kw.length < 3) {
+                        dd_mitra.classList.remove('show');
+                        dd_mitra.innerHTML = '';
+                        return;
+                    }
+                    dd_mitra.classList.add('show');
+                    timerM = setTimeout(async () => {
+                        const { data } = await db.from('tb_mitra').select('id_mitra,nama_mitra,termin_penjualan,tempo_penjualan,akun_hutang').ilike('nama_mitra', `%${kw}%`).limit(10);
+                        if (!data || data.length === 0) { dd_mitra.innerHTML = `<div class="dropdown-item text-muted">Tidak ada</div>`; return; }
+                        dd_mitra.innerHTML = data.map(m => `<div class="dropdown-item" data-id="${m.id_mitra}" data-nama="${m.nama_mitra}" data-termin="${m.termin_penjualan||'cash'}" data-tempo="${m.tempo_penjualan||0}" data-akunhutang="${m.akun_hutang||''}">${m.nama_mitra}</div>`).join('');
+                    }, 250);
+                });
+                dd_mitra.addEventListener('click', e => {
+                    const it = e.target.closest('.dropdown-item');
+                    if (!it) return;
+                    cari_mitra.value = it.dataset.nama;
+                    selectedMitra = { id: it.dataset.id, termin: it.dataset.termin, tempo: parseInt(it.dataset.tempo || 0), akun_hutang: it.dataset.akunhutang };
+                    cari_mitra.dataset.id = it.dataset.id;
+                    dd_mitra.classList.remove('show');
+
+                    // set termin from mitra if available
+                    if (selectedMitra.termin) termin.value = selectedMitra.termin;
+                    if (selectedMitra.tempo) tempo.value = selectedMitra.tempo;
+                });
+
+                // ITEM search
+                let timerI = null,
+                    itemIdx = -1;
+                cari_item.addEventListener('input', function() {
+                    clearTimeout(timerI);
+                    const kw = this.value.trim();
+                    if (kw.length < 2) {
+                        dd_item.classList.remove('show');
+                        dd_item.innerHTML = '';
+                        return;
+                    }
+                    dd_item.classList.add('show');
+                    timerI = setTimeout(async () => {
+                        const { data, error } = await db
+                            .from("tb_produk")
+                            .select("id_produk,kode_produk,nama_produk,satuan1,satuan2,satuan3,akun_pembelian")
+                            .or(`nama_produk.ilike.%${kw}%,kode_produk.ilike.%${kw}%`)
+                            .limit(20);
+                        if (!data || data.length === 0) { dd_item.innerHTML = `<div class="dropdown-item text-muted">Tidak ada</div>`; return; }
+                        dd_item.innerHTML = data.map(p => `<div class="dropdown-item" data-id="${p.id_produk}" data-nama="${p.nama_produk}" data-s1="${p.satuan1||''}" data-akun="${p.akun_pembelian||''}">${p.kode_produk? p.kode_produk+' — ':''}${p.nama_produk}</div>`).join('');
+                    }, 200);
+                });
+                dd_item.addEventListener('click', e => {
+                    const it = e.target.closest('.dropdown-item');
+                    if (!it) return;
+                    cari_item.value = it.dataset.nama;
+                    cari_item.dataset.id = it.dataset.id;
+                    satuan.value = it.dataset.s1 || '';
+                    // harga default kosong — user isi
+                    dd_item.classList.remove('show');
+                });
+
+                // add item
+                addItem.addEventListener('click', () => {
+                    const id_produk = cari_item.dataset.id || null;
+                    const nama_item = cari_item.value.trim();
+                    const q = parseFloat(qty.value) || 0;
+                    const s = satuan.value.trim();
+                    const h = toNum(harga.value);
+                    const d = toNum(diskon_item.value);
+                    if (!nama_item) return alert('Isi nama item');
+                    if (q <= 0) return alert('Qty > 0');
+                    const subtotal = (q * h) - d;
+                    items.push({ id_produk, nama_item, qty: q, satuan: s, harga: h, diskon_item: d, subtotal, akun_pembelian: null });
+                    render();
+                    // reset
+                    cari_item.value = '';
+                    cari_item.dataset.id = '';
+                    qty.value = 1;
+                    satuan.value = '';
+                    harga.value = '';
+                    diskon_item.value = '0';
+                    cari_item.focus();
+                });
+
+                function render() {
+                    tbl.innerHTML = '';
+                    let sub = 0;
+                    items.forEach((it, idx) => {
+                        sub += Number(it.subtotal);
+                        tbl.innerHTML += `<tr data-idx="${idx}">
+      <td>${it.nama_item}</td>
+      <td class="text-right">${it.qty}</td>
+      <td>${it.satuan||''}</td>
+      <td class="text-right">${fmt(it.harga)}</td>
+      <td class="text-right">${fmt(it.diskon_item)}</td>
+      <td class="text-right">${fmt(it.subtotal)}</td>
+      <td class="text-center"><button class="btn btn-sm btn-danger btnDel">x</button></td>
+    </tr>`;
+                    });
+                    document.querySelectorAll('.btnDel').forEach(b => b.addEventListener('click', e => {
+                        items.splice(e.target.closest('tr').dataset.idx, 1);
+                        render();
+                    }));
+                    subTxt.textContent = fmt(sub);
+                    recalc();
+                }
+
+                function recalc() {
+                    const sub = items.reduce((s, it) => s + Number(it.subtotal), 0);
+                    const dt = toNum(diskon_total.value);
+                    const bl = toNum(biaya_lain.value);
+                    const grand = sub - dt + bl;
+                    grandTxt.textContent = fmt(grand);
+                }
+
+                diskon_total.addEventListener('input', recalc);
+                biaya_lain.addEventListener('input', recalc);
+
+                // ENTER move next, CTRL+ENTER submit
+                document.getElementById('form').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.ctrlKey && e.target.type !== 'submit') { e.preventDefault(); const idx = Array.prototype.indexOf.call(this, e.target); if (this.elements[idx + 1]) this.elements[idx + 1].focus(); }
+                });
+                document.addEventListener('keydown', e => {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        e.preventDefault();
+                        btnSave.click();
+                    }
+                });
+
+                // SAVE
+                btnSave.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    try {
+                        if (items.length === 0) throw new Error('Tambahkan minimal 1 item');
+                        const kodeVal = kode.value;
+                        const tanggalVal = tanggal.value || new Date().toISOString().slice(0, 10);
+                        const id_mitra = cari_mitra.dataset.id || null;
+                        const terminVal = termin.value;
+                        const tempoVal = parseInt(tempo.value) || 0;
+                        const keteranganVal = keterangan.value.trim() || null;
+                        const sub = items.reduce((s, it) => s + Number(it.subtotal), 0);
+                        const dt = toNum(diskon_total.value);
+                        const bl = toNum(biaya_lain.value);
+                        const grand = sub - dt + bl;
+
+                        // tanggal jatuh tempo if credit
+                        const t_jatuh = (terminVal === 'credit' && tempoVal > 0) ? new Date(new Date(tanggalVal).getTime() + tempoVal * 24 * 3600 * 1000).toISOString().slice(0, 10) : null;
+
+                        // insert header
+                        const { data: head, error: errHead } = await db.from('tb_pembelian').insert([{
+                            kode_pembelian: kodeVal,
+                            tanggal: tanggalVal,
+                            id_mitra: id_mitra || null,
+                            termin: terminVal,
+                            tempo: tempoVal,
+                            tanggal_jatuh_tempo: t_jatuh,
+                            total_sub: sub,
+                            total_diskon: dt,
+                            total_biaya_lain: bl,
+                            grand_total: grand,
+                            keterangan: keteranganVal
+                        }]).select().single();
+                        if (errHead) throw errHead;
+                        const idP = head.id_pembelian;
+
+                        // insert details + mutasi + prepare jurnal lines grouped by akun
+                        const jurnalMap = {}; // akun => amount debit
+                        for (const it of items) {
+                            const ins = {
+                                id_pembelian: idP,
+                                id_produk: it.id_produk || null,
+                                nama_item: it.nama_item,
+                                qty: it.qty,
+                                satuan: it.satuan,
+                                harga: it.harga,
+                                diskon_item: it.diskon_item,
+                                subtotal: it.subtotal
+                            };
+                            const { error: errD } = await db.from('tb_pembelian_detail').insert([ins]);
+                            if (errD) throw errD;
+
+                            // mutasi stok jika id_produk
+                            if (it.id_produk) {
+                                await db.from('tb_stock_mutasi').insert([{
+                                    id_produk: it.id_produk,
+                                    sumber: 'pembelian',
+                                    ref_id: idP,
+                                    tanggal: tanggalVal,
+                                    qty: it.qty,
+                                    satuan: it.satuan,
+                                    keterangan: `Pembelian ${kodeVal}`
+                                }]);
+                            }
+
+                            // ambil akun_pembelian dari tb_produk
+                            let akun = '610000'; // default biaya lain
+                            if (it.id_produk) {
+                                const { data: p } = await db.from('tb_produk').select('akun_pembelian').eq('id_produk', it.id_produk).single();
+                                if (p && p.akun_pembelian) akun = p.akun_pembelian;
+                            }
+                            // akumulasi subtotal ke akun
+                            jurnalMap[akun] = (jurnalMap[akun] || 0) + Number(it.subtotal);
+                        }
+
+                        // jika ada biaya lain -> put to biaya akun (610020)
+                        if (bl > 0) jurnalMap['610020'] = (jurnalMap['610020'] || 0) + bl;
+
+                        // buat jurnal: debit per akun (jurnalMap), kredit ke hutang/ kas
+                        // insert debit lines
+                        for (const akun in jurnalMap) {
+                            const { error: e } = await db.from('tb_jurnal').insert([{
+                                tanggal: tanggalVal,
+                                id_source: idP,
+                                sumber: 'pembelian',
+                                kode_akun: akun,
+                                debit: jurnalMap[akun],
+                                kredit: 0,
+                                keterangan: `Pembelian ${kodeVal}`
+                            }]);
+                            if (e) throw e;
+                        }
+
+                        // kredit: jika termin credit -> hutang (akun mitra.akun_hutang atau default 210001). If cash -> kredit kas (110001)
+                        if (terminVal === 'credit') {
+                            // create tb_hutang
+                            const jatuh = t_jatuh;
+                            const { data: mit } = id_mitra ? await db.from('tb_mitra').select('akun_hutang').eq('id_mitra', id_mitra).single() : { data: null };
+                            const akunHutang = (mit && mit.akun_hutang) ? mit.akun_hutang : '210001';
+                            const { error: errH } = await db.from('tb_hutang').insert([{
+                                id_pembelian: idP,
+                                id_mitra: id_mitra || null,
+                                total: grand,
+                                sisa: grand,
+                                jatuh_tempo: jatuh,
+                                status: 'open'
+                            }]);
+                            if (errH) throw errH;
+
+                            // jurnal kredit
+                            const { error: e2 } = await db.from('tb_jurnal').insert([{
+                                tanggal: tanggalVal,
+                                id_source: idP,
+                                sumber: 'pembelian',
+                                kode_akun: akunHutang,
+                                debit: 0,
+                                kredit: grand,
+                                keterangan: `Hutang pembelian ${kodeVal}`
+                            }]);
+                            if (e2) throw e2;
+                        } else {
+                            // cash: kredit kas akun 110001 (you can change to ask user which kas)
+                            const kasAkun = '110001';
+                            const { error: e3 } = await db.from('tb_jurnal').insert([{
+                                tanggal: tanggalVal,
+                                id_source: idP,
+                                sumber: 'pembelian',
+                                kode_akun: kasAkun,
+                                debit: 0,
+                                kredit: grand,
+                                keterangan: `Pembayaran tunai ${kodeVal}`
+                            }]);
+                            if (e3) throw e3;
+                        }
+
+                        alert('Pembelian tersimpan. Kode: ' + kodeVal);
+                        // reset form
+                        items = [];
+                        render();
+                        cari_mitra.value = '';
+                        cari_mitra.dataset.id = '';
+                        selectedMitra = null;
+                        diskon_total.value = '0';
+                        biaya_lain.value = '0';
+                        genKode();
+                        tanggal.value = new Date().toISOString().slice(0, 10);
+
+                    } catch (err) {
+                        alert('Gagal simpan: ' + (err.message || JSON.stringify(err)));
+                        console.error(err);
+                    }
+                });
+                </script>
+</body>
+
+</html>

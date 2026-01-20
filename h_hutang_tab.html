@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+        .dropdown-menu.show {
+        display: block;
+        max-height: 200px;
+        overflow-y: auto;
+        cursor: pointer;
+    }
+
+    .input-error {
+        border: 1px solid #dc3545 !important;
+        /* merah bootstrap */
+        box-shadow: 0 0 4px rgba(220, 53, 69, 0.4) !important;
+    }
+
+    #dropdown_kategori.dropdown-menu {
+        width: 100% !important;
+        min-width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    #dropdown_merek.dropdown-menu {
+        width: 100% !important;
+        min-width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    .dropdown-item.active-highlight {
+        background-color: #007bff !important;
+        color: white !important;
+    }
+
+    .shortcut-menu {
+        gap: 10px;
+        margin-top: 45px !important;
+        /* turun dari 70 px → lebih dekat ke navbar */
+    }
+
+    .shortcut-item {
+        width: 55px;
+        /* dari 70px */
+        text-align: center;
+        text-decoration: none !important;
+    }
+
+    .shortcut-icon {
+        width: 38px;
+        /* dari 50px */
+        height: 38px;
+        /* dari 50px */
+        border-radius: 10px;
+        /* sedikit lebih kecil */
+        font-size: 16px;
+        /* dari 20px */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
+
+    .shortcut-text {
+        margin-top: 4px;
+        font-size: 11px;
+        /* dari 12px */
+        color: #444;
+    }
+
+    .form-horizontal .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .form-horizontal label {
+        width: 110px;
+        /* lebar label (bisa diubah) */
+        margin-bottom: 0;
+        font-size: 13px;
+        color: #333;
+    }
+
+    .form-horizontal .form-control,
+    .form-horizontal .form-select {
+        flex: 1;
+    }
+
+    /* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+    .form-horizontal .form-group>.position-relative {
+        flex: 1;
+        /* wajib */
+        display: flex;
+        /* biar textarea/input di dalamnya ikut full */
+        align-items: center;
+    }
+
+    .form-horizontal .position-relative input.form-control-sm {
+        width: 100%;
+        /* pastikan penuh */
+    }
+
+    .gap-2>* {
+        margin-left: 6px;
+    }
+
+    .table thead th {
+        background: linear-gradient(to bottom, #f5f5f5, #ededee);
+        color: #7789bf;
+        font-weight: 600;
+        border-bottom: 2px solid #ffffff;
+    }
+
+    .card-body {
+        padding-bottom: 0 !important;
+    }
+
+    .card-body nav {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    #pagination {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* HANYA BARIS DATA (ISI TABEL) */
+    .table-tight tbody td {
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+        line-height: 1.15;
+        vertical-align: middle;
+    }
+
+    .action-icon {
+        cursor: pointer;
+        padding: 2px;
+    }
+
+    tr.barisdata:hover {
+        background: #f1f5ff;
+        cursor: pointer
+    }
+/* BARIS JATUH TEMPO (WARNING LEMBUT) */
+tr.overdue-row {
+  background-color: #ffeded !important; /* bootstrap warning soft */
+}
+.table-compact {
+  max-width: 600px; 
+}
+
+/* HIGHLIGHT SUPPLIER HASIL PENCARIAN */
+.highlight-row {
+  background-color: #fff7cc !important; /* kuning lembut */
+  transition: background-color 0.2s ease;
+}
+    </style>
+</head>
+
+<body id="page-top">
+    <div id="navbar"></div>
+    <div id="wrapper">
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="container-fluid">
+                    <div id="shortcut"></div>
+                    <div class="card shadow mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
+                            <h6 class="m-0 font-weight-bold text-primary">Hutang
+                                <span class="ml-3 text-danger font-weight-bold" id="totalHutangTxt">Rp 0</span>
+                            </h6>
+                            <input type="text" id="searchSupplier" class="form-control form-control-sm" style="max-width:100px" placeholder="Cari..">
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                  <h6 class="font-weight-bold mb-2 text-center">Total Jatuh Tempo</h6>
+
+                                  <div class="table-responsive table-compact">
+                                    <table class="table table-hover table-sm table-bordered table-tight">
+                                      <thead>
+                                        <tr>
+                                          <th>Supplier</th>
+                                          <th class="text-right" width="110px">Jatuh Tempo</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody id="tbTotalJT"></tbody>
+                                      <tfoot>
+                                        <tr class="font-weight-bold bg-light">
+                                          <td class="text-right">TOTAL</td>
+                                          <td class="text-right text-danger" id="grandTotalJT">Rp 0</td>
+                                        </tr>
+                                      </tfoot>
+                                    </table>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <h6 class="font-weight-bold mb-2 text-center">Total Hutang</h6>
+                                  <div class="table-responsive table-compact">
+                                    <table class="table table-hover table-sm table-bordered table-tight">
+                                      <thead>
+                                        <tr>
+                                          <th>Supplier</th>
+                                          <th class="text-right" width="110px">Total Hutang</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody id="tbTotalHutang"></tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                                  </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ================= MODAL DETAIL ================= -->
+    <div class="modal" id="modalDetail" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h6 class="modal-title" id="judulDetail"></h6>
+                    <div class="text-right">
+                        <small class="text-muted">Total Jatuh Tempo</small><br>
+                        <span class="font-weight-bold text-danger" id="totalJTTxt">Rp 0</span>
+                    </div>
+                </div>
+                <div class="modal-body table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Tanggal</th>
+                                <th>JT</th>
+                                <th class="text-right">Total</th>
+                                <th class="text-right">Terbayar</th>
+                                <th class="text-right">Sisa</th>
+                                <th class="text-center" width="80px">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbDetail"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="modalInvoice" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header ">
+        <h6 class="modal-title">Invoice Pembelian</h6>
+        <button class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th class="text-right">Qty</th>
+              <th>Satuan</th>
+              <th class="text-right">Harga</th>
+              <th class="text-right">Diskon</th>
+              <th class="text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="tbInvoiceDetail"></tbody>
+        </table>
+
+        <div class="row mt-3">
+          <div class="col-md-6"></div>
+          <div class="col-md-6">
+            <table class="table table-sm">
+              <tr>
+                <td>Sub Total</td>
+                <td class="text-right" id="invSubtotal">0</td>
+              </tr>
+              <tr>
+                <td>Diskon</td>
+                <td class="text-right" id="invDiskon">0</td>
+              </tr>
+              <tr class="font-weight-bold">
+                <td>Total</td>
+                <td class="text-right" id="invTotal">0</td>
+              </tr>
+              <tr>
+                <td>Terbayar</td>
+                <td class="text-right" id="invTerbayar">0</td>
+              </tr>
+              <tr class="font-weight-bold text-danger">
+                <td>Sisa</td>
+                <td class="text-right" id="invSisa">0</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+    <script src="js/navbar_on_off.js"></script>
+    <script>
+    function initNavbarQuickSearch() {
+        const nav = document.getElementById("navbar");
+        if (!nav) return;
+        const input = nav.querySelector("#quickSearchInput");
+        if (!input || input.dataset.bound) return;
+        input.dataset.bound = "1";
+        input.addEventListener("keydown", e => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            const q = input.value.trim();
+            if (!q) return;
+            location.href =
+                "h_harga_produk.html?q=" + encodeURIComponent(q);
+        });
+    }
+    async function loadNavbar() {
+        const navEl = document.getElementById("navbar");
+        if (localStorage.getItem("navbar")) {
+            navEl.innerHTML = localStorage.getItem("navbar");
+            navEl.classList.add("loaded");
+        }
+        const res = await fetch("navbar.html");
+        const html = await res.text();
+        localStorage.setItem("navbar", html);
+        navEl.innerHTML = html;
+        navEl.classList.add("loaded");
+        if (typeof applyShortcutVisibility === "function") {
+            applyShortcutVisibility();
+        }
+        initNavbarQuickSearch();
+    }
+    async function loadShortcut() {
+        if (!isShortcutEnabled()) {
+            const el = document.getElementById("shortcut");
+            if (el) el.style.display = "none";
+            return;
+        }
+
+        const el = document.getElementById("shortcut");
+
+        if (localStorage.getItem("shortcut_html")) {
+            el.innerHTML = localStorage.getItem("shortcut_html");
+            applyShortcutIcons(); // ⬅️ WAJIB
+        }
+
+        const res = await fetch("shortcut.html");
+        const html = await res.text();
+
+        localStorage.setItem("shortcut_html", html);
+        el.innerHTML = html;
+
+        applyShortcutIcons(); // ⬅️ WAJIB
+    }
+    loadNavbar();
+    loadShortcut();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/db_supabase.js"></script>
+    <script>
+    // ================= HELPER =================
+    function fmt(n) {
+        return (n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function todayStr() {
+        return new Date().toISOString().slice(0, 10);
+    }
+
+    // ================= LOAD LIST SUPPLIER =================
+    let supplierCache = [];
+
+async function loadHutangSupplier(){
+  const { data, error } = await db
+    .from("v_hutang_supplier")
+    .select("*")
+    .order("total_hutang", { ascending:false });
+
+  if(error){
+    alert("Gagal load hutang");
+    return;
+  }
+
+  supplierCache = data || [];
+
+  // 🔥 TOTAL HUTANG GLOBAL
+  let total = 0;
+  supplierCache.forEach(r => total += r.total_hutang);
+
+  document.getElementById("totalHutangTxt").innerText =
+    "Rp " + fmt(total);
+
+  renderTotalHutang();
+  renderTotalJT();
+}
+
+    function renderTotalHutang(){
+      const tb = document.getElementById("tbTotalHutang");
+      tb.innerHTML = "";
+
+      supplierCache.forEach(r=>{
+        tb.insertAdjacentHTML("beforeend",`
+          <tr class="barisdata"
+            onclick="openDetail('${r.id_mitra}','${r.nama_mitra}','all')">
+            <td>${r.nama_mitra}</td>
+            <td class="text-right">${fmt(r.total_hutang)}</td>
+          </tr>
+        `);
+      });
+    }
+
+    function renderTotalJT(){
+      const tb = document.getElementById("tbTotalJT");
+      tb.innerHTML = "";
+
+      let grand = 0;
+
+      supplierCache
+        .filter(r => r.total_jt > 0)
+        .forEach(r=>{
+          grand += r.total_jt;
+
+          tb.insertAdjacentHTML("beforeend",`
+            <tr class="barisdata"
+              onclick="openDetail('${r.id_mitra}','${r.nama_mitra}','overdue')">
+              <td>${r.nama_mitra}</td>
+              <td class="text-right text-danger">${fmt(r.total_jt)}</td>
+            </tr>
+          `);
+        });
+
+      document.getElementById("grandTotalJT").innerText = fmt(grand);
+    }
+
+    // ================= POPUP DETAIL =================
+async function openDetail(id_mitra, nama, mode){
+  document.getElementById("judulDetail").innerText =
+    mode === "overdue"
+      ? `${nama}`
+      : `${nama}`;
+
+    let q = db
+      .from("tb_hutang")
+      .select(`
+        id_hutang,
+        total,
+        sisa,
+        jatuh_tempo,
+        tb_pembelian:id_pembelian (
+          id_pembelian,
+          kode_pembelian,
+          tanggal,
+          total_sub,
+          total_diskon,
+          total_ppn,
+          total_biaya_lain,
+          grand_total,
+          dp
+        )
+      `)
+      .eq("id_mitra", id_mitra)
+      .eq("status", "open");
+
+
+  if(mode === "overdue"){
+    q = q.lt("jatuh_tempo", todayStr());
+  }
+
+  const { data } = await q.order("jatuh_tempo");
+
+  const tb = document.getElementById("tbDetail");
+  tb.innerHTML = "";
+
+  let totalJT = 0; // 🔥 PENTING
+
+  data.forEach(h=>{
+    const overdue = h.jatuh_tempo && h.jatuh_tempo < todayStr();
+
+    if(overdue){
+      totalJT += h.sisa; // 🔥 AKUMULASI
+    }
+
+    tb.insertAdjacentHTML("beforeend",`
+      <tr class="${overdue?'overdue-row':''}">
+        <td>${h.tb_pembelian.kode_pembelian}</td>
+        <td>${h.tb_pembelian.tanggal}</td>
+        <td>${h.jatuh_tempo||'-'}</td>
+        <td class="text-right">${fmt(h.total)}</td>
+        <td class="text-right">${fmt(h.total-h.sisa)}</td>
+        <td class="text-right text-danger">${fmt(h.sisa)}</td>
+        <td class="text-center">
+        <span class="action-icon text-dark"
+            title="Lihat detail pembelian"
+            onclick="viewInvoice('${h.id_hutang}')">
+            ${ICON_INFO}
+        </span>
+        <span class="action-icon text-primary"
+            title="Bayar hutang"
+            onclick="goBayarAuto('${id_mitra}','${h.id_hutang}')">
+            ${ICON_IMPORT_BAYAR}
+        </span>
+        </td>
+      </tr>
+    `);
+  });
+
+  // 🔥 SET TOTAL JT DI MODAL
+  document.getElementById("totalJTTxt").innerText =
+    "Rp " + fmt(totalJT);
+
+  $("#modalDetail").modal("show");
+}
+
+async function viewInvoice(idHutang){
+
+  // ================= 1. AMBIL HUTANG + PEMBELIAN =================
+  const { data: hutang, error } = await db
+    .from("tb_hutang")
+    .select(`
+      sisa,
+      tb_pembelian:id_pembelian (
+        id_pembelian,
+        total_sub,
+        total_diskon,
+        total_ppn,
+        total_biaya_lain,
+        grand_total,
+        dp
+      )
+    `)
+    .eq("id_hutang", idHutang)
+    .single();
+
+  if (error || !hutang || !hutang.tb_pembelian) {
+    console.error(error);
+    alert("Data invoice tidak ditemukan");
+    return;
+  }
+
+  const p = hutang.tb_pembelian;
+  const idPembelian = p.id_pembelian;
+
+  // ================= 2. AMBIL DETAIL PEMBELIAN =================
+  const { data: items, error: errItem } = await db
+    .from("tb_pembelian_detail")
+    .select(`
+      nama_item,
+      qty,
+      satuan,
+      harga,
+      diskon_item,
+      subtotal
+    `)
+    .eq("id_pembelian", idPembelian)
+    .order("nama_item");
+
+  if (errItem) {
+    console.error(errItem);
+    alert("Gagal mengambil detail pembelian");
+    return;
+  }
+
+  const tb = document.getElementById("tbInvoiceDetail");
+  tb.innerHTML = "";
+
+  let subtotalHitung = 0;
+
+  items.forEach(i=>{
+    subtotalHitung += Number(i.subtotal || 0);
+
+    tb.insertAdjacentHTML("beforeend",`
+      <tr>
+        <td>${i.nama_item}</td>
+        <td class="text-right">${i.qty}</td>
+        <td>${i.satuan || "-"}</td>
+        <td class="text-right">${fmt(i.harga)}</td>
+        <td class="text-right">${fmt(i.diskon_item)}</td>
+        <td class="text-right">${fmt(i.subtotal)}</td>
+      </tr>
+    `);
+  });
+
+  // ================= 3. RINGKASAN INVOICE =================
+  const subtotal = p.total_sub || subtotalHitung;
+  const diskon   = p.total_diskon || 0;
+  const total    = p.grand_total || 0;
+  const terbayar = total - hutang.sisa;
+  const sisa     = hutang.sisa;
+
+  document.getElementById("invSubtotal").innerText = fmt(subtotal);
+  document.getElementById("invDiskon").innerText   = fmt(diskon);
+  document.getElementById("invTotal").innerText    = fmt(total);
+  document.getElementById("invTerbayar").innerText = fmt(terbayar);
+  document.getElementById("invSisa").innerText     = fmt(sisa);
+
+  // ================= 4. TAMPILKAN MODAL =================
+  $("#modalInvoice").modal("show");
+}
+
+document.getElementById("searchSupplier")
+  .addEventListener("input", e => {
+    const q = e.target.value.toLowerCase().trim();
+
+    // 🔥 HANYA tabel Total Hutang
+    const rows = document.querySelectorAll(
+      "#tbTotalHutang tr.barisdata"
+    );
+
+    let firstMatch = null;
+
+    rows.forEach(row => {
+      row.classList.remove("highlight-row");
+
+      if (!q) return;
+
+      const text = row.innerText.toLowerCase();
+      if (text.includes(q)) {
+        row.classList.add("highlight-row");
+
+        if (!firstMatch) {
+          firstMatch = row;
+        }
+      }
+    });
+
+    // auto scroll ke hasil pertama
+    if (firstMatch) {
+      firstMatch.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+});
+
+const searchInput = document.getElementById("searchSupplier");
+
+/* ===============================
+   ESC → CLEAR HIGHLIGHT (TOTAL HUTANG SAJA)
+   =============================== */
+searchInput.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+
+  e.preventDefault();
+
+  // kosongkan input
+  searchInput.value = "";
+
+  // 🔥 hapus highlight HANYA di tabel Total Hutang
+  document.querySelectorAll(
+    "#tbTotalHutang tr.highlight-row"
+  ).forEach(row => {
+    row.classList.remove("highlight-row");
+  });
+});
+
+    // ================= AKSI BAYAR =================
+    function goBayar(id_mitra) {
+        location.href = `h_hutang_bayar.html?id_mitra=${id_mitra}`;
+    }
+function goBayarAuto(idMitra, idHutang){
+  if (!idHutang || idHutang === "undefined") {
+    alert("ID hutang tidak valid");
+    return;
+  }
+
+  location.href =
+    `h_hutang_bayar.html?id_mitra=${idMitra}&auto_hutang=${idHutang}`;
+}
+
+
+    // ================= INIT =================
+    loadHutangSupplier();
+    </script>
+</body>
+
+</html>

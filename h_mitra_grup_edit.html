@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #4d5061  !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.card-body {
+    padding-bottom: 10px !important;
+}
+
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+#statusDropdownBtn {
+    width: 80px;       /* bebas atur: 80 / 90 / 100 px */
+    text-align: left;
+}
+
+#btnUpdate {
+    width: 100px;       /* bebas atur: 80 / 90 / 100 px */
+    text-align: center;
+}
+
+
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+    <div id="wrapper">
+<!-- CONTENT -->
+  <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+  <div class="card shadow mb-4"> 
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <!-- JUDUL -->
+      <h6 class="m-0 font-weight-bold text-primary">Edit Mitra Grup</h6>
+      <!-- TOMBOL -->
+      <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="statusDropdownBtn" data-toggle="dropdown" disabled>Aktif</button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="setStatus(true); return false;">Aktif</a>
+                <a class="dropdown-item" href="#" onclick="setStatus(false); return false;">Nonaktif</a>
+            </div>
+        </div>
+        <button type="button" form="formEdit" id="btnUpdate" class="btn btn-warning btn-sm" data-mode="edit">Edit</button>
+          <a href="h_mitra_tab_grup.html" class="btn btn-secondary btn-sm">Kembali</a>
+      </div>
+    </div>
+      <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <form id="formEdit">
+
+                        <input type="hidden" id="id_grup">
+                        <input type="hidden" id="aktif">
+                        <div class="form-group mb-3">
+                            <label>Nama Grup</label>
+                            <input id="nama_grup" type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Keterangan</label>
+                            <textarea id="keterangan" class="form-control"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+const grupID = new URLSearchParams(location.search).get("id");
+const btnUpdate = document.getElementById("btnUpdate");
+const statusBtn = document.getElementById("statusDropdownBtn");
+const form = document.getElementById("formEdit");
+const aktifInput = document.getElementById("aktif");
+
+// =====================
+// LOCK / UNLOCK FORM
+// =====================
+function lockForm() {
+    form.querySelectorAll("input, textarea").forEach(el => {
+        if (el.id !== "id_grup") el.disabled = true;
+    });
+    statusBtn.disabled = true;
+}
+
+function unlockForm() {
+    form.querySelectorAll("input, textarea").forEach(el => {
+        if (el.id !== "id_grup") el.disabled = false;
+    });
+    statusBtn.disabled = false;
+}
+
+// =====================
+// STATUS DROPDOWN
+// =====================
+function updateStatusButton(val) {
+    statusBtn.innerText = val ? "Aktif" : "Nonaktif";
+    statusBtn.classList.remove("btn-success", "btn-danger");
+    statusBtn.classList.add(val ? "btn-success" : "btn-danger");
+}
+
+function setStatus(val) {
+    if (statusBtn.disabled) return;
+    aktifInput.value = val ? "true" : "false";
+    updateStatusButton(val);
+}
+
+// =====================
+// LOAD DATA
+// =====================
+async function loadData() {
+    const { data, error } = await db
+        .from("tb_grup_mitra")
+        .select("*")
+        .eq("id_grup_mitra", grupID)
+        .single();
+
+    if (error || !data) {
+        alert("Data grup tidak ditemukan");
+        return;
+    }
+
+    id_grup.value = data.id_grup_mitra;
+    nama_grup.value = data.nama_grup;
+    keterangan.value = data.keterangan || "";
+
+    aktifInput.value = data.aktif ? "true" : "false";
+    updateStatusButton(data.aktif);
+
+    lockForm();
+}
+
+loadData();
+
+// =====================
+// CEK DUPLIKAT (EDIT)
+// =====================
+async function isNamaGrupExistEdit(nama) {
+    const { data } = await db
+        .from("tb_grup_mitra")
+        .select("id_grup_mitra")
+        .ilike("nama_grup", nama)
+        .neq("id_grup_mitra", grupID)
+        .limit(1);
+
+    return data && data.length > 0;
+}
+
+// =====================
+// UPDATE BUTTON
+// =====================
+btnUpdate.onclick = async () => {
+
+    // ===== MODE EDIT =====
+    if (btnUpdate.dataset.mode === "edit") {
+        unlockForm();
+        btnUpdate.dataset.mode = "update";
+        btnUpdate.innerText = "Update";
+        btnUpdate.classList.replace("btn-warning","btn-primary");
+        return;
+    }
+
+    // ===== MODE UPDATE =====
+    btnUpdate.disabled = true;
+
+    const nama = nama_grup.value.trim();
+    if (!nama) {
+        alert("Nama grup wajib diisi");
+        nama_grup.focus();
+        btnUpdate.disabled = false;
+        return;
+    }
+
+    if (await isNamaGrupExistEdit(nama)) {
+        alert(`Nama grup "${nama}" sudah digunakan`);
+        nama_grup.focus();
+        nama_grup.select();
+        btnUpdate.disabled = false;
+        return;
+    }
+
+    const payload = {
+        nama_grup: nama,
+        keterangan: keterangan.value.trim() || null,
+        aktif: aktifInput.value === "true"
+    };
+
+    const { error } = await db
+        .from("tb_grup_mitra")
+        .update(payload)
+        .eq("id_grup_mitra", grupID);
+
+    if (error) {
+        alert("Gagal update grup");
+        btnUpdate.disabled = false;
+        return;
+    }
+
+    alert("✅ Grup mitra berhasil diperbarui");
+
+    // 🔥 CLEAR CACHE TAB
+    localStorage.removeItem("cache_grup_mitra_all");
+
+    lockForm();
+    btnUpdate.dataset.mode = "edit";
+    btnUpdate.innerText = "Edit";
+    btnUpdate.classList.replace("btn-primary","btn-warning");
+    btnUpdate.disabled = false;
+};
+
+// =====================
+// CTRL + ENTER
+// =====================
+document.addEventListener("keydown", e => {
+    if (e.ctrlKey && e.key === "Enter") {
+        btnUpdate.click();
+    }
+});
+// ⛔ CEGAT SUBMIT FORM
+form.addEventListener("submit", function (e) {
+    e.preventDefault();
+});
+
+// ENTER = trigger tombol update
+form.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        btnUpdate.click();
+    }
+});
+
+</script>
+
+</body>
+</html>

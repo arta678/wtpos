@@ -1,0 +1,100 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow" style="border-bottom:1px solid #e5e5e5;">
+    <a class="navbar-brand font-weight-bold text-dark" href="#">WIGUNA T</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="topMenu">
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item">
+                <a class="nav-link" href="#">Statistik</a>
+            </li>
+
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Data</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item is-active" href="h_produk_add.html">Tambah Produk</a>
+                    <a class="dropdown-item" href="h_produk_tab.html">Produk</a>
+                    <a class="dropdown-item" href="h_merek_tab.html">Merek</a>
+                    <a class="dropdown-item" href="h_kategori_tab.html">Kategori</a>
+                    <a class="dropdown-item" href="h_harga_produk.html">Daftar Harga</a>
+                    <a class="dropdown-item" href="h_harga_awal.html">HPP Produk</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="h_pembelian_add.html">Beli</a>
+            </li>
+<!-- 
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Beli</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item is-active" href="h_pembelian_add.html">Tambah Pembelian</a>
+                    <a class="dropdown-item" href="h_pembelian_tab.html">Daftar Pembelian</a>
+                </div>
+            </li>
+ -->
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Jual</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item is-active" href="#">Tambah Penjualan</a>
+                    <a class="dropdown-item" href="#">Daftar Penjualan</a>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="h_hutang_bayar.html">Bayar</a>
+            </li>
+
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Mitra</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item is-active" href="h_mitra_add.html?jenis=customer">Tambah Customer</a>
+                    <a class="dropdown-item is-active" href="h_mitra_add.html?jenis=supplier">Tambah Supplier</a>
+                    <a class="dropdown-item" href="h_mitra_tab.html">Mitra</a>
+                    <a class="dropdown-item" href="h_mitra_tab_grup.html">Grup Mitra</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Akuntansi</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="h_akun_tab.html">Akun</a>
+                    <a class="dropdown-item" href="h_jurnal_tab.html">Jurnal Umum</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Laporan</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Pembelian</a>
+                    <a class="dropdown-item" href="#">Penjualan</a>
+                    <a class="dropdown-item" href="#">Stok</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Setting</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="h_setting.html">Default Akun</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item d-flex justify-content-between align-items-center"
+                       href="#"
+                       onclick="toggleShortcut(); return false;">
+                        Shortcut 
+                        <span id="shortcutStatus" class="badge badge-success">ON</span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+<div class="form-inline my-2 my-lg-0">
+  <input
+    id="quickSearchInput"
+    class="form-control form-control-sm ml-lg-3"
+    type="search"
+    placeholder="Cari"
+    autocomplete="off"
+    style="width:150px"
+  >
+</div>
+</nav>

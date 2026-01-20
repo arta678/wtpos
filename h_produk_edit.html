@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #4d5061  !important;
+    color: white !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.card-body {
+    padding-bottom: 10px !important;
+}
+
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+#statusDropdownBtn {
+    width: 80px;       /* bebas atur: 80 / 90 / 100 px */
+    text-align: left;
+}
+
+#btnUpdate {
+    width: 100px;       /* bebas atur: 80 / 90 / 100 px */
+    text-align: center;
+}
+
+
+</style>
+</head>
+<body id="page-top">
+<div id="navbar"></div>
+    <div id="wrapper">
+<!-- CONTENT -->
+  <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+<div class="container-fluid">    
+  <div id="shortcut"></div>
+  <div class="card shadow mb-4"> 
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <!-- JUDUL -->
+      <h6 class="m-0 font-weight-bold text-primary">Edit Produk</h6>
+      <!-- TOMBOL -->
+      <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="statusDropdownBtn" data-toggle="dropdown" disabled>Aktif</button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="setStatus(true)">Aktif</a>
+                <a class="dropdown-item" href="#" onclick="setStatus(false)">Nonaktif</a>
+            </div>
+        </div>
+        <button type="submit" form="formEdit" id="btnUpdate" class="btn btn-warning btn-sm" data-mode="edit">Edit</button>
+          <a href="h_produk_tab.html" class="btn btn-secondary btn-sm">Kembali</a>
+      </div>
+    </div>
+      <div class="card-body">
+       <form id="formEdit">
+        <div class="row">
+          <!-- KOLUMEN 1 -->
+          <div class="col-md-4 form-horizontal">
+            <div class="form-group">
+              <label>Kode</label>
+              <input id="kode_produk" type="text" class="form-control form-control-sm " placeholder="AUTO"
+                    minlength="4" maxlength="4" pattern="[0-9]{4}" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label>Nama Produk</label>
+              <input id="nama_produk" type="text" class="form-control form-control-sm" required>
+            </div>
+            <div class="form-group">
+              <label>Kategori</label>
+              <div class="position-relative w-100">
+                <input type="text" id="cari_kategori" class="form-control form-control-sm" placeholder="Cari Kategori" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <div id="dropdown_kategori" class="dropdown-menu w-100"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Merek</label>
+              <div class="position-relative w-100">
+                <input type="text" id="cari_merek" class="form-control form-control-sm" placeholder="Cari Merek" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <div id="dropdown_merek" class="dropdown-menu w-100"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Barcode 1</label>
+              <input id="barcode1" class="form-control form-control-sm" placeholder=""> 
+            </div>
+            <div class="form-group">
+              <label>Barcode 2</label>
+              <input id="barcode2" class="form-control form-control-sm" placeholder="">
+            </div>
+            <div class="form-group">
+              <label>Satuan</label>
+              <input id="satuan1" class="form-control form-control-sm" value="PCS" placeholder="PCS">
+            </div>
+<!--             <div class="form-group">
+              <label>Aktif</label>
+              <input id="aktif" type="checkbox" checked style="margin-left: 10px;">
+            </div> -->
+            <input type="checkbox" id="aktif" hidden>
+          </div>
+          <!-- KOLUMEN 2 -->
+          <div class="col-md-4 form-horizontal">
+
+            <div class="form-group">
+              <label>Satuan 2</label>
+              <input id="satuan2" class="form-control form-control-sm" placeholder="Satuan2">
+            </div>
+            <div class="form-group">
+              <label>Konversi 2</label>
+              <input id="konversi2" class="form-control form-control-sm" placeholder="Konversi2">
+            </div>
+            <div class="form-group">
+              <label>Satuan 3</label>
+              <input id="satuan3" class="form-control form-control-sm" placeholder="Satuan3">
+            </div>
+            <div class="form-group">
+              <label>Konversi 3</label>
+              <input id="konversi3" class="form-control form-control-sm" placeholder="Konversi3">
+            </div>
+            <div class="form-group">
+              <label>Satuan beli</label>
+              <select id="satuan_beli" class="form-control form-control-sm"></select>
+            </div>
+            <div class="form-group">
+              <label>Satuan Jual</label>
+              <select id="satuan_jual" class="form-control form-control-sm"></select>
+            </div>
+          </div>
+          <!-- KOLUMEN 3 -->
+          <div class="col-md-4 form-horizontal">
+            <div class="form-group">
+              <label>Stok Min</label>
+              <input id="stok_min" class="form-control form-control-sm" value="1" type="number">
+            </div>
+            <div class="form-group">
+              <label>Stok Max</label>
+              <input id="stok_max" class="form-control form-control-sm" value="10" type="number">
+            </div>
+            <div class="form-group">
+              <label>Harga Eceran</label>
+              <input id="harga_eceran" class="form-control form-control-sm" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label>Harga Grosir</label>
+              <input id="harga_grosir" class="form-control form-control-sm" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label>Harga Toko</label>
+              <input id="harga_toko" class="form-control form-control-sm" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label>Keterangan</label>
+              <textarea id="keterangan" class="form-control form-control-sm" placeholder="Keterangan"></textarea>
+            </div>
+          </div>
+        </div>
+      </form>
+      </div>
+    </div>
+    <div class="modal fade" id="modalTambahMerek" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Merek Baru</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <label>Kode</label>
+        <input type="text" id="kode_merek_baru" class="form-control mb-3" placeholder="AUTO">
+
+        <label>Nama Merek</label>
+        <input type="text" id="nama_merek_baru" class="form-control">
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnSimpanMerekBaru" class="btn btn-primary" onclick="simpanMerekBaru()">Simpan</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+  <div class="modal fade" id="modalTambahKategori" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Kategori Baru</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <label>Kode</label>
+        <input type="text" id="kode_kategori_baru" class="form-control mb-3" placeholder="AUTO">
+
+        <label>Nama Kategori</label>
+        <input type="text" id="nama_kategori_baru" class="form-control">
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnSimpanKategoriBaru" class="btn btn-primary" onclick="simpanKategoriBaru()">Simpan</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script>
+function initNavbarQuickSearch() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const input = nav.querySelector("#quickSearchInput");
+  if (!input || input.dataset.bound) return;
+  input.dataset.bound = "1";
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    location.href =
+      "h_harga_produk.html?q=" + encodeURIComponent(q);
+  });
+}
+async function loadNavbar() {
+  const navEl = document.getElementById("navbar");
+  if (localStorage.getItem("navbar")) {
+    navEl.innerHTML = localStorage.getItem("navbar");
+    navEl.classList.add("loaded");
+  }
+  const res = await fetch("navbar.html");
+  const html = await res.text();
+  localStorage.setItem("navbar", html);
+  navEl.innerHTML = html;
+  navEl.classList.add("loaded");
+  if (typeof applyShortcutVisibility === "function") {
+    applyShortcutVisibility();
+  }
+  initNavbarQuickSearch();
+}
+async function loadShortcut() {
+  if (!isShortcutEnabled()) {
+    const el = document.getElementById("shortcut");
+    if (el) el.style.display = "none";
+    return;
+  }
+
+  const el = document.getElementById("shortcut");
+
+  if (localStorage.getItem("shortcut_html")) {
+    el.innerHTML = localStorage.getItem("shortcut_html");
+    applyShortcutIcons(); // ⬅️ WAJIB
+  }
+
+  const res = await fetch("shortcut.html");
+  const html = await res.text();
+
+  localStorage.setItem("shortcut_html", html);
+  el.innerHTML = html;
+
+  applyShortcutIcons(); // ⬅️ WAJIB
+}
+loadNavbar();
+loadShortcut();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+// =======================================================
+// GET ID PRODUK
+// =======================================================
+const id = new URLSearchParams(location.search).get("id");
+if (!id) {
+    alert("ID produk tidak ditemukan!");
+    location.href = "h_produk_tab.html";
+}
+
+// =======================================================
+// INPUT REFERENCES
+// =======================================================
+const kode_produk = document.getElementById("kode_produk");
+const nama_produk = document.getElementById("nama_produk");
+
+const cari_kategori = document.getElementById("cari_kategori");
+const cari_merek = document.getElementById("cari_merek");
+
+const dropdown_kategori = document.getElementById("dropdown_kategori");
+const dropdown_merek = document.getElementById("dropdown_merek");
+
+const barcode1 = document.getElementById("barcode1");
+const barcode2 = document.getElementById("barcode2");
+
+const satuan1 = document.getElementById("satuan1");
+const satuan2 = document.getElementById("satuan2");
+const konversi2 = document.getElementById("konversi2");
+const satuan3 = document.getElementById("satuan3");
+const konversi3 = document.getElementById("konversi3");
+
+const satuan_beli = document.getElementById("satuan_beli");
+const satuan_jual = document.getElementById("satuan_jual");
+
+const stok_min = document.getElementById("stok_min");
+const stok_max = document.getElementById("stok_max");
+
+const harga_eceran = document.getElementById("harga_eceran");
+const harga_grosir = document.getElementById("harga_grosir");
+const harga_toko   = document.getElementById("harga_toko");
+
+const keterangan = document.getElementById("keterangan");
+const aktif = document.getElementById("aktif");
+
+// untuk kategori & merek
+let id_kategori_selected = null;
+let id_merek_selected = null;
+
+// =========================
+// STATUS PRODUK (Dropdown)
+// =========================
+const statusBtn = document.getElementById("statusDropdownBtn");
+
+// memperbarui tampilan tombol
+function updateStatusButton(isActive) {
+    statusBtn.innerText = isActive ? "Aktif" : "Nonaktif";
+}
+
+// dipanggil saat klik dropdown
+function setStatus(isActive) {
+    if (statusBtn.disabled) return; // tidak bisa dipilih jika form terkunci
+    aktif.checked = isActive;
+    updateStatusButton(isActive);
+}
+
+
+
+// =======================================================
+// FORMAT RUPIAH SEDERHANA (tidak lompat kursor)
+// =======================================================
+function simpleRupiah(el) {
+    el.addEventListener("input", () => {
+        el.value = el.value
+            .replace(/\D/g, "")
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    });
+}
+
+// Aktifkan format rupiah
+simpleRupiah(harga_eceran);
+simpleRupiah(harga_grosir);
+simpleRupiah(harga_toko);
+
+// Konversi titik → angka
+function toNumber(str) {
+    return str.replace(/\./g, "") || 0;
+}
+
+// ===============================
+// CACHE PRODUK (instan load)
+// ===============================
+function getCachedProduk(id) {
+    const cache = localStorage.getItem("produk_cache");
+    if (!cache) return null;
+
+    const map = JSON.parse(cache);
+    return map[id] || null;
+}
+
+function saveProdukToCache(id, data) {
+    let map = {};
+    const cache = localStorage.getItem("produk_cache");
+
+    if (cache) map = JSON.parse(cache);
+
+    map[id] = data;
+    localStorage.setItem("produk_cache", JSON.stringify(map));
+}
+
+
+// =======================================================
+// LOAD PRODUK
+// =======================================================
+async function loadProduk() {
+
+    // 1) CEK CACHE DULU → tampil instan
+    const cached = getCachedProduk(id);
+    if (cached) {
+        console.log("⭐⭐ Instan load dari CACHE");
+        isiFormProduk(cached);
+    }
+
+    // 2) Ambil data terbaru dari Supabase di background
+    const { data: p, error } = await db
+      .from("tb_produk")
+      .select(`
+          *,
+          tb_kategori ( nama_kategori ),
+          tb_merek ( nama_merek ),
+          tb_harga_produk ( level, harga )
+      `)
+      .eq("id_produk", id)
+      .single();
+
+    if (error || !p) {
+        alert("Produk tidak ditemukan!");
+        return;
+    }
+
+    // 3) Update tampilan jika berbeda dari cache
+    console.log("📌 Loaded dari database (fresh)");
+    isiFormProduk(p);
+
+    // 4) Simpan ke cache untuk buka cepat berikutnya
+    saveProdukToCache(id, p);
+}
+
+
+
+
+// =======================================================
+// ISI FORM
+// =======================================================
+async function isiFormProduk(p) {
+
+    kode_produk.value = p.kode_produk;
+    nama_produk.value = p.nama_produk;
+
+    barcode1.value = p.barcode1 || "";
+    barcode2.value = p.barcode2 || "";
+
+    satuan1.value = p.satuan1 || "";
+    satuan2.value = p.satuan2 || "";
+    konversi2.value = p.konversi2 || "";
+    satuan3.value = p.satuan3 || "";
+    konversi3.value = p.konversi3 || "";
+
+    stok_min.value = p.stok_min ?? "";
+    stok_max.value = p.stok_max ?? "";
+
+    keterangan.value = p.keterangan || "";
+    aktif.checked = p.aktif;
+    updateStatusButton(p.aktif);
+    // kategori
+    if (p.tb_kategori) {
+        setKategoriSaatEdit(p.id_kategori, p.tb_kategori.nama_kategori);
+    }
+
+    // merek
+    if (p.tb_merek) {
+        setMerekSaatEdit(p.id_merek, p.tb_merek.nama_merek);
+    }
+
+
+    // kategori & merek
+    id_kategori_selected = p.id_kategori;
+    id_merek_selected = p.id_merek;
+
+    // satuan beli / jual mengikuti satuan1-3
+    updateSatuanDropdown();
+    satuan_beli.value = p.satuan_beli;
+    satuan_jual.value = p.satuan_jual;
+    // === harga dari JOIN ===
+    if (p.tb_harga_produk && Array.isArray(p.tb_harga_produk)) {
+        p.tb_harga_produk.forEach(h => {
+            const formatted = simpleFormat(h.harga);
+            if (h.level === "eceran") harga_eceran.value = formatted;
+            if (h.level === "grosir") harga_grosir.value = formatted;
+            if (h.level === "toko")   harga_toko.value   = formatted;
+        });
+    }
+
+}
+
+// format awal saat load
+function simpleFormat(v) {
+    return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// =======================================================
+// UPDATE SATUAN BELI/JUAL OTOMATIS dari satuan1-3
+// =======================================================
+function updateSatuanDropdown() {
+
+    const s1 = satuan1.value.trim();
+    const s2 = satuan2.value.trim();
+    const s3 = satuan3.value.trim();
+
+    const arr = [];
+    if (s1) arr.push(s1);
+    if (s2) arr.push(s2);
+    if (s3) arr.push(s3);
+
+    satuan_beli.innerHTML = "";
+    satuan_jual.innerHTML = "";
+
+    arr.forEach(v => {
+        satuan_beli.innerHTML += `<option value="${v}">${v}</option>`;
+        satuan_jual.innerHTML += `<option value="${v}">${v}</option>`;
+    });
+
+    if (arr.length > 0) {
+        if (!satuan_beli.value) satuan_beli.value = arr[0];
+        if (!satuan_jual.value) satuan_jual.value = arr[0];
+    }
+}
+
+satuan1.addEventListener("input", updateSatuanDropdown);
+satuan2.addEventListener("input", updateSatuanDropdown);
+satuan3.addEventListener("input", updateSatuanDropdown);
+
+
+// =======================================================
+// KATEGORI — SAMA PERSIS DENGAN h_produk_add.html
+// =======================================================
+let timerKategori = null;
+let kategoriIndex = -1;
+
+// set kategori saat edit
+function setKategoriSaatEdit(id, nama) {
+    cari_kategori.value = nama;
+    cari_kategori.dataset.id = id;
+}
+
+// pilih kategori
+function pilihKategori(id, nama) {
+    cari_kategori.value = nama;
+    cari_kategori.dataset.id = id;
+    id_kategori_selected = id;  // WAJIB DITAMBAHKAN
+    cari_kategori.classList.remove("input-error");
+    dropdown_kategori.classList.remove("show");
+}
+
+
+// validasi blur
+cari_kategori.addEventListener("blur", function () {
+    if (!this.dataset.id && this.value.trim() !== "") {
+        this.classList.add("input-error");
+    } else {
+        this.classList.remove("input-error");
+    }
+});
+
+// input kategori
+cari_kategori.addEventListener("input", function () {
+    kategoriIndex = -1;
+    this.dataset.id = "";
+    this.classList.remove("input-error");
+
+    clearTimeout(timerKategori);
+
+    const keyword = this.value.trim();
+    const dropdown = dropdown_kategori;
+
+    if (keyword === "") {
+        dropdown.classList.remove("show");
+        dropdown.innerHTML = "";
+        return;
+    }
+
+    dropdown.classList.add("show");
+
+    const baseMenu = `
+        <div class="dropdown-item text-dark" onclick="openTambahKategori()">
+            <i class="fas fa-plus mr-2"></i> Kategori
+        </div>
+    `;
+
+    if (keyword.length < 3) {
+        dropdown.innerHTML = baseMenu +
+            `<div class="dropdown-item text-muted">Masukkan 3 huruf</div>`;
+        return;
+    }
+
+    timerKategori = setTimeout(async () => {
+        const { data } = await db
+            .from("tb_kategori")
+            .select("*")
+            .ilike("nama_kategori", `%${keyword}%`)
+            .limit(10);
+
+        if (!data || data.length === 0) {
+            dropdown.innerHTML = baseMenu +
+                `<div class="dropdown-item text-muted">Tidak ada hasil</div>`;
+            return;
+        }
+
+        dropdown.innerHTML = baseMenu +
+            data.map(k => `
+                <div class="dropdown-item"
+                    onclick="pilihKategori('${k.id_kategori}', '${k.nama_kategori}')">
+                    ${k.nama_kategori}
+                </div>
+            `).join("");
+
+    }, 300);
+});
+
+// nav keyboard kategori
+cari_kategori.addEventListener("keydown", function (e) {
+    const items = dropdown_kategori.querySelectorAll(".dropdown-item");
+    if (!dropdown_kategori.classList.contains("show")) return;
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        kategoriIndex = (kategoriIndex + 1) % items.length;
+        updateHighlight(items, kategoriIndex);
+    }
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        kategoriIndex = (kategoriIndex - 1 + items.length) % items.length;
+        updateHighlight(items, kategoriIndex);
+    }
+    if (e.key === "Enter") {
+        e.preventDefault();
+        if (kategoriIndex >= 0 && items[kategoriIndex]) items[kategoriIndex].click();
+    }
+});
+
+function updateHighlight(items, index) {
+    items.forEach(el => el.classList.remove("active-highlight"));
+    if (items[index]) items[index].classList.add("active-highlight");
+}
+
+function openTambahMerek() {
+    $("#modalTambahMerek").modal("show");
+}
+
+$('#modalTambahMerek').on('shown.bs.modal', function () {
+    document.getElementById("nama_merek_baru").focus();
+});
+
+async function simpanMerekBaru() {
+    const kode = document.getElementById("kode_merek_baru").value.trim();
+    const nama = document.getElementById("nama_merek_baru").value.trim();
+
+    if (!nama) {
+        alert("Nama Merek wajib diisi");
+        return;
+    }
+
+    const { data, error } = await db.from("tb_merek")
+        .insert([{ kode_merek: kode || null, nama_merek: nama }])
+        .select()
+        .single();
+
+    if (error) {
+        alert("❌ Gagal Menambah Merek");
+        return;
+    }
+
+    pilihMerek(data.id_merek, data.nama_merek); // isi input otomatis
+    $("#modalTambahMerek").modal("hide");
+
+    document.getElementById("kode_merek_baru").value = "";
+    document.getElementById("nama_merek_baru").value = "";
+    alert("✅ SUKSES !");
+    document.getElementById("barcode1").focus();
+
+}
+
+function openTambahKategori() {
+    $("#modalTambahKategori").modal("show");
+}
+$('#modalTambahKategori').on('shown.bs.modal', function () {
+    document.getElementById("nama_kategori_baru").focus();
+});
+// fungsi simpan kategori baru
+async function simpanKategoriBaru() {
+    const kode = document.getElementById("kode_kategori_baru").value.trim();
+    const nama = document.getElementById("nama_kategori_baru").value.trim();
+
+    if (!nama) {
+        alert("Nama Kategori wajib diisi");
+        return;
+    }
+
+    const { data, error } = await db.from("tb_kategori")
+        .insert([{ kode_kategori: kode || null, nama_kategori: nama }])
+        .select()
+        .single();
+
+    if (error) {
+        alert("❌ Gagal menambah kategori: " + error.message);
+        return;
+    }
+
+    // Isi input kategori di form produk
+    pilihKategori(data.id_kategori, data.nama_kategori);
+
+    // Tutup popup
+    $("#modalTambahKategori").modal("hide");
+
+    // Reset form popup
+    document.getElementById("kode_kategori_baru").value = "";
+    document.getElementById("nama_kategori_baru").value = "";
+
+    alert("✅ SUKSES !");
+    document.getElementById("cari_merek").focus();
+}
+
+
+// =======================================================
+// MEREK — SAMA DENGAN h_produk_add.html
+// =======================================================
+let timerMerek = null;
+let merekIndex = -1;
+
+function setMerekSaatEdit(id, nama) {
+    cari_merek.value = nama;
+    cari_merek.dataset.id = id;
+}
+
+function pilihMerek(id, nama) {
+    cari_merek.value = nama;
+    cari_merek.dataset.id = id;
+    id_merek_selected = id;  // WAJIB DITAMBAHKAN
+    cari_merek.classList.remove("input-error");
+    dropdown_merek.classList.remove("show");
+}
+
+// validasi blur
+cari_merek.addEventListener("blur", function () {
+    if (!this.dataset.id && this.value.trim() !== "") this.classList.add("input-error");
+    else this.classList.remove("input-error");
+});
+
+// input merek
+cari_merek.addEventListener("input", function () {
+    merekIndex = -1;
+    this.dataset.id = "";
+    this.classList.remove("input-error");
+
+    clearTimeout(timerMerek);
+    const keyword = this.value.trim();
+    const dropdown = dropdown_merek;
+
+    if (keyword === "") {
+        dropdown.classList.remove("show");
+        dropdown.innerHTML = "";
+        return;
+    }
+
+    dropdown.classList.add("show");
+
+    const baseMenu = `
+        <div class="dropdown-item text-dark" onclick="openTambahMerek()">
+            <i class="fas fa-plus mr-2"></i> Merek
+        </div>
+    `;
+
+    if (keyword.length < 3) {
+        dropdown.innerHTML = baseMenu +
+            `<div class="dropdown-item text-muted">Masukkan 3 huruf</div>`;
+        return;
+    }
+
+    timerMerek = setTimeout(async () => {
+        const { data } = await db
+            .from("tb_merek")
+            .select("*")
+            .ilike("nama_merek", `%${keyword}%`)
+            .limit(10);
+
+        if (!data || data.length === 0) {
+            dropdown.innerHTML = baseMenu +
+                `<div class="dropdown-item text-muted">Tidak ada hasil</div>`;
+            return;
+        }
+
+        dropdown.innerHTML = baseMenu +
+            data.map(m => `
+                <div class="dropdown-item"
+                    onclick="pilihMerek('${m.id_merek}', '${m.nama_merek}')">
+                    ${m.nama_merek}
+                </div>
+            `).join("");
+
+    }, 300);
+});
+
+// nav keyboard merek
+cari_merek.addEventListener("keydown", function (e) {
+    const items = dropdown_merek.querySelectorAll(".dropdown-item");
+    if (!dropdown_merek.classList.contains("show")) return;
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        merekIndex = (merekIndex + 1) % items.length;
+        updateHighlight(items, merekIndex);
+    }
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        merekIndex = (merekIndex - 1 + items.length) % items.length;
+        updateHighlight(items, merekIndex);
+    }
+    if (e.key === "Enter") {
+        e.preventDefault();
+        if (merekIndex >= 0 && items[merekIndex]) items[merekIndex].click();
+    }
+});
+
+
+// =======================================================
+// UPDATE PRODUK
+// =======================================================
+async function updateProduk() {
+
+    // ------------------------
+    // VALIDASI SATUAN 2 & 3
+    // ------------------------
+    if (satuan2.value.trim() !== "" && konversi2.value.trim() === "") {
+        alert("Konversi 2 wajib diisi jika Satuan 2 diisi!");
+        konversi2.focus();
+        return false;
+    }
+    if (konversi2.value.trim() !== "" && satuan2.value.trim() === "") {
+        alert("Satuan 2 wajib diisi jika Konversi 2 diisi!");
+        satuan2.focus();
+        return false;
+    }
+
+    if (satuan3.value.trim() !== "" && konversi3.value.trim() === "") {
+        alert("Konversi 3 wajib diisi jika Satuan 3 diisi!");
+        konversi3.focus();
+        return false;
+    }
+    if (konversi3.value.trim() !== "" && satuan3.value.trim() === "") {
+        alert("Satuan 3 wajib diisi jika Konversi 3 diisi!");
+        satuan3.focus();
+        return false;
+    }
+
+    // ------------------------
+    // QUERY UPDATE PRODUK
+    // ------------------------
+    const qProduk = db.from("tb_produk")
+        .update({
+            kode_produk : kode_produk.value,
+            nama_produk : nama_produk.value,
+            id_kategori : id_kategori_selected || null,
+            id_merek    : id_merek_selected || null,
+            barcode1    : barcode1.value,
+            barcode2    : barcode2.value,
+            satuan1     : satuan1.value,
+            satuan2     : satuan2.value,
+            konversi2   : konversi2.value || null,
+            satuan3     : satuan3.value,
+            konversi3   : konversi3.value || null,
+            satuan_beli : satuan_beli.value,
+            satuan_jual : satuan_jual.value,
+            stok_min    : stok_min.value || null,
+            stok_max    : stok_max.value || null,
+            keterangan  : keterangan.value,
+            aktif       : aktif.checked
+        })
+        .eq("id_produk", id);
+
+    // ------------------------
+    // QUERY UPDATE 3 LEVEL HARGA (PARALEL)
+    // ------------------------
+    const hargaList = [
+        { level: "eceran", harga: toNumber(harga_eceran.value) },
+        { level: "grosir", harga: toNumber(harga_grosir.value) },
+        { level: "toko",   harga: toNumber(harga_toko.value) }
+    ];
+
+    const qHarga = hargaList.map(h =>
+        db.from("tb_harga_produk")
+            .upsert(
+                {
+                    id_produk: id,
+                    level: h.level,
+                    harga: h.harga,
+                    aktif: true
+                },
+                { onConflict: "id_produk,level" }
+            )
+    );
+
+    // ------------------------
+    // JALANKAN SEMUA QUERY SEKALIGUS
+    // ------------------------
+    const results = await Promise.all([ qProduk, ...qHarga ]);
+
+    for (const r of results) {
+        if (r.error) throw r.error;
+    }
+
+    return true;
+}
+
+
+document.getElementById("satuan2").addEventListener("input", function () {
+    const konversi = document.getElementById("konversi2");
+
+    if (this.value.trim() !== "") {
+        konversi.setAttribute("required", true);
+    } else {
+        konversi.removeAttribute("required");
+    }
+});
+
+document.getElementById("konversi2").addEventListener("input", function () {
+    const satuan = document.getElementById("satuan2");
+
+    if (this.value.trim() !== "") {
+        satuan.setAttribute("required", true);
+    } else {
+        satuan.removeAttribute("required");
+    }
+});
+document.getElementById("satuan3").addEventListener("input", function () {
+    const konversi = document.getElementById("konversi3");
+
+    if (this.value.trim() !== "") {
+        konversi.setAttribute("required", true);
+    } else {
+        konversi.removeAttribute("required");
+    }
+});
+
+document.getElementById("konversi3").addEventListener("input", function () {
+    const satuan = document.getElementById("satuan3");
+
+    if (this.value.trim() !== "") {
+        satuan.setAttribute("required", true);
+    } else {
+        satuan.removeAttribute("required");
+    }
+});
+function lockForm() {
+    document.querySelectorAll("#formEdit input, #formEdit select, #formEdit textarea")
+        .forEach(el => el.disabled = true);
+
+    statusBtn.disabled = true;
+}
+
+function unlockForm() {
+    document.querySelectorAll("#formEdit input, #formEdit select, #formEdit textarea")
+        .forEach(el => el.disabled = false);
+
+    statusBtn.disabled = false;
+}
+
+
+// SUBMIT
+document.getElementById("formEdit").addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = document.getElementById("btnUpdate");
+
+    // ==============================
+    // MODE EDIT → buka form
+    // ==============================
+    if (btn.dataset.mode === "edit") {
+        unlockForm();
+        statusBtn.disabled = false;
+        btn.dataset.mode = "update";
+        btn.textContent = "Update";
+        btn.classList.remove("btn-warning");
+        btn.classList.add("btn-primary");
+        return;
+    }
+
+    // ==============================
+    // MODE UPDATE → simpan data
+    // ==============================
+    btn.disabled = true;
+    btn.innerHTML = "Menyimpan..";
+
+    try {
+        await updateProduk();
+        alert("Produk berhasil diperbarui!");
+        Object.keys(sessionStorage)
+        .filter(k => k.startsWith("produk:"))
+        .forEach(k => sessionStorage.removeItem(k));
+
+        lockForm(); // kunci lagi setelah update
+
+        btn.dataset.mode = "edit";
+        btn.textContent = "Edit";
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-warning");
+
+    } catch (err) {
+        alert("Gagal update: " + err.message);
+    }
+
+    btn.disabled = false;
+});
+
+lockForm();
+loadProduk();
+
+// mencegah submit otomatis saat tekan ENTER
+document.getElementById("formEdit").addEventListener("keydown", function (e) {
+    // ENTER hanya DI-BLOK kalau fokusnya input/select/textarea
+    if (e.key === "Enter" && !e.ctrlKey && e.target.type !== "submit") {
+        e.preventDefault();
+
+        // pindah ke field berikutnya
+        const form = this;
+        const idx = Array.prototype.indexOf.call(form, e.target);
+        if (form.elements[idx + 1]) {
+            form.elements[idx + 1].focus();
+        }
+    }
+});
+
+// ENTER pada input nama_merek_baru → pindah ke tombol simpan
+document.getElementById("nama_merek_baru").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("btnSimpanMerekBaru").focus();
+    }
+});
+
+// ENTER pada tombol simpan → submit
+document.getElementById("btnSimpanMerekBaru").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        simpanMerekBaru();
+    }
+});
+
+// ENTER pada input nama_kategori_baru → pindah ke tombol simpan
+document.getElementById("nama_kategori_baru").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("btnSimpanKategoriBaru").focus();
+    }
+});
+
+// ENTER pada tombol simpan → submit
+document.getElementById("btnSimpanKategoriBaru").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        simpanKategoriBaru();
+    }
+});
+
+// =============== CTRL + ENTER -> SUBMIT UPDATE ===============
+document.addEventListener("keydown", function(e) {
+    // Jika menekan CTRL + Enter
+    if (e.ctrlKey && e.key === "Enter") {
+
+        // Cegah behavior lain
+        e.preventDefault();
+
+        // Tekan tombol Update / Edit
+        const btn = document.getElementById("btnUpdate");
+
+        // Jika mode = update → submit form
+        // Jika mode = edit → buka form
+        btn.click();
+    }
+});
+
+
+// ================================
+// AUTO SELECT ALL SAAT FOKUS
+// ================================
+[cari_kategori, cari_merek].forEach(input => {
+    input.addEventListener("focus", function () {
+        setTimeout(() => this.select(), 10); // jeda kecil supaya bekerja di Chrome
+    });
+});
+
+
+
+</script>
+</body>
+</html>

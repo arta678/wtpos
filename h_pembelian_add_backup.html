@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Aplikasi Wiguna Teknik</title>
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+    href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+    rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+.dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+table {
+  overflow: visible !important;
+}
+
+table tbody,
+table tr,
+table td {
+  overflow: visible !important;
+}
+
+.dd-produk {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 9999 !important;
+}
+/* === FIX dropdown produk terpotong === */
+.table-responsive {
+  overflow: visible !important;
+}
+
+.table-responsive table,
+.table-responsive tbody,
+.table-responsive tr,
+.table-responsive td {
+  overflow: visible !important;
+}
+
+.dd-produk {
+    min-width: 350px !important;  /* atur sesuai kebutuhan */
+    white-space: normal !important; /* biar teks turun ke bawah, bukan terpotong */
+}
+.dropdown-item.active-highlight {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+/* Semua input & select di dalam tabel pembelian */
+#tbl input.form-control-sm,
+#tbl select.form-control-sm {
+    border-radius: 7px !important;   /* ubah sesuai selera: 4px, 8px, 12px */
+}
+.dropdown-item.active-highlight {
+    background: #007bff !important;
+    color: #fff !important;
+}
+</style>
+</head>
+<body id="page-top" class="sidebar-toggled">
+    <div id="wrapper">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">WIGUNA T</div>
+            </a>
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+                </li>
+                <hr class="sidebar-divider">
+                <li class="nav-item active">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-database"></i>
+                    <span>Data</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="h_produk_tab.html">Produk</a>
+                        <a class="collapse-item" href="h_merek_tab.html">Merek</a>
+                        <a class="collapse-item" href="h_kategori_tab.html">Kategori Produk</a>
+                        <a class="collapse-item" href="#">Daftar Harga</a>
+                        <a class="collapse-item" href="#">Stok Produk</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                aria-expanded="true" aria-controls="collapseUtilities">
+                <i class="fas fa-cart-arrow-down"></i>
+                <span>Transaksi</span>
+            </a>
+            <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="#">Pembelian</a>
+                <a class="collapse-item" href="#">Penjualan</a>
+                <a class="collapse-item" href="#">Orderan Produk</a>
+                <a class="collapse-item" href="#">Retur</a>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item active">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collap_mitra_bisnis"
+        aria-expanded="true" aria-controls="collap_mitra_bisnis">
+        <i class="fas fa-users"></i>
+        <span>Mitra Bisnis</span>
+    </a>
+    <div id="collap_mitra_bisnis" class="collapse" aria-labelledby="headingUtilities"
+    data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="h_mitra_tab_customer.html">Customer</a>
+                <a class="collapse-item" href="h_mitra_tab_supplier.html">Supplier</a>
+                <a class="collapse-item" href="h_mitra_tab_grup.html">Grup Mitra Bisnis</a>
+            </div>
+</div>
+</li>
+<li class="nav-item active">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collap_laporan"
+    aria-expanded="true" aria-controls="collap_laporan">
+    <i class="fas fa-chart-line"></i>
+    <span>Laporan</span>
+</a>
+<div id="collap_laporan" class="collapse" aria-labelledby="headingUtilities"
+data-parent="#accordionSidebar">
+<div class="bg-white py-2 collapse-inner rounded">
+    <a class="collapse-item" href="#">Pembelian</a>
+    <a class="collapse-item" href="#">Penjualan</a>
+    <a class="collapse-item" href="#">Stok</a>
+</div>
+</div>
+</li>
+<!-- Divider -->
+<hr class="sidebar-divider d-none d-md-block">
+<!-- Sidebar Toggler (Sidebar) -->
+<div class="text-center d-none d-md-inline">
+    <button class="rounded-circle border-0" id="sidebarToggle"></button>
+</div>
+</ul>
+<!-- CONTENT -->
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <!-- Sidebar Toggle (Topbar) -->
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                <i class="fa fa-bars"></i>
+            </button>
+            <!-- Topbar Search -->
+            <form
+            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <div class="input-group">
+                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                aria-label="Search" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <!-- Topbar Navbar -->
+        <ul class="navbar-nav ml-auto">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+                <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+            </a>
+            <!-- Dropdown - Messages -->
+            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+            aria-labelledby="searchDropdown">
+            <form class="form-inline mr-auto w-100 navbar-search">
+                <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small"
+                    placeholder="Search for..." aria-label="Search"
+                    aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </li>
+    <!-- Nav Item - Alerts -->
+    <li class="nav-item dropdown no-arrow mx-1">
+        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-bell fa-fw"></i>
+        <!-- Counter - Alerts -->
+        <span class="badge badge-danger badge-counter">3+</span>
+    </a>
+    <!-- Dropdown - Alerts -->
+    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+    aria-labelledby="alertsDropdown">
+    <h6 class="dropdown-header">
+        Alerts Center
+    </h6>
+    <a class="dropdown-item d-flex align-items-center" href="#">
+        <div class="mr-3">
+            <div class="icon-circle bg-primary">
+                <i class="fas fa-file-alt text-white"></i>
+            </div>
+        </div>
+        <div>
+            <div class="small text-gray-500">December 12, 2019</div>
+            <span class="font-weight-bold">A new monthly report is ready to download!</span>
+        </div>
+    </a>
+    <a class="dropdown-item d-flex align-items-center" href="#">
+        <div class="mr-3">
+            <div class="icon-circle bg-success">
+                <i class="fas fa-donate text-white"></i>
+            </div>
+        </div>
+        <div>
+            <div class="small text-gray-500">December 7, 2019</div>
+            $290.29 has been deposited into your account!
+        </div>
+    </a>
+    <a class="dropdown-item d-flex align-items-center" href="#">
+        <div class="mr-3">
+            <div class="icon-circle bg-warning">
+                <i class="fas fa-exclamation-triangle text-white"></i>
+            </div>
+        </div>
+        <div>
+            <div class="small text-gray-500">December 2, 2019</div>
+            Spending Alert: We've noticed unusually high spending for your account.
+        </div>
+    </a>
+    <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+</div>
+</li>
+<!-- Nav Item - Messages -->
+<li class="nav-item dropdown no-arrow mx-1">
+    <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fas fa-envelope fa-fw"></i>
+    <!-- Counter - Messages -->
+    <span class="badge badge-danger badge-counter">7</span>
+</a>
+<!-- Dropdown - Messages -->
+<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+aria-labelledby="messagesDropdown">
+<h6 class="dropdown-header">
+    Message Center
+</h6>
+<a class="dropdown-item d-flex align-items-center" href="#">
+    <div class="dropdown-list-image mr-3">
+        <img class="rounded-circle" src="img/undraw_profile_1.svg"
+        alt="...">
+        <div class="status-indicator bg-success"></div>
+    </div>
+    <div class="font-weight-bold">
+        <div class="text-truncate">Hi there! I am wondering if you can help me with a
+        problem I've been having.</div>
+        <div class="small text-gray-500">Emily Fowler · 58m</div>
+    </div>
+</a>
+<a class="dropdown-item d-flex align-items-center" href="#">
+    <div class="dropdown-list-image mr-3">
+        <img class="rounded-circle" src="img/undraw_profile_2.svg"
+        alt="...">
+        <div class="status-indicator"></div>
+    </div>
+    <div>
+        <div class="text-truncate">I have the photos that you ordered last month, how
+        would you like them sent to you?</div>
+        <div class="small text-gray-500">Jae Chun · 1d</div>
+    </div>
+</a>
+<a class="dropdown-item d-flex align-items-center" href="#">
+    <div class="dropdown-list-image mr-3">
+        <img class="rounded-circle" src="img/undraw_profile_3.svg"
+        alt="...">
+        <div class="status-indicator bg-warning"></div>
+    </div>
+    <div>
+        <div class="text-truncate">Last month's report looks great, I am very happy with
+        the progress so far, keep up the good work!</div>
+        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
+    </div>
+</a>
+<a class="dropdown-item d-flex align-items-center" href="#">
+    <div class="dropdown-list-image mr-3">
+        <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
+        alt="...">
+        <div class="status-indicator bg-success"></div>
+    </div>
+    <div>
+        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
+        told me that people say this to all dogs, even if they aren't good...</div>
+        <div class="small text-gray-500">Chicken the Dog · 2w</div>
+    </div>
+</a>
+<a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+</li>
+<div class="topbar-divider d-none d-sm-block"></div>
+<!-- Nav Item - User Information -->
+<li class="nav-item dropdown no-arrow">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+    <img class="img-profile rounded-circle"
+    src="img/undraw_profile.svg">
+</a>
+<!-- Dropdown - User Information -->
+<div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+aria-labelledby="userDropdown">
+<a class="dropdown-item" href="#">
+    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+    Profile
+</a>
+<a class="dropdown-item" href="#">
+    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+    Settings
+</a>
+<a class="dropdown-item" href="#">
+    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+    Activity Log
+</a>
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+    Logout
+</a>
+</div>
+</li>
+</ul>
+</nav>
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+      <div class="card-body">
+          <form id="form">
+            <div class="form-row">
+              <div>
+                <!-- <small>Kode</small> -->
+                <input type="hidden" id="kode">
+              </div>
+              <div class="col-md-2 mb-2">
+                <small>Tanggal</small>
+                <input type="date" id="tanggal" class="form-control form-control-sm">
+              </div>
+              <div class="col-md-7 mb-2">
+                <small>Keterangan</small>
+                <input id="keterangan" class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="col-md-3 mb-2">
+                <small>Supplier (Mitra)</small>
+                <input id="cari_mitra" class="form-control form-control-sm" placeholder="Cari supplier (≥3 huruf)">
+                <div id="dd_mitra" class="dropdown-menu w-100"></div>
+              </div>
+              <div class="col-md-2 mb-2">
+                <small>Termin</small>
+                <select id="termin" class="form-control form-control-sm"><option value="cash">CASH</option><option value="credit">CREDIT</option></select>
+              </div>
+              <div class="col-md-2 mb-2">
+                <small>Tempo (hari)</small>
+                <input id="tempo" type="number" min="0" class="form-control form-control-sm" value="0">
+              </div>
+              <div class="col-md-2 mb-2">
+                    <small>Tanggal Jatuh Tempo</small>
+                    <input type="date" id="jatuh_tempo" class="form-control form-control-sm" readonly>
+                </div>
+            </div>
+            <hr>
+            <div class="table-responsive mt-2">
+              <table class="table table-sm  table-borderless" id="tbl">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>No</th>
+                        <th>Item</th>
+                        <th width="70px">Qty</th>
+                        <th>Satuan</th>
+                        <th width="100px">Harga</th>
+                        <th width="80px">Diskon</th>
+                        <!-- <th>Diskon</th> -->
+                        <th>Pajak</th>
+                        <th width="110px">Subtotal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="table-borderless"></tbody>
+              </table>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6"></div>
+              <div class="col-md-6">
+                <table class="table table-borderless table-sm">
+                  <tr><td class="text-right small">Sub Total</td><td class="text-right" id="subTxt">0</td></tr>
+                  <tr><td class="text-right small">Diskon Total (Rp)</td><td><input id="diskon_total" class="form-control form-control-sm text-right" value="0"></td></tr>
+                  <tr><td class="text-right small">Biaya Lain (Rp)</td><td><input id="biaya_lain" class="form-control form-control-sm text-right" value="0"></td></tr>
+                  <tr><td class="text-right font-weight-bold">Grand Total</td><td class="text-right font-weight-bold" id="grandTxt">0</td></tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="d-flex">
+              <button id="btnSave" class="btn btn-primary">Simpan (Ctrl+Enter)</button>
+              <a href="h_pembelian_tab.html" class="btn btn-secondary ml-2">Batal</a>
+            </div>
+          </form>
+      </div>
+    </div>
+    <div class="modal fade" id="modalTambahMerek" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Merek Baru</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <label>Kode</label>
+        <input type="text" id="kode_merek_baru" class="form-control mb-3" placeholder="AUTO">
+
+        <label>Nama Merek</label>
+        <input type="text" id="nama_merek_baru" class="form-control">
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnSimpanMerekBaru" class="btn btn-primary" onclick="simpanMerekBaru()">Simpan</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+  <div class="modal fade" id="modalTambahKategori" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Kategori Baru</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <label>Kode</label>
+        <input type="text" id="kode_kategori_baru" class="form-control mb-3" placeholder="AUTO">
+
+        <label>Nama Kategori</label>
+        <input type="text" id="nama_kategori_baru" class="form-control">
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnSimpanKategoriBaru" class="btn btn-primary" onclick="simpanKategoriBaru()">Simpan</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+<script>
+// ===================== HELPERS =====================
+function fmt(n){ return (n==null||n===0) ? '0' : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function toNum(s){ return parseFloat((s||'').toString().replace(/\./g,'')) || 0; }
+
+function formatRupiahInput(el) {
+    el.addEventListener("input", () => {
+        let val = el.value.replace(/\D/g, ""); // hanya angka
+        if (val === "") {
+            el.value = "";
+            return;
+        }
+        el.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    });
+}
+
+function intOnlyInput(el){
+  if(!el) return;
+  el.addEventListener('input', ()=> {
+    el.value = el.value.replace(/\D/g,'');
+  });
+}
+
+function soundError() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sawtooth";
+    osc.frequency.value = 200;
+
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.25);
+}
+
+
+
+
+
+
+function parseDiskon(raw, qty, harga){
+  if(!raw) return 0;
+  // normalisasi: hapus spasi
+  raw = raw.toString().trim();
+
+  // support multiple parts separated by '+'
+  const parts = raw.split('+').map(p => p.trim()).filter(Boolean);
+  let total = 0;
+
+  for(const p of parts){
+    if(p.endsWith('%')){
+      // percent -> hitung dari harga per unit
+      const pct = parseFloat(p.replace('%','')) || 0;
+      const perUnit = Math.floor(harga * pct / 100);
+      total += perUnit * qty;
+    } else {
+      // nominal -> angka; bisa ada titik sebagai thousand separator
+      // treat as nominal PER UNIT
+      const rawNum = p.replace(/\./g,'').replace(/,/g,''); // hapus dot/komer
+      if(rawNum === '') continue;
+      const val = parseInt(rawNum) || 0;
+      // if value < 100 and user likely meant percent WITHOUT %, you could optionally treat as percent
+      // but we'll treat plain numbers as nominal Rp per unit (safer for your case)
+      total += val * qty;
+    }
+  }
+  return total;
+}
+
+function cleanDiskonInput(el){
+    el.addEventListener("input", () => {
+        el.value = el.value
+            .replace(/[^0-9+.%]/g, "")  // hanya angka, +, ., %
+            .replace(/(\++)+/g, "+")    // hilangkan ++ menjadi +
+            .replace(/(\.)+/g, ".");    // hilangkan .. menjadi .
+    });
+}
+
+// ===================== ELEMENTS =====================
+const kode = document.getElementById('kode');
+const tanggal = document.getElementById('tanggal');
+const cari_mitra = document.getElementById('cari_mitra');
+const dd_mitra = document.getElementById('dd_mitra');
+const termin = document.getElementById('termin');
+const tempo = document.getElementById('tempo');
+const jatuh_tempo = document.getElementById("jatuh_tempo");
+const keterangan = document.getElementById('keterangan');
+const tblBody = document.querySelector('#tbl tbody');
+const subTxt = document.getElementById('subTxt');
+const diskon_total = document.getElementById('diskon_total');
+const biaya_lain = document.getElementById('biaya_lain');
+const grandTxt = document.getElementById('grandTxt');
+const btnSave = document.getElementById('btnSave');
+
+intOnlyInput(diskon_total);
+intOnlyInput(biaya_lain);
+tanggal.value = new Date().toISOString().slice(0,10);
+
+function updateJatuhTempo() {
+    const tgl = tanggal.value;
+    const isCredit = termin.value === "credit";
+    const tempoHari = parseInt(tempo.value) || 0;
+
+    if (!tgl || !isCredit || tempoHari <= 0) {
+        jatuh_tempo.value = "";
+        return;
+    }
+
+    const d = new Date(tgl);
+    d.setDate(d.getDate() + tempoHari);
+
+    jatuh_tempo.value = d.toISOString().slice(0, 10);
+}
+tanggal.addEventListener("change", updateJatuhTempo);
+termin.addEventListener("change", updateJatuhTempo);
+tempo.addEventListener("input", updateJatuhTempo);
+tempo.addEventListener("keydown", function(e){
+    if (e.key === "Enter") {
+        e.preventDefault();
+
+        // Fokus ke input produk baris pertama
+        const firstProduk = tblBody.querySelector("tr.line-row:first-child .inp-nama");
+        if (firstProduk) {
+            firstProduk.focus();
+            firstProduk.select();
+        }
+    }
+});
+
+
+
+// ===================== KODE =====================
+async function genKode(){
+  const { data } = await db.from('tb_pembelian')
+    .select('kode_pembelian')
+    .order('created_at',{ascending:false})
+    .limit(1);
+
+  let next = 1;
+  if(data && data.length){
+    next = (parseInt(data[0].kode_pembelian.replace(/\D/g,'')) || 0) + 1;
+  }
+  kode.value = "BL" + String(next).padStart(7,'0');
+}
+genKode();
+
+let mitraItems = [];
+let mitraIndex = -1;
+cari_mitra.addEventListener("keydown", function(e){
+    // Jika dropdown tidak tampil → abaikan navigasi
+    if (!dd_mitra.classList.contains("show")) return;
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (mitraItems.length === 0) return;
+        mitraIndex = (mitraIndex + 1) % mitraItems.length;
+    }
+
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (mitraItems.length === 0) return;
+        mitraIndex = (mitraIndex - 1 + mitraItems.length) % mitraItems.length;
+    }
+
+    // ENTER pilih supplier
+    if (e.key === "Enter") {
+        e.preventDefault();
+        if (mitraIndex >= 0 && mitraItems[mitraIndex]) {
+            mitraItems[mitraIndex].click();
+        }
+    }
+
+    updateMitraHighlight();
+});
+function updateMitraHighlight() {
+    mitraItems.forEach(el => el.classList.remove("active-highlight"));
+    if (mitraIndex >= 0 && mitraItems[mitraIndex]) {
+        mitraItems[mitraIndex].classList.add("active-highlight");
+        mitraItems[mitraIndex].scrollIntoView({ block: "nearest" });
+    }
+}
+
+
+
+
+
+// ===================== MITRA SEARCH =====================
+let timerM=null;
+cari_mitra.addEventListener('input', function(){
+  this.dataset.id='';
+  clearTimeout(timerM);
+
+  const kw = this.value.trim();
+  if(kw.length < 3){
+    dd_mitra.classList.remove('show');
+    dd_mitra.innerHTML="";
+    return;
+  }
+
+  dd_mitra.classList.add('show');
+
+  timerM = setTimeout(async ()=>{
+    const { data } = await db.from('tb_mitra')
+      .select('id_mitra,nama_mitra,termin_pembelian,tempo_pembelian,akun_hutang')
+      .ilike('nama_mitra', `%${kw}%`)
+      .limit(15);
+
+    if(!data || !data.length){
+      dd_mitra.innerHTML = `<div class="dropdown-item text-muted">Tidak ada</div>`;
+      return;
+    }
+
+    dd_mitra.innerHTML = data.map(m =>
+        `<div class="dropdown-item"
+            data-id="${m.id_mitra}"
+            data-nama="${m.nama_mitra}"
+            data-termin="${m.termin_pembelian || 'cash'}"
+            data-tempo="${m.tempo_pembelian || 0}">
+            ${m.nama_mitra}
+         </div>`
+    ).join("");
+
+    dd_mitra.classList.add("show");
+
+    // simpan list item untuk keyboard nav
+    mitraItems = Array.from(dd_mitra.querySelectorAll(".dropdown-item"));
+    mitraIndex = -1;
+
+  },200);
+});
+
+// --- ketika pilih supplier dari dropdown ---
+dd_mitra.addEventListener('click', e => {
+  const it = e.target.closest('.dropdown-item');
+  if(!it) return;
+
+  // simpan informasi supplier di input cari_mitra
+  cari_mitra.value = it.dataset.nama;
+  cari_mitra.dataset.id = it.dataset.id;
+  // simpan tempo asli supplier (string) agar bisa dipakai kembali
+  cari_mitra.dataset.tempo = it.dataset.tempo || "0";
+  cari_mitra.dataset.termin = it.dataset.termin || "cash";
+
+  // set termin & tempo berdasarkan data supplier
+  termin.value = cari_mitra.dataset.termin;
+  termin.dispatchEvent(new Event("change"));
+
+  if (termin.value === 'cash') {
+    // kalau cash -> tempo disabled dan kosong (atau 0 sesuai preferensi)
+    tempo.value = 0;
+    tempo.setAttribute('disabled','disabled');
+
+    // fokus ke input produk langsung
+    setTimeout(()=>{
+      const firstProduk = tblBody.querySelector('tr.line-row:first-child .inp-nama');
+      if(firstProduk){ firstProduk.focus(); firstProduk.select(); }
+    }, 10);
+  } else {
+    // credit -> aktifkan tempo dan isi dengan tempo supplier yang sudah disimpan
+    tempo.removeAttribute('disabled');
+    // pastikan parseInt aman dan fallback jika kosong
+    const supplierTempo = parseInt(cari_mitra.dataset.tempo || "0") || 0;
+    tempo.value = supplierTempo;
+
+    // fokus ke tempo supaya user bisa ubah kalau perlu
+    setTimeout(()=> {
+      tempo.focus();
+      tempo.select && tempo.select();
+    }, 10);
+  }
+
+  dd_mitra.classList.remove('show');
+  updateJatuhTempo();
+});
+
+
+
+
+
+termin.addEventListener('change', () => {
+  if (termin.value === 'cash') {
+    tempo.value = 0;
+    tempo.setAttribute('disabled', 'disabled');
+    // fokus ke produk agar workflow cepat
+    setTimeout(()=>{
+      const firstProduk = tblBody.querySelector('tr.line-row:first-child .inp-nama');
+      if(firstProduk){ firstProduk.focus(); firstProduk.select(); }
+    }, 10);
+  } else {
+    // credit: ambil tempo dari supplier jika tersedia, kalau tidak biarkan 0
+    tempo.removeAttribute('disabled');
+    const supplierTempo = parseInt(cari_mitra.dataset.tempo || "0") || 0;
+    tempo.value = supplierTempo;
+    setTimeout(()=> { tempo.focus(); tempo.select && tempo.select(); }, 10);
+  }
+  updateJatuhTempo();
+});
+
+
+
+
+// ===================== DYNAMIC ROWS =====================
+const TAX_RATES = { NO:0, PPN:0.10 };
+
+
+function createRow(){
+  const tr = document.createElement('tr');
+  tr.className = 'line-row';
+
+  tr.innerHTML = `
+    <td class="line-no text-center"></td>
+
+    <td>
+      <div style="position:relative">
+        <input type="text" class="form-control form-control-sm inp-nama" placeholder="Cari Produk (≥2)">
+        <div class="dropdown-menu dd-produk w-100"></div>
+      </div>
+    </td>
+
+    <td><input class="form-control form-control-sm inp-qty text-right" value="1"></td>
+
+    <td>
+      <select class="form-control form-control-sm inp-satuan">
+        <option value="">Pilih Satuan</option>
+      </select>
+    </td>
+
+    <td><input class="form-control form-control-sm inp-harga text-right" value="0"></td>
+
+    <td><input class="form-control form-control-sm inp-diskon text-right"></td>
+
+    <td>
+      <select class="form-control form-control-sm inp-pajak">
+        <option value="NO">No Pajak</option>
+        <option value="PPN">PPN</option>
+      </select>
+    </td>
+
+    <td class="subtotal-cell text-right">0</td>
+
+    <td class="text-center">
+      <button type="button" class="btn btn-sm btn-light btn-delete"><i class="fas fa-trash"></i></button>
+    </td>
+  `;
+
+  attachRowHandlers(tr);
+  return tr;
+}
+
+function moveRowFocus(currentInput, direction) {
+    const row = currentInput.closest("tr.line-row");
+    if (!row) return;
+
+    const allRows = Array.from(tblBody.querySelectorAll("tr.line-row"));
+    const index = allRows.indexOf(row);
+    const newIndex = index + direction;
+
+    if (newIndex < 0 || newIndex >= allRows.length) return;
+
+    // cari kolom yang sama di baris berikutnya
+    const className = "." + currentInput.classList[2];
+    const nextInput = allRows[newIndex].querySelector(className);
+
+    if (nextInput) {
+        nextInput.focus();
+        nextInput.select?.();
+    }
+}
+
+
+// =============== ATTACH ROW HANDLERS ==================
+function attachRowHandlers(tr){
+
+    
+
+  refreshRowNumbers();
+
+  const inpNama  = tr.querySelector('.inp-nama');
+  const inpQty   = tr.querySelector('.inp-qty');
+  const inpHarga = tr.querySelector('.inp-harga');
+  const inpDiskon= tr.querySelector('.inp-diskon');
+  const selSatuan= tr.querySelector('.inp-satuan');
+  const selPajak = tr.querySelector('.inp-pajak');
+  const subCell  = tr.querySelector('.subtotal-cell');
+  const btnDel   = tr.querySelector('.btn-delete');
+  const dd       = tr.querySelector('.dd-produk');
+
+     intOnlyInput(inpQty);
+    intOnlyInput(inpHarga);
+    autoSelectOnFocus(cari_mitra);
+    autoSelectOnFocus(inpNama);
+    autoSelectOnFocus(inpQty);
+    autoSelectOnFocus(inpHarga);
+    autoSelectOnFocus(inpDiskon);
+    formatRupiahInput(inpHarga);
+    cleanDiskonInput(inpDiskon);
+
+  // ------------------- Dropdown Navigation State -------------------
+  let activeIndex = -1;
+  let currentItems = [];
+
+
+
+  function updateHighlight(){
+    currentItems.forEach(el => el.classList.remove('active-highlight'));
+    if(activeIndex >= 0 && currentItems[activeIndex]){
+      currentItems[activeIndex].classList.add('active-highlight');
+      currentItems[activeIndex].scrollIntoView({ block:"nearest" });
+    }
+  }
+
+  function moveFocus(el) {
+    if (!el) return;
+    setTimeout(() => {
+        el.focus();
+        el.select && el.select();
+    }, 10);
+}
+
+inpNama.addEventListener("keydown", e => {
+
+    // → Pindah ke kolom qty (kode lama Anda)
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        moveFocus(inpQty);
+        return;
+    }
+
+    // ⬆ Pindah ke baris atas (jika dropdown tidak terbuka)
+    if (e.key === "ArrowUp" && !dd.classList.contains("show")) {
+        e.preventDefault();
+        moveRowFocus(inpNama, -1);
+        return;
+    }
+
+    // ⬇ Pindah ke baris bawah (jika dropdown tidak terbuka)
+    if (e.key === "ArrowDown" && !dd.classList.contains("show")) {
+        e.preventDefault();
+        moveRowFocus(inpNama, +1);
+        return;
+    }
+});
+
+inpQty.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        moveFocus(inpNama);
+    }
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        moveFocus(selSatuan);
+    }
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveRowFocus(inpQty, -1);
+        return;
+    }
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveRowFocus(inpQty, +1);
+        return;
+    }
+});
+// selSatuan.addEventListener("keydown", e => {
+//     if (e.key === "ArrowLeft") {
+//         e.preventDefault();
+//         moveFocus(inpQty);
+//     }
+//     if (e.key === "ArrowRight") {
+//         e.preventDefault();
+//         moveFocus(inpHarga);
+//     }
+// });
+
+selSatuan.addEventListener("keydown", e => {
+
+    // ← → tetap navigasi kolom
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        moveFocus(inpQty);
+        return;
+    }
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        moveFocus(inpHarga);
+        return;
+    }
+
+    // Alt + Arrow → biarkan browser membuka dropdown select
+    if (e.altKey) return;
+
+    // ENTER → pindah ke harga
+    if (e.key === "Enter") {
+        e.preventDefault();
+        moveFocus(inpHarga);
+        return;
+    }
+
+    // ArrowUp → pindah ke baris atas
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveRowFocus(selSatuan, -1);
+        return;
+    }
+
+    // ArrowDown → pindah ke baris bawah
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveRowFocus(selSatuan, +1);
+        return;
+    }
+});
+
+inpHarga.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        moveFocus(selSatuan);
+    }
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        moveFocus(inpDiskon);
+    }
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveRowFocus(inpHarga, -1);
+        return;
+    }
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveRowFocus(inpHarga, +1);
+        return;
+    }
+});
+inpDiskon.addEventListener("keydown", e => {
+
+    // ← kiri pindah ke harga
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        moveFocus(inpHarga);
+    }
+
+    // → kanan pindah ke pajak
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        moveFocus(selPajak);
+    }
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveRowFocus(inpDiskon, -1);
+        return;
+    }
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveRowFocus(inpDiskon, +1);
+        return;
+    }
+
+    // ⏎ ENTER → tambah baris baru
+    if (e.key === "Enter") {
+        e.preventDefault();
+
+        const nama = inpNama.value.trim();
+        const q = parseInt(inpQty.value) || 0;
+        const h = parseInt(inpHarga.value.replace(/\./g,'')) || 0;
+
+        if (nama && q > 0 && h > 0) {
+            addRowIfNeeded();
+
+            // Fokus ke produk di baris baru
+            setTimeout(() => {
+                const last = tblBody.querySelector("tr.line-row:last-child .inp-nama");
+                if (last) {
+                    last.focus();
+                    last.select();
+                }
+            }, 20);
+        }
+    }
+});
+
+selPajak.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        moveFocus(inpDiskon);
+    }
+
+});
+
+
+
+  function autoSelectOnFocus(el) {
+    if (!el) return;
+    el.addEventListener("focus", () => {
+        setTimeout(() => el.select && el.select(), 10);
+    });
+    el.addEventListener("click", () => {
+        setTimeout(() => el.select && el.select(), 10);
+    });
+}
+
+
+  // ENTER pada kolom satuan → fokus ke harga + select value
+selSatuan.addEventListener("keydown", function(e){
+    if (e.key === "Enter") {
+        e.preventDefault();
+        setTimeout(() => {
+            inpHarga.focus();
+            inpHarga.select();   // blok semua angka supaya bisa langsung ketik
+        }, 10);
+    }
+});
+
+
+
+  // ------------------- AUTOCOMPLETE PRODUK -------------------
+  let timerP = null;
+
+  inpNama.addEventListener('input', function(){
+    clearTimeout(timerP);
+
+    const q = this.value.trim();
+    this.dataset.id = "";
+    activeIndex = -1;
+
+    if(q.length < 2){
+      dd.classList.remove('show');
+      dd.innerHTML = "";
+      return;
+    }
+
+    timerP = setTimeout(async ()=>{
+      const { data } = await db.from("tb_produk")
+        .select("id_produk,kode_produk,nama_produk,satuan1,satuan2,satuan3,satuan_beli")
+        .or(`nama_produk.ilike.%${q}%,kode_produk.ilike.%${q}%`)
+        .limit(20);
+
+      if(!data || !data.length){
+        dd.innerHTML = `<div class="dropdown-item text-muted">Tidak ada</div>`;
+        dd.classList.add("show");
+        return;
+      }
+
+      dd.innerHTML = data.map(p=>`
+        <a class="dropdown-item"
+           data-id="${p.id_produk}"
+           data-nama="${p.nama_produk}"
+           data-s1="${p.satuan1||''}"
+           data-s2="${p.satuan2||''}"
+           data-s3="${p.satuan3||''}"
+           data-sb="${p.satuan_beli||''}">
+           ${p.kode_produk ? p.kode_produk + ' — ' : ''}${p.nama_produk}
+        </a>
+      `).join("");
+
+      dd.classList.add("show");
+
+      currentItems = Array.from(dd.querySelectorAll('.dropdown-item'));
+      activeIndex = -1;
+    },150);
+  });
+
+
+  // ------------------- KEYBOARD NAVIGATION -------------------
+  inpNama.addEventListener("keydown", function(e){
+    if(!dd.classList.contains("show")) return;
+
+    if(e.key === "ArrowDown"){
+      e.preventDefault();
+      if(currentItems.length === 0) return;
+      activeIndex = (activeIndex + 1) % currentItems.length;
+      updateHighlight();
+    }
+
+    else if(e.key === "ArrowUp"){
+      e.preventDefault();
+      if(currentItems.length === 0) return;
+      activeIndex = (activeIndex - 1 + currentItems.length) % currentItems.length;
+      updateHighlight();
+    }
+
+    else if(e.key === "Enter"){
+      if(activeIndex >= 0 && currentItems[activeIndex]){
+        e.preventDefault();
+        currentItems[activeIndex].click();
+      }
+    }
+  });
+
+
+
+  // ------------------- PILIH PRODUK -------------------
+  dd.addEventListener("click", function(e){
+    const it = e.target.closest(".dropdown-item");
+    if(!it) return;
+
+    inpNama.value = it.dataset.nama;
+    inpNama.dataset.id = it.dataset.id;
+
+    selSatuan.innerHTML = '<option value="">Pilih Satuan</option>';
+    if(it.dataset.s1) selSatuan.add(new Option(it.dataset.s1, it.dataset.s1));
+    if(it.dataset.s2) selSatuan.add(new Option(it.dataset.s2, it.dataset.s2));
+    if(it.dataset.s3) selSatuan.add(new Option(it.dataset.s3, it.dataset.s3));
+
+    selSatuan.value = it.dataset.sb || it.dataset.s1 || "";
+
+    dd.classList.remove("show");
+
+    setTimeout(()=>{
+      inpQty.focus();
+      inpQty.select();
+    },20);
+  });
+
+
+  // ------------------- CLICK OUTSIDE HIDE DROPDOWN -------------------
+  document.addEventListener("click", (ev)=>{
+    if(!tr.contains(ev.target)) dd.classList.remove("show");
+  });
+
+
+
+  // ------------------- RECALC -------------------
+function recalc(){
+  const q = parseInt(inpQty.value) || 0;
+  // harga input mungkin berformat "100.000" -> hapus titik
+  const h = parseInt((inpHarga.value||'').toString().replace(/\./g,'')) || 0;
+  const base = q * h; // total sebelum diskon
+
+  const rawDiskon = (inpDiskon.value||'').toString().trim();
+  let discTotal = parseDiskon(rawDiskon, q, h);
+
+  if(discTotal > base) discTotal = base;
+
+  // hitung pajak berdasarkan taxable = base - discTotal
+  const taxRate = TAX_RATES[selPajak.value] || 0;
+  const taxable = base - discTotal;
+  const taxAmount = Math.round(taxable * taxRate);
+
+  const subtotal = taxable + taxAmount;
+  subCell.innerText = fmt(subtotal);
+
+  // jika mau tampilkan diskon per baris di kolom diskon Rp terpisah, bisa set value:
+  // const perUnitDisc = Math.floor(discTotal / Math.max(1,q));
+  // jika ada kolom diskon-rp, isi dengan fmt(perUnitDisc);
+
+  refreshTotals();
+}
+
+  inpQty.addEventListener('input', recalc);
+  inpHarga.addEventListener('input', recalc);
+  inpDiskon.addEventListener('input', ()=> {
+  // allow only digits, dot, percent and plus
+  let v = (inpDiskon.value || '').toString();
+  v = v.replace(/[^\d+.%]/g, '');               // hanya 0-9 + . % dan +
+  v = v.replace(/\++/g, '+');                   // ganti "+++" jadi "+"
+  v = v.replace(/(\.%|%\.)/g, '%');             // bersihkan kombinasi aneh
+  inpDiskon.value = v;
+  recalc();
+});
+
+inpDiskon.addEventListener('blur', e=>{
+  let v = (e.target.value||'').toString().trim();
+  if(!v) return;
+
+  if(v.endsWith('%')){
+    // biarkan "10%" atau "10%+5%"
+    // kita normalisasi tiap part: if numeric <100 and no % sign, we keep as-is
+    // nothing to auto-convert here
+    inpDiskon.value = v;
+    return;
+  }
+
+  // jika berisi '+' -> format tiap bagian nominal jika bukan persen
+  if(v.includes('+')){
+    const parts = v.split('+').map(p => p.trim()).map(p=>{
+      if(p.endsWith('%')) return p;
+      // remove existing dots then format with dots
+      const n = parseInt(p.replace(/\./g,'')) || 0;
+      return n === 0 ? '' : fmt(n);
+    }).filter(Boolean);
+    inpDiskon.value = parts.join('+');
+    return;
+  }
+
+  // jika hanya angka -> anggap nominal per unit, format dengan titik (1000 -> 1.000)
+  const onlyNum = v.replace(/\./g,'').replace(/,/g,'');
+  if(/^\d+$/.test(onlyNum)){
+    const num = parseInt(onlyNum) || 0;
+    // jika kurang dari 100 mungkin pengguna maksud persen — kalau ingin auto-convert uncomment:
+    // if(num < 100){ inpDiskon.value = num + '%'; recalc(); return; }
+    inpDiskon.value = num === 0 ? '' : fmt(num);
+    return;
+  }
+});
+
+
+
+  selPajak.addEventListener('change', recalc);
+
+
+
+  // ------------------- ENTER ON HARGA = TAMBAH BARIS -------------------
+  inpHarga.addEventListener("keydown", e=>{
+    if(e.key === "Enter"){
+      e.preventDefault();
+
+      if(inpNama.value.trim() !== "" && parseInt(inpQty.value)>0 && parseInt(inpHarga.value)>0){
+        addRowIfNeeded();
+        setTimeout(()=>{
+          const last = tblBody.querySelector('tr.line-row:last-child .inp-nama');
+          if(last) last.focus();
+        },20);
+      }
+    }
+  });
+
+
+
+  // ------------------- DELETE ROW -------------------
+  btnDel.addEventListener("click", ()=>{
+    tr.remove();
+    refreshRowNumbers();
+    refreshTotals();
+    addRowIfNeeded();
+  });
+}
+
+
+
+// ===================== ADD ROW IF NEEDED =====================
+function addRowIfNeeded(){
+  const rows = Array.from(tblBody.querySelectorAll('tr.line-row'));
+  const last = rows[rows.length-1];
+
+  if(!last ||
+     last.querySelector('.inp-nama').value.trim() !== "" ||
+     parseInt(last.querySelector('.inp-harga').value) > 0){
+
+    tblBody.appendChild(createRow());
+  }
+
+  refreshRowNumbers();
+}
+
+
+
+// ===================== ROW NUMBERING =====================
+function refreshRowNumbers(){
+  Array.from(tblBody.querySelectorAll('tr.line-row')).forEach((r,i)=>{
+    const noCell = r.querySelector('.line-no');
+    if(noCell) noCell.innerText = i+1;
+  });
+}
+
+
+
+// ===================== INITIALIZE FIRST ROW =====================
+if(!tblBody.querySelector('tr.line-row')){
+  tblBody.appendChild(createRow());
+}
+
+
+
+// ===================== TOTALS =====================
+function refreshTotals(){
+  const rows = Array.from(tblBody.querySelectorAll('tr.line-row'));
+  let sub = 0;
+
+  rows.forEach(r=>{
+    sub += toNum(r.querySelector('.subtotal-cell').innerText);
+  });
+
+  subTxt.innerText = fmt(sub);
+  const dt = toNum(diskon_total.value);
+  const bl = toNum(biaya_lain.value);
+  const grand = sub - dt + bl;
+  grandTxt.innerText = fmt(grand);
+}
+
+diskon_total.addEventListener('input', refreshTotals);
+biaya_lain.addEventListener('input', refreshTotals);
+
+
+
+// ===================== GATHER ITEMS =====================
+function gatherItemsFromTable(){
+  const items = [];
+
+  Array.from(tblBody.querySelectorAll('.line-row')).forEach(r=>{
+    const nama = r.querySelector('.inp-nama').value.trim();
+    if(!nama) return;
+
+    const id_produk = r.querySelector('.inp-nama').dataset.id || null;
+    const qty = parseInt(r.querySelector('.inp-qty').value) || 0;
+    const satuan = r.querySelector('.inp-satuan').value || '';
+    const harga = parseInt(r.querySelector('.inp-harga').value) || 0;
+
+    const rawDiskon = r.querySelector('.inp-diskon').value.trim();
+    const base = qty * harga;
+    const diskon_rp = parseDiskon(rawDiskon, base);
+
+    const pajak = r.querySelector('.inp-pajak').value || 'NO';
+    const subtotal = toNum(r.querySelector('.subtotal-cell').innerText);
+
+    items.push({
+      id_produk,
+      nama_item: nama,
+      qty,
+      satuan,
+      harga,
+      diskon_item: diskon_rp,
+      subtotal,
+      pajak
+    });
+  });
+
+  return items;
+}
+
+async function confirmHargaNol() {
+    const rows = Array.from(tblBody.querySelectorAll("tr.line-row"));
+    let adaHargaNol = false;
+    let pesan = "";
+
+    rows.forEach((r, i) => {
+        const nama = r.querySelector(".inp-nama").value.trim();
+        const harga = parseInt((r.querySelector(".inp-harga").value || "").replace(/\./g, "")) || 0;
+
+        if (!nama) return; // skip baris kosong
+
+        if (harga === 0) {
+            soundError();
+            adaHargaNol = true;
+            pesan += `- No ${i + 1} (${nama}) harganya 0\n`;
+        }
+    });
+
+    if (!adaHargaNol) return true;
+
+    // Konfirmasi
+    return confirm(
+        "Terdapat harga 0:\n\n" +
+        pesan +
+        "\nApakah Anda yakin ingin melanjutkan?"
+    );
+
+}
+
+
+// ===================== SAVE =====================
+btnSave.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const lanjut = await confirmHargaNol();
+    if (!lanjut) return;
+
+    try {
+        // === Prevent double click ===
+        btnSave.disabled = true;
+        btnSave.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Menyimpan...`;
+
+        // === Gather data ===
+        const items = gatherItemsFromTable();
+        if (items.length === 0) throw new Error("Tambahkan minimal 1 item!");
+
+        const kodeVal = kode.value;
+        const tanggalVal = tanggal.value;
+        const id_mitra = cari_mitra.dataset.id || null;
+        const terminVal = termin.value;
+        const tempoVal = parseInt(tempo.value) || 0;
+        const ketVal = keterangan.value.trim() || null;
+
+        const sub = items.reduce((s, it) => s + it.subtotal, 0);
+        const dt = toNum(diskon_total.value);
+        const bl = toNum(biaya_lain.value);
+        const grand = sub - dt + bl;
+
+        const t_jatuh =
+            terminVal === "credit" && tempoVal > 0
+                ? new Date(new Date(tanggalVal).getTime() + tempoVal * 86400000)
+                      .toISOString()
+                      .slice(0, 10)
+                : null;
+
+        // ============================================================
+        // 1️⃣ INSERT HEADER (1x Request)
+        // ============================================================
+        const { data: head, error: hErr } = await db
+            .from("tb_pembelian")
+            .insert([
+                {
+                    kode_pembelian: kodeVal,
+                    tanggal: tanggalVal,
+                    id_mitra,
+                    termin: terminVal,
+                    tempo: tempoVal,
+                    tanggal_jatuh_tempo: t_jatuh,
+                    total_sub: sub,
+                    total_diskon: dt,
+                    total_biaya_lain: bl,
+                    grand_total: grand,
+                    keterangan: ketVal,
+                },
+            ])
+            .select()
+            .single();
+
+        if (hErr) throw hErr;
+
+        const idP = head.id_pembelian;
+
+        // ============================================================
+        // 2️⃣ INSERT DETAIL PEMBELIAN (Batch, 1x Request)
+        // ============================================================
+        const details = items.map((it) => ({
+            id_pembelian: idP,
+            id_produk: it.id_produk,
+            nama_item: it.nama_item,
+            qty: it.qty,
+            satuan: it.satuan,
+            harga: it.harga,
+            diskon_item: it.diskon_item,
+            subtotal: it.subtotal,
+        }));
+
+        const { error: dErr } = await db.from("tb_pembelian_detail").insert(details);
+        if (dErr) throw dErr;
+
+        // ============================================================
+        // 3️⃣ INSERT MUTASI STOK (Batch, 1x Request)
+        // ============================================================
+        const mutasi = items
+            .filter((it) => it.id_produk)
+            .map((it) => ({
+                id_produk: it.id_produk,
+                sumber: "pembelian",
+                ref_id: idP,
+                tanggal: tanggalVal,
+                qty: it.qty,
+                satuan: it.satuan,
+                keterangan: `Pembelian ${kodeVal}`,
+            }));
+
+        if (mutasi.length > 0) {
+            const { error: mErr } = await db.from("tb_stock_mutasi").insert(mutasi);
+            if (mErr) throw mErr;
+        }
+
+        // ============================================================
+        // 4️⃣ SELESAI
+        // ============================================================
+        alert("Pembelian berhasil disimpan: " + kodeVal);
+        location.reload();
+    } catch (err) {
+        console.error(err);
+        alert("Gagal menyimpan data:\n" + err.message);
+    } finally {
+        // always re-enable the button if needed
+        btnSave.disabled = false;
+        btnSave.innerHTML = `Simpan`;
+    }
+});
+
+
+
+
+// ===================== CTRL + ENTER SUBMIT =====================
+document.addEventListener("keydown", e=>{
+  if(e.ctrlKey && e.key==="Enter"){
+    e.preventDefault();
+    btnSave.click();
+  }
+});
+
+
+// ===================== ENTER NAVIGATION FORM (di luar table) =====================
+document.getElementById('form').addEventListener('keydown', function(e){
+  if(e.key==='Enter' && !e.ctrlKey && !e.target.classList.contains('inp-harga')){
+    e.preventDefault();
+
+    const idx = Array.prototype.indexOf.call(this, e.target);
+    if(this.elements[idx+1])
+        this.elements[idx+1].focus();
+  }
+});
+
+
+// ===================== INITIALIZE =====================
+addRowIfNeeded();
+refreshTotals();
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+  <meta charset="utf-8">
+  <title>Detail Kas Bank</title>
+
+  <link href="css/sb-admin-2.min.css" rel="stylesheet">
+  <link href="css/noscroll.css" rel="stylesheet">
+
+  <style>
+    .saldo-akhir {
+      font-weight: bold;
+      color: #1cc88a;
+    }
+    tr.barisdata:hover {
+      background:#f1f5ff;
+    }
+  </style>
+</head>
+
+<body id="page-top">
+<div id="navbar"></div>
+
+<div id="wrapper">
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+<div class="container-fluid">
+
+<div class="card shadow mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center py-2">
+    <h6 class="m-0 font-weight-bold text-primary" id="judul">
+      Detail Kas Bank
+    </h6>
+  </div>
+
+  <div class="card-body table-responsive">
+    <table class="table table-sm table-bordered">
+      <thead>
+        <tr>
+          <th width="110">Tanggal</th>
+          <th>Keterangan</th>
+          <th width="130" class="text-right">Debit</th>
+          <th width="130" class="text-right">Kredit</th>
+          <th width="140" class="text-right">Saldo</th>
+        </tr>
+      </thead>
+      <tbody id="tb_mutasi"></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+<script src="js/navbar_on_off.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+
+<script>
+/* ================== HELPERS ================== */
+function fmt(n){
+  return (n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
+function getParam(name){
+  return new URLSearchParams(location.search).get(name);
+}
+
+/* ================== MAIN ================== */
+const kodeKasbank = getParam("kode");
+if(!kodeKasbank){
+  alert("Kode kasbank tidak ditemukan");
+}
+
+async function loadDetailKasBank(){
+  // ambil info rekening
+  const { data: kb } = await db
+    .from("tb_kasbank")
+    .select("kode,nama_rekening,tipe")
+    .eq("kode", kodeKasbank)
+    .single();
+
+  document.getElementById("judul").innerText =
+    `Mutasi ${kb.nama_rekening} (${kb.kode})`;
+
+  // ambil mutasi
+  const { data, error } = await db
+    .from("tb_kasbank_mutasi")
+    .select("tanggal,jenis,jumlah,keterangan")
+    .eq("kode_kasbank", kodeKasbank)
+    .order("tanggal", { ascending: true });
+
+  if(error){
+    alert("Gagal load mutasi");
+    console.error(error);
+    return;
+  }
+
+  let saldo = 0;
+  const tb = document.getElementById("tb_mutasi");
+  tb.innerHTML = "";
+
+  data.forEach(r => {
+    const debit  = r.jenis === "debit"  ? r.jumlah : 0;
+    const kredit = r.jenis === "kredit" ? r.jumlah : 0;
+
+    saldo += debit - kredit;
+
+    tb.insertAdjacentHTML("beforeend", `
+      <tr class="barisdata">
+        <td>${r.tanggal}</td>
+        <td>${r.keterangan || ""}</td>
+        <td class="text-right">${debit ? fmt(debit) : ""}</td>
+        <td class="text-right">${kredit ? fmt(kredit) : ""}</td>
+        <td class="text-right saldo-akhir">${fmt(saldo)}</td>
+      </tr>
+    `);
+  });
+}
+
+loadDetailKasBank();
+</script>
+</body>
+</html>
