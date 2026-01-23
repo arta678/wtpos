@@ -19,8 +19,8 @@
     cursor:pointer;
 }
 .input-error {
-    border: 1px solid #dc3545 !important; /* merah bootstrap */
-    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+    border: 2px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 10px rgba(220,53,69,0.4) !important;
 }
 #dropdown_kategori.dropdown-menu {
     width: 100% !important;
@@ -478,6 +478,18 @@
       }
     }
 
+function findRowByProduk(idProduk, exceptRow = null) {
+  const rows = tbItem.querySelectorAll("tr.line-row");
+
+  for (const tr of rows) {
+    if (tr === exceptRow) continue;
+    if (tr.dataset.produk === idProduk) {
+      return tr;
+    }
+  }
+  return null;
+}
+
     /* ======================================================
        TAMBAH ORDER
     ====================================================== */
@@ -740,6 +752,31 @@ function pilihProduk(el, id, nama, satuan1, satuan2, satuan3) {
     return;
   }
 
+  // 🚫 CEK DUPLIKAT
+  const dupeRow = findRowByProduk(id, tr);
+  if (dupeRow) {
+    // highlight baris lama
+    dupeRow.classList.add("input-error");
+
+    setTimeout(() => {
+      dupeRow.classList.remove("input-error");
+    }, 800);
+
+    // fokus ke qty baris lama
+    const qty = dupeRow.querySelector(".qty");
+    if (qty) {
+      qty.focus();
+      qty.select();
+    }
+
+    // tutup dropdown
+    el.parentElement.classList.remove("show");
+
+    selectingProduk = false;
+    return;
+  }
+
+  // ================= NORMAL FLOW =================
   tr.dataset.produk = id;
 
   const inpProduk = tr.querySelector(".cari-produk");
@@ -754,13 +791,15 @@ function pilihProduk(el, id, nama, satuan1, satuan2, satuan3) {
 
   inpSatuan.value = satuan1 || "PCS";
 
-  el.parentElement?.classList.remove("show");
+  el.parentElement.classList.remove("show");
   updateManualHighlight(tr);
 
   requestAnimationFrame(() => {
     selectingProduk = false;
-    inpQty?.focus();
-    inpQty?.select();
+    if (inpQty) {
+      inpQty.focus();
+      inpQty.select();
+    }
   });
 }
 
@@ -1271,7 +1310,7 @@ document.addEventListener("focusin", e => {
 
   // produk manual → PCS saja
   if (!tr.dataset.produk) {
-    dd.innerHTML = `<a class="dropdown-item" onclick="setSatuan(this)">PCS</a>`;
+    dd.innerHTML = `<a class="dropdown-item" onclick="setSatuan(this, { skipFocusQty:true })">PCS</a>`;
     dd.classList.add("show");
   } else {
     // produk DB → ambil satuan1-3
@@ -1279,9 +1318,11 @@ document.addEventListener("focusin", e => {
       const val = tr.dataset[k];
       if (val) {
         dd.innerHTML += `
-          <a class="dropdown-item" onclick="setSatuan(this)">
+          <a class="dropdown-item"
+             onclick="setSatuan(this, { skipFocusQty:true })">
             ${val}
-          </a>`;
+          </a>
+        `;
       }
     });
 
