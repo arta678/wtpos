@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>List Orderan</title>
+    <link rel="icon" href="img/logo.svg">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/noscroll.css">
+    <style>
+        .dropdown-menu.show {
+    display:block;
+    max-height:200px;
+    overflow-y:auto;
+    cursor:pointer;
+}
+.input-error {
+    border: 1px solid #dc3545 !important; /* merah bootstrap */
+    box-shadow: 0 0 4px rgba(220,53,69,0.4) !important;
+}
+#dropdown_kategori.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+#dropdown_merek.dropdown-menu {
+    width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+.dropdown-item.active-highlight {
+    background-color: #e3e6f0 !important;
+    color: black !important;
+}
+.shortcut-menu {
+    gap: 10px;
+    margin-top: 45px !important; /* turun dari 70 px → lebih dekat ke navbar */
+}
+
+.shortcut-item {
+    width: 55px; /* dari 70px */
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.shortcut-icon {
+    width: 38px;   /* dari 50px */
+    height: 38px;  /* dari 50px */
+    border-radius: 10px; /* sedikit lebih kecil */
+    font-size: 16px;     /* dari 20px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.shortcut-text {
+    margin-top: 4px;
+    font-size: 11px; /* dari 12px */
+    color: #444;
+}
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-horizontal label {
+    width: 110px; /* lebar label (bisa diubah) */
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-horizontal .form-control,
+.form-horizontal .form-select {
+    flex: 1;
+}
+/* Agar wrapper kategori/merek ikut aturan flex dan ukurannya sama dgn input lainnya */
+.form-horizontal .form-group > .position-relative {
+    flex: 1;                       /* wajib */
+    display: flex;                 /* biar textarea/input di dalamnya ikut full */
+    align-items: center;
+}
+
+.form-horizontal .position-relative input.form-control-sm {
+    width: 100%;                   /* pastikan penuh */
+}
+.gap-2 > * {
+    margin-left: 6px;
+}
+.table thead th {
+    background: linear-gradient(to bottom, #f5f5f5, #ededee);
+    color: #7789bf;
+    font-weight: 600;
+    border-bottom: 2px solid #ffffff;
+}
+.card-body {
+    padding-bottom: 0 !important;
+}
+.card-body nav {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+#pagination {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* HANYA BARIS DATA (ISI TABEL) */
+.table-tight tbody td {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    line-height: 1.15;
+    vertical-align: middle;
+}
+  tr.jurnal-row:hover { background:#f1f5ff; cursor:pointer }
+  .modal-lg { max-width: 600px }
+.table-noselect,
+.table-noselect * {
+    user-select: none;
+    -webkit-user-select: none; /* Chrome, Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Edge lama */
+}
+/* FIX dropdown supplier di modal */
+#modalOrder .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1055; /* lebih tinggi dari modal content */
+}
+
+/* pastikan modal body tidak memotong dropdown */
+#modalOrder .modal-body {
+  overflow: visible;
+}
+/* ================================
+   ORDER MODAL – EXCEL STYLE
+   SAMA DENGAN PEMBELIAN
+================================ */
+
+/* padding super rapat */
+#tbl-order th,
+#tbl-order td {
+  padding: 1px 3px !important;
+  vertical-align: middle;
+  font-size: 12px;
+}
+
+/* header sedikit tebal */
+#tbl-order thead th {
+  padding: 4px 3px !important;
+  font-weight: 600;
+}
+
+/* input & select */
+#tbl-order input.form-control-sm,
+#tbl-order select.form-control-sm {
+  padding: 0 3px;
+  height: 22px;
+  line-height: 1.1;
+  font-size: 14px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* fokus = underline + bold */
+#tbl-order input.form-control-sm:focus,
+#tbl-order select.form-control-sm:focus {
+  outline: none;
+  font-weight: 700;
+  border-bottom: 1px solid #4e73df;
+}
+
+/* hilangkan panah number */
+#tbl-order input[type=number]::-webkit-inner-spin-button,
+#tbl-order input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* baris aktif */
+#tbl-order tr.line-row:focus-within {
+  background-color: #f8f9fc;
+}
+
+/* hover ringan */
+/*#tbl-order tbody tr:hover {
+  background-color: #f1f3f8;
+}*/
+
+/* icon hapus */
+#tbl-order .btn-delete svg {
+  fill: #6c757d;
+  transition: fill 0.15s ease, transform 0.1s ease;
+}
+#tbl-order .btn-delete:hover svg {
+  fill: #e74a3b;
+  transform: scale(1.15);
+}
+
+#tbl-order .dd-produk {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1060;
+  min-width: 350px;
+  white-space: normal;
+}
+/* ✍️ produk manual (tidak ada di DB) */
+.manual-produk input.cari-produk {
+  background-color: #fff9e6 !important;
+  border-bottom: 1px dashed #856404;
+}
+
+.manual-produk input.cari-produk::after {
+  content: " ✍️";
+}
+
+
+</style>
+</head>
+
+<body id="page-top">
+    <div id="navbar"></div>
+    <div id="wrapper">
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="container-fluid">
+                    <div id="shortcut"></div>
+                    <div class="card shadow mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
+                            <h6 class="m-0 font-weight-bold text-primary">Orderan</h6>
+                            <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search..." style="max-width:90px">
+                                <button class="btn btn-primary btn-sm" onclick="openTambahOrder()">Tambah</button>
+                            </div>
+                        </div>
+                        <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                            <table class="table table-hover table-sm table-bordered table-tight table-noselect">
+                                <thead class="table-sm">
+                                    <tr>
+                                        <th width="120px">Nama Mitra</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbOrderList"></tbody>
+                            </table>
+                            <nav>
+                                <ul class="pagination justify-content-center" id="pagination">
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" onclick="prevPage()">&laquo;</a>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#">Page <span id="page-number">1</span></a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" onclick="nextPage()">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="modalOrder" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h6 class="modal-title">Order</h6>
+                    <div class="ml-auto d-flex gap-2">
+                        <button class="btn btn-light btn-sm" onclick="handleCopyOrder()">📋 Copy</button>
+                        <button class="btn btn-light btn-sm" onclick="simpanOrder()">💾 Save</button>
+                        <button class="btn btn-light btn-sm" data-dismiss="modal">❌ Close</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <!-- SUPPLIER -->
+                    <div class="form-group mb-2 position-relative">
+                        <input id="inpMitra" class="form-control form-control-sm" placeholder="Supplier / Mitra">
+                        <div id="ddMitra" class="dropdown-menu w-100"></div>
+                    </div>
+                    <!-- ITEM -->
+                    <table class="table table-sm table-bordered table-tight" id="tbl-order">
+                        <thead>
+                            <tr>
+                                <th width="30">No.</th>
+                                <th>Produk</th>
+                                <th width="60">Qty</th>
+                                <th width="70">Satuan</th>
+                                <th width="40"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbItem"></tbody>
+                    </table>
+                    <button class="btn btn-sm btn-light" onclick="tambahBarisDanFokus()">Tambah Baris</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalCopy" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <!--       <div class="modal-header py-2">
+        <h6 class="modal-title">Copy Order</h6>
+        <button class="close" data-dismiss="modal">&times;</button>
+      </div> -->
+                <div class="modal-body p-2">
+                    <textarea id="copyText" class="form-control" rows="8" readonly></textarea>
+                    <!--         <small class="text-muted d-block mt-1">
+          Tekan & tahan → Copy → Paste ke WhatsApp
+        </small> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+    <script src="js/navbar_on_off.js"></script>
+    <script>
+    function initNavbarQuickSearch() {
+        const nav = document.getElementById("navbar");
+        if (!nav) return;
+        const input = nav.querySelector("#quickSearchInput");
+        if (!input || input.dataset.bound) return;
+        input.dataset.bound = "1";
+        input.addEventListener("keydown", e => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            const q = input.value.trim();
+            if (!q) return;
+            location.href =
+                "h_harga_produk.html?q=" + encodeURIComponent(q);
+        });
+    }
+    async function loadNavbar() {
+        const navEl = document.getElementById("navbar");
+        if (localStorage.getItem("navbar")) {
+            navEl.innerHTML = localStorage.getItem("navbar");
+            navEl.classList.add("loaded");
+        }
+        const res = await fetch("navbar.html");
+        const html = await res.text();
+        localStorage.setItem("navbar", html);
+        navEl.innerHTML = html;
+        navEl.classList.add("loaded");
+        if (typeof applyShortcutVisibility === "function") {
+            applyShortcutVisibility();
+        }
+        initNavbarQuickSearch();
+    }
+    async function loadShortcut() {
+        if (!isShortcutEnabled()) {
+            const el = document.getElementById("shortcut");
+            if (el) el.style.display = "none";
+            return;
+        }
+
+        const el = document.getElementById("shortcut");
+
+        if (localStorage.getItem("shortcut_html")) {
+            el.innerHTML = localStorage.getItem("shortcut_html");
+            applyShortcutIcons(); // ⬅️ WAJIB
+        }
+
+        const res = await fetch("shortcut.html");
+        const html = await res.text();
+
+        localStorage.setItem("shortcut_html", html);
+        el.innerHTML = html;
+
+        applyShortcutIcons(); // ⬅️ WAJIB
+    }
+    loadNavbar();
+    loadShortcut();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/db_supabase.js"></script>
+    <script>
+    /* ======================================================
+   STATE GLOBAL
+====================================================== */
+    let MODE = "ADD"; // ADD | EDIT
+    let currentOrder = null; // id_order
+    let currentMitra = null; // id_mitra
+    let deletedItems = new Set();
+    const inpMitra = document.getElementById("inpMitra");
+    const ddMitra = document.getElementById("ddMitra");
+    const tbItem = document.getElementById("tbItem");
+    let activeProdukIndex = -1;
+    let currentProdukItems = [];
+    let supplierItems = [];
+    let supplierIndex = -1;
+    let activeSatuanIndex = -1;
+    let currentSatuanItems = [];
+
+    function handleCopyOrder() {
+    if (isMobileDevice()) {
+        // 📱 HP → pakai modal (manual copy)
+        openCopyModal();
+      } else {
+        // 💻 PC → langsung copy
+        copyOrderDirect();
+      }
+    }
+
+    async function getOrCreateOrder(idMitra) {
+        // cari order terakhir supplier
+        const { data } = await db
+            .from("tb_order")
+            .select("id_order")
+            .eq("id_mitra", idMitra)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        // kalau sudah ada → pakai
+        if (data && data.id_order) {
+            return data.id_order;
+        }
+
+        // kalau belum ada → buat baru
+        const { data: newOrder, error } = await db
+            .from("tb_order")
+            .insert({ id_mitra: idMitra })
+            .select()
+            .single();
+
+        if (error) {
+            throw new Error("Gagal membuat order");
+        }
+
+        return newOrder.id_order;
+    }
+
+    function addRowIfLast(tr) {
+        const rows = Array.from(tbItem.querySelectorAll("tr.line-row"));
+        const isLast = rows[rows.length - 1] === tr;
+
+        if (isLast) {
+            addItemRow();
+        }
+
+        requestAnimationFrame(() => {
+            const lastRow = tbItem.querySelector("tr.line-row:last-child");
+            if (lastRow) {
+              const inpProduk = lastRow.querySelector(".cari-produk");
+              if (inpProduk) {
+                inpProduk.focus();
+                inpProduk.select();
+              }
+            }
+
+            if (inpProduk) {
+                inpProduk.focus();
+                inpProduk.select();
+            }
+        });
+    }
+    function updateManualHighlight(tr) {
+      if (!tr.dataset.produk) {
+        tr.classList.add("manual-produk");
+        tr.title = "Produk manual (belum ada di database)";
+      } else {
+        tr.classList.remove("manual-produk");
+      }
+    }
+
+    /* ======================================================
+       TAMBAH ORDER
+    ====================================================== */
+    function openTambahOrder() {
+        MODE = "ADD";
+        currentOrder = null;
+        currentMitra = null;
+        deletedItems.clear();
+
+        inpMitra.value = "";
+        inpMitra.disabled = false;
+        tbItem.innerHTML = "";
+
+        addItemRow();
+        $('#modalOrder').modal('show');
+    }
+
+
+
+    /* ======================================================
+       EDIT ORDER (dipanggil dari klik baris tabel)
+    ====================================================== */
+    async function openEditOrder(idOrder, idMitra, namaMitra) {
+        MODE = "EDIT";
+        currentOrder = idOrder;
+        currentMitra = idMitra; // ⬅️ INI YANG HILANG
+        deletedItems.clear();
+
+        inpMitra.value = namaMitra;
+        inpMitra.disabled = true;
+        tbItem.innerHTML = "";
+
+        await loadOrderItem(idOrder);
+        $('#modalOrder').modal('show');
+    }
+
+    /* ======================================================
+       LOAD ITEM ORDER (EDIT MODE)
+    ====================================================== */
+    async function loadOrderItem(idOrder) {
+        const { data, error } = await db
+            .from("tb_order_item")
+            .select(`
+              id_item,
+              id_produk,
+              nama_manual,
+              qty,
+              satuan,
+              tb_produk:tb_produk (
+                nama_produk,
+                satuan1,
+                satuan2,
+                satuan3
+              )
+            `)
+            .eq("id_order", idOrder);
+
+        if (error) {
+            alert("Gagal load item order");
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            addItemRow();
+            return;
+        }
+
+        // data.forEach(i => addItemRow(i));
+        data.forEach(i => {
+          addItemRow(i);
+
+          const tr = tbItem.querySelector("tr.line-row:last-child");
+            if (i.tb_produk) {
+              tr.dataset.satuan1 = i.tb_produk.satuan1 || "PCS";
+              tr.dataset.satuan2 = i.tb_produk.satuan2 || "";
+              tr.dataset.satuan3 = i.tb_produk.satuan3 || "";
+            }
+
+          updateManualHighlight(tr);
+        });
+
+
+        refreshOrderRowNumbers();
+    }
+
+    /* ======================================================
+       BARIS ITEM
+    ====================================================== */
+ function addItemRow(item = {}) {
+  tbItem.insertAdjacentHTML("beforeend", `
+    <tr class="line-row" data-id="${item.id_item || ""}"
+        data-produk="${item.id_produk || ""}">
+      <td class="line-no text-center"></td>
+      <td class="position-relative">
+        <input class="form-control form-control-sm cari-produk">
+        <div class="dropdown-menu w-100 dd-produk"></div>
+      </td>
+      <td>
+        <input type="number" class="form-control form-control-sm qty">
+      </td>
+      <td class="position-relative">
+        <input class="form-control form-control-sm satuan">
+        <div class="dropdown-menu w-100 dd-satuan"></div>
+      </td>
+      <td class="text-center">
+        <span class="action-icon text-dark btn-delete"
+              onclick="hapusItemRow(this)">
+          ${ICON_SILANG}
+        </span>
+      </td>
+    </tr>
+  `);
+
+  // 🔑 ambil row SEKALI
+  const lastRow = tbItem.querySelector("tr.line-row:last-child");
+
+  // 🔐 AMAN untuk ", ', <, >, emoji, dll
+  lastRow.querySelector(".cari-produk").value =
+  (lastRow.querySelector(".cari-produk").value =
+  (item.tb_produk && item.tb_produk.nama_produk) ||
+  item.nama_manual ||
+  "");
+  lastRow.querySelector(".qty").value = item.qty || 1;
+  lastRow.querySelector(".satuan").value = item.satuan || "PCS";
+
+  // =====================
+  // BIND QTY KEYBOARD
+  // =====================
+  const inpQty = lastRow.querySelector(".qty");
+
+  if (!inpQty.dataset.bind) {
+    inpQty.dataset.bind = "1";
+
+    inpQty.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+
+        const namaManual =
+          lastRow.querySelector(".cari-produk").value.trim();
+
+        if (!lastRow.dataset.produk && !namaManual) {
+          lastRow.classList.add("input-error");
+          return;
+        }
+
+        addRowIfLast(lastRow);
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (lastRow.previousElementSibling) {
+          const q = lastRow.previousElementSibling.querySelector(".qty");
+          if (q) q.focus();
+        }
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (lastRow.nextElementSibling) {
+          const q = lastRow.nextElementSibling.querySelector(".qty");
+          if (q) q.focus();
+        }
+      }
+    });
+  }
+
+  // =====================
+  // BIND PRODUK MANUAL
+  // =====================
+  const inpProduk = lastRow.querySelector(".cari-produk");
+
+  if (!inpProduk.dataset.bindManual) {
+    inpProduk.dataset.bindManual = "1";
+
+    inpProduk.addEventListener("input", () => {
+        searchProduk(inpProduk);
+        lastRow.dataset.produk = "";
+        updateManualHighlight(lastRow);
+    });
+  }
+
+  updateManualHighlight(lastRow);
+  refreshOrderRowNumbers();
+}
+
+
+    function hapusItemRow(btn) {
+        const tr = btn.closest("tr");
+        const id = tr.dataset.id;
+        if (id) deletedItems.add(id);
+        tr.remove();
+        refreshOrderRowNumbers();
+    }
+
+    function refreshOrderRowNumbers() {
+        const rows = tbItem.querySelectorAll("tr.line-row");
+        rows.forEach((tr, i) => {
+            const noCell = tr.querySelector(".line-no");
+            if (noCell) noCell.innerText = i + 1;
+        });
+    }
+
+    /* ======================================================
+       SEARCH PRODUK (ON DEMAND)
+    ====================================================== */
+async function searchProduk(inp) {
+  const q = inp.value.trim().toLowerCase();
+  const dd = inp.nextElementSibling;
+
+  if (q.length < 2) {
+    dd.classList.remove("show");
+    return;
+  }
+
+  // 🔥 SPLIT PER KATA
+  const keywords = q.split(/\s+/).filter(Boolean);
+
+  let query = db
+    .from("tb_produk")
+    .select("id_produk, nama_produk, satuan1, satuan2, satuan3")
+    .eq("aktif", true);
+
+  // 🔥 SETIAP KATA HARUS MATCH (AND LOGIC)
+  keywords.forEach(k => {
+    query = query.ilike("nama_produk", `%${k}%`);
+  });
+
+  const { data } = await query.limit(10);
+
+  if (!data || data.length === 0) {
+    dd.classList.remove("show");
+    return;
+  }
+
+  dd.innerHTML = data.map(p => `
+    <a class="dropdown-item"
+       data-id="${p.id_produk}"
+       data-nama="${encodeURIComponent(p.nama_produk)}"
+       data-satuan1="${p.satuan1 || 'PCS'}"
+       data-satuan2="${p.satuan2 || ''}"
+       data-satuan3="${p.satuan3 || ''}">
+       ${p.nama_produk}
+    </a>
+  `).join("");
+
+  dd.classList.add("show");
+  currentProdukItems = Array.from(dd.querySelectorAll(".dropdown-item"));
+  activeProdukIndex = -1;
+}
+
+let selectingProduk = false;
+
+function pilihProduk(el, id, nama, satuan1, satuan2, satuan3) {
+  if (selectingProduk) return;
+  selectingProduk = true;
+
+  const tr = el.closest("tr");
+  if (!tr) {
+    selectingProduk = false;
+    return;
+  }
+
+  tr.dataset.produk = id;
+
+  const inpProduk = tr.querySelector(".cari-produk");
+  const inpQty = tr.querySelector(".qty");
+  const inpSatuan = tr.querySelector(".satuan");
+
+  inpProduk.value = nama;
+
+  tr.dataset.satuan1 = satuan1 || "PCS";
+  tr.dataset.satuan2 = satuan2 || "";
+  tr.dataset.satuan3 = satuan3 || "";
+
+  inpSatuan.value = satuan1 || "PCS";
+
+  el.parentElement?.classList.remove("show");
+  updateManualHighlight(tr);
+
+  requestAnimationFrame(() => {
+    selectingProduk = false;
+    inpQty?.focus();
+    inpQty?.select();
+  });
+}
+
+    /* ======================================================
+       SEARCH SUPPLIER (ON DEMAND)
+    ====================================================== */
+    inpMitra.addEventListener("input", async () => {
+        if (inpMitra.disabled) return;
+
+        const q = inpMitra.value.trim();
+        if (q.length < 2) {
+            ddMitra.classList.remove("show");
+            return;
+        }
+
+        const { data } = await db
+            .from("tb_mitra")
+            .select("id_mitra, nama_mitra")
+            .ilike("nama_mitra", `%${q}%`)
+            .eq("aktif", true)
+            .limit(10);
+
+        if (!data || data.length === 0) {
+            ddMitra.classList.remove("show");
+            return;
+        }
+
+        ddMitra.innerHTML = data.map(m => `
+  <a class="dropdown-item"
+     data-id="${m.id_mitra}"
+     data-nama="${m.nama_mitra}"
+     onclick="pilihMitra('${m.id_mitra}','${m.nama_mitra}')">
+     ${m.nama_mitra}
+  </a>
+`).join("");
+
+        ddMitra.classList.add("show");
+
+        // 🔥 simpan item untuk keyboard navigation
+        supplierItems = Array.from(ddMitra.querySelectorAll(".dropdown-item"));
+        supplierIndex = -1;
+
+    });
+
+    inpMitra.addEventListener("keydown", e => {
+
+        // kalau dropdown tidak tampil → abaikan
+        if (!ddMitra.classList.contains("show")) return;
+
+        // ⬇ ARROW DOWN
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!supplierItems.length) return;
+            supplierIndex = (supplierIndex + 1) % supplierItems.length;
+            updateSupplierHighlight();
+        }
+
+        // ⬆ ARROW UP
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (!supplierItems.length) return;
+            supplierIndex =
+                (supplierIndex - 1 + supplierItems.length) % supplierItems.length;
+            updateSupplierHighlight();
+        }
+
+        // ⏎ ENTER → PILIH SUPPLIER
+        if (e.key === "Enter") {
+            if (supplierIndex >= 0 && supplierItems[supplierIndex]) {
+                e.preventDefault();
+                supplierItems[supplierIndex].click();
+            }
+        }
+
+        // ESC → TUTUP DROPDOWN
+        if (e.key === "Escape") {
+            ddMitra.classList.remove("show");
+        }
+    });
+
+    function updateSupplierHighlight() {
+        supplierItems.forEach(el =>
+            el.classList.remove("active-highlight")
+        );
+
+        if (supplierIndex >= 0 && supplierItems[supplierIndex]) {
+            const el = supplierItems[supplierIndex];
+            el.classList.add("active-highlight");
+            el.scrollIntoView({ block: "nearest" });
+        }
+    }
+
+
+    function pilihMitra(id, nama) {
+        currentMitra = id;
+        inpMitra.value = nama;
+        ddMitra.classList.remove("show");
+
+        // ============================
+        // AUTO FOCUS KE PRODUK PERTAMA
+        // ============================
+        requestAnimationFrame(() => {
+            let firstProduk = tbItem.querySelector(".cari-produk");
+
+            // kalau belum ada baris → buat
+            if (!firstProduk) {
+                addItemRow();
+                firstProduk = tbItem.querySelector(".cari-produk");
+            }
+
+            if (firstProduk) {
+                firstProduk.focus();
+                firstProduk.select();
+            }
+        });
+    }
+
+    /* ======================================================
+       SIMPAN ORDER
+    ====================================================== */
+async function simpanOrder() {
+  if (!currentMitra) {
+    alert("Supplier belum dipilih");
+    return;
+  }
+
+  // ⛔ Disable tombol biar tidak double click
+  const btnSave = event?.target;
+  btnSave && (btnSave.disabled = true);
+
+  try {
+    // =========================
+    // 1️⃣ Ambil / buat order
+    // =========================
+    let orderId = currentOrder;
+
+    if (!orderId) {
+      const { data } = await db
+        .from("tb_order")
+        .select("id_order")
+        .eq("id_mitra", currentMitra)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data?.id_order) {
+        orderId = data.id_order;
+      } else {
+        const { data: newOrder, error } = await db
+          .from("tb_order")
+          .insert({ id_mitra: currentMitra })
+          .select()
+          .single();
+
+        if (error) throw error;
+        orderId = newOrder.id_order;
+      }
+    }
+
+    // =========================
+    // 2️⃣ KUMPULKAN DATA
+    // =========================
+    const inserts = [];
+    const updates = [];
+
+    tbItem.querySelectorAll("tr.line-row").forEach(tr => {
+      const idItem = tr.dataset.id;
+      const idProduk = tr.dataset.produk || null;
+      const namaManual = tr.querySelector(".cari-produk").value.trim();
+      const qty = Number(tr.querySelector(".qty").value);
+      const satuan = tr.querySelector(".satuan").value;
+
+      if ((!idProduk && !namaManual) || qty <= 0) return;
+
+      if (idItem) {
+        updates.push({
+          id_item: idItem,
+          id_order: orderId, 
+          id_produk: idProduk,
+          nama_manual: idProduk ? null : namaManual,
+          qty,
+          satuan
+        });
+
+      } else {
+        inserts.push({
+          id_order: orderId,
+          id_produk: idProduk,
+          nama_manual: idProduk ? null : namaManual,
+          qty,
+          satuan
+        });
+      }
+    });
+
+
+
+    // =========================
+    // 3️⃣ EKSEKUSI BATCH
+    // =========================
+    if (updates.length) {
+      await db.from("tb_order_item").upsert(updates, {
+        onConflict: "id_item"
+      });
+    }
+
+    if (inserts.length) {
+      await db.from("tb_order_item").insert(inserts);
+    }
+
+    // =========================
+    // 4️⃣ DELETE ITEM
+    // =========================
+    if (deletedItems.size) {
+      await db
+        .from("tb_order_item")
+        .delete()
+        .in("id_item", Array.from(deletedItems));
+    }
+
+    $('#modalOrder').modal('hide');
+    loadOrderList();
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal menyimpan order");
+  } finally {
+    btnSave && (btnSave.disabled = false);
+  }
+}
+
+
+    /* ======================================================
+       SEARCH MITRA (HIGHLIGHT SAJA, TANPA QUERY)
+    ====================================================== */
+    document.querySelector('input[placeholder="Search..."]')
+        .addEventListener("input", e => {
+            const q = e.target.value.toLowerCase();
+
+            document.querySelectorAll("tbody tr").forEach(tr => {
+                tr.style.background = "";
+                if (q && tr.innerText.toLowerCase().includes(q)) {
+                    tr.style.background = "#fff3cd"; // kuning
+                }
+            });
+        });
+
+    /* ======================================================
+   LOAD LIST ORDER
+====================================================== */
+    const tbOrderList = document.getElementById("tbOrderList");
+
+    async function loadOrderList() {
+        const { data, error } = await db
+            .from("tb_order")
+            .select(`
+      id_order,
+      id_mitra,
+      created_at,
+      tb_mitra ( nama_mitra )
+    `)
+            .order("created_at", { ascending: false }); // penting: terbaru dulu
+
+        if (error) {
+            console.error(error);
+            alert("Gagal load order");
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            tbOrderList.innerHTML = `
+      <tr>
+        <td class="text-center text-muted py-3">
+          Belum ada order
+        </td>
+      </tr>
+    `;
+            return;
+        }
+
+        // ==============================
+        // FILTER: 1 SUPPLIER = 1 BARIS
+        // ==============================
+        const mapSupplier = new Map();
+
+        data.forEach(o => {
+            if (!mapSupplier.has(o.id_mitra)) {
+                mapSupplier.set(o.id_mitra, o);
+            }
+        });
+
+        const uniqueOrders = Array.from(mapSupplier.values());
+
+        tbOrderList.innerHTML = uniqueOrders.map(o => `
+    <tr class="jurnal-row"
+        onclick="openEditOrder(
+          '${o.id_order}',
+          '${o.id_mitra}',
+          '${(o.tb_mitra?.nama_mitra || '').replace(/'/g, "\\'")}'
+        )">
+      <td>${o.tb_mitra?.nama_mitra || '-'}</td>
+    </tr>
+  `).join("");
+    }
+    $('#modalOrder').on('shown.bs.modal', function() {
+        const inp = document.getElementById('inpMitra');
+        if (inp && !inp.disabled) {
+            inp.focus();
+            inp.select(); // opsional: langsung seleksi teks
+        }
+    });
+    document.addEventListener("keydown", function(e) {
+        const inp = document.activeElement;
+        if (!inp || !inp.classList.contains("cari-produk")) return;
+
+        const dd = inp.nextElementSibling;
+        if (!dd || !dd.classList.contains("show")) return;
+
+        // ⬇ Arrow Down
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!currentProdukItems.length) return;
+            activeProdukIndex = (activeProdukIndex + 1) % currentProdukItems.length;
+            updateProdukHighlight();
+        }
+
+        // ⬆ Arrow Up
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (!currentProdukItems.length) return;
+            activeProdukIndex =
+                (activeProdukIndex - 1 + currentProdukItems.length) %
+                currentProdukItems.length;
+            updateProdukHighlight();
+        }
+
+        // ⏎ Enter
+        if (e.key === "Enter") {
+          if (activeProdukIndex >= 0 && currentProdukItems[activeProdukIndex]) {
+            e.preventDefault();
+            e.stopImmediatePropagation(); // 🔥 PENTING
+
+            const el = currentProdukItems[activeProdukIndex];
+
+            pilihProduk(
+              el,
+              el.dataset.id,
+              decodeURIComponent(el.dataset.nama),
+              el.dataset.satuan1,
+              el.dataset.satuan2,
+              el.dataset.satuan3
+            );
+          }
+        }
+
+
+    });
+
+    function updateProdukHighlight() {
+        currentProdukItems.forEach(el =>
+            el.classList.remove("active-highlight")
+        );
+
+        if (
+            activeProdukIndex >= 0 &&
+            currentProdukItems[activeProdukIndex]
+        ) {
+            const el = currentProdukItems[activeProdukIndex];
+            el.classList.add("active-highlight");
+            el.scrollIntoView({ block: "nearest" });
+        }
+    }
+
+    function tambahBarisDanFokus() {
+        addItemRow();
+
+        requestAnimationFrame(() => {
+            const lastRow = tbItem.querySelector("tr.line-row:last-child");
+            const inpProduk = lastRow?.querySelector(".cari-produk");
+
+            if (inpProduk) {
+                inpProduk.focus();
+                inpProduk.select();
+            }
+        });
+    }
+
+    function buildOrderText() {
+        const supplier = inpMitra.value || "-";
+        const rows = tbItem.querySelectorAll("tr.line-row");
+
+        if (rows.length === 0) {
+            alert("Item order masih kosong");
+            return "";
+        }
+
+        let text = "📦 ORDER BARANG\n";
+        text += `Supplier : ${supplier}\n\n`;
+
+        rows.forEach(tr => {
+            const produk = tr.querySelector(".cari-produk")?.value?.trim();
+            const qty = tr.querySelector(".qty")?.value;
+            const satuan = tr.querySelector(".satuan")?.value || "";
+
+            if (!produk || !qty) return;
+
+            text += `(${qty} ${satuan}) ${produk}\n`;
+        });
+
+        text += "\nTerima kasih 🙏 \n(Jangan tambah Orderan jika produk sudah masuk nota!)";
+
+        return text;
+    }
+
+    function copyOrderToClipboard() {
+        const text = buildOrderText();
+        if (!text) return;
+
+        const ta = document.createElement("textarea");
+        ta.value = text;
+
+        // 🔥 WAJIB: terlihat secara teknis (HP requirement)
+        ta.style.position = "fixed";
+        ta.style.top = "10px";
+        ta.style.left = "10px";
+        ta.style.width = "1px";
+        ta.style.height = "1px";
+        ta.style.opacity = "0";
+
+        document.body.appendChild(ta);
+
+        ta.focus();
+        ta.setSelectionRange(0, ta.value.length);
+
+        const success = document.execCommand("copy");
+        document.body.removeChild(ta);
+
+        if (success) {
+            showCopyToast();
+        } else {
+            alert("Copy gagal, silakan copy manual");
+        }
+    }
+
+
+    function showCopyToast() {
+        const toast = document.createElement("div");
+        toast.innerText = "📋 Order berhasil disalin";
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.background = "#1cc88a";
+        toast.style.color = "#fff";
+        toast.style.padding = "10px 14px";
+        toast.style.borderRadius = "8px";
+        toast.style.fontSize = "14px";
+        toast.style.zIndex = 9999;
+
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    function openCopyModal() {
+        const text = buildOrderText();
+        if (!text) return;
+
+        const ta = document.getElementById("copyText");
+        ta.value = text;
+
+        $('#modalCopy').modal('show');
+        setTimeout(() => {
+            ta.focus();
+            ta.select();
+        }, 300);
+    }
+    async function copyOrderDirect() {
+    const text = buildOrderText();
+    if (!text) return;
+
+    try {
+      // Modern browser (Chrome PC, Edge, dll)
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // fallback (browser lama)
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+
+      showCopyToast();
+    } catch (err) {
+      alert("Copy gagal, silakan copy manual");
+    }
+  }
+document.addEventListener("focusin", e => {
+  if (!e.target.classList.contains("satuan")) return;
+
+  const tr = e.target.closest("tr");
+  const dd = tr.querySelector(".dd-satuan");
+  dd.innerHTML = "";
+
+  // produk manual → PCS saja
+  if (!tr.dataset.produk) {
+    dd.innerHTML = `<a class="dropdown-item" onclick="setSatuan(this)">PCS</a>`;
+    dd.classList.add("show");
+  } else {
+    // produk DB → ambil satuan1-3
+    ["satuan1", "satuan2", "satuan3"].forEach(k => {
+      const val = tr.dataset[k];
+      if (val) {
+        dd.innerHTML += `
+          <a class="dropdown-item" onclick="setSatuan(this)">
+            ${val}
+          </a>`;
+      }
+    });
+
+    if (dd.innerHTML) dd.classList.add("show");
+  }
+
+  // 🔥 PINDAHKAN KE SINI (SETELAH ITEM ADA)
+  currentSatuanItems = Array.from(dd.querySelectorAll(".dropdown-item"));
+  activeSatuanIndex = -1;
+});
+
+
+document.addEventListener("keydown", e => {
+  const inp = document.activeElement;
+  if (!inp || !inp.classList.contains("satuan")) return;
+
+  const dd = inp.nextElementSibling;
+  if (!dd || !dd.classList.contains("show")) return;
+
+  // ⬇ Arrow Down
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    if (!currentSatuanItems.length) return;
+    activeSatuanIndex =
+      (activeSatuanIndex + 1) % currentSatuanItems.length;
+    updateSatuanHighlight();
+  }
+
+  // ⬆ Arrow Up
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+    if (!currentSatuanItems.length) return;
+    activeSatuanIndex =
+      (activeSatuanIndex - 1 + currentSatuanItems.length) %
+      currentSatuanItems.length;
+    updateSatuanHighlight();
+  }
+
+  // ⏎ Enter → pilih satuan
+if (e.key === "Enter") {
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  const tr = inp.closest("tr");
+  const rows = Array.from(tbItem.querySelectorAll("tr.line-row"));
+  const isLast = rows[rows.length - 1] === tr;
+
+  // 🔥 pilih satuan TANPA fokus ke qty
+  if (
+    activeSatuanIndex >= 0 &&
+    currentSatuanItems[activeSatuanIndex]
+  ) {
+    setSatuan(
+      currentSatuanItems[activeSatuanIndex],
+      { skipFocusQty: true }
+    );
+  }
+
+  // 🔥 langsung tambah baris
+  addItemRow();
+
+    requestAnimationFrame(() => {
+      const inpProduk = tbItem.querySelector(
+        "tr.line-row:last-child .cari-produk"
+      );
+
+      if (inpProduk) {
+        inpProduk.focus();
+        inpProduk.select();
+      }
+    });
+
+}
+
+
+  // Esc → tutup dropdown
+  if (e.key === "Escape") {
+    dd.classList.remove("show");
+  }
+});
+function updateSatuanHighlight() {
+  currentSatuanItems.forEach(el =>
+    el.classList.remove("active-highlight")
+  );
+
+  if (
+    activeSatuanIndex >= 0 &&
+    currentSatuanItems[activeSatuanIndex]
+  ) {
+    const el = currentSatuanItems[activeSatuanIndex];
+    el.classList.add("active-highlight");
+    el.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function setSatuan(el, opts = {}) {
+  const tr = el.closest("tr");
+  tr.querySelector(".satuan").value = el.innerText;
+  el.parentElement.classList.remove("show");
+
+  // ⛔ JANGAN fokus ke qty kalau diminta skip
+  if (opts.skipFocusQty) return;
+
+  requestAnimationFrame(() => {
+    const qty = tr.querySelector(".qty");
+    qty?.focus();
+    qty?.select();
+  });
+}
+
+
+document.addEventListener("click", e => {
+  document.querySelectorAll(".dd-satuan.show")
+    .forEach(dd => {
+      if (!dd.contains(e.target) && !dd.previousElementSibling.contains(e.target)) {
+  dd.classList.remove("show");
+}
+    });
+});
+document.addEventListener("click", e => {
+  const el = e.target.closest(".dd-produk .dropdown-item");
+  if (!el) return;
+
+  pilihProduk(
+    el,
+    el.dataset.id,
+    decodeURIComponent(el.dataset.nama),
+    el.dataset.satuan1,
+    el.dataset.satuan2,
+    el.dataset.satuan3
+  );
+});
+
+// =======================================
+// AUTO SELECT ALL SAAT FOCUS (PRODUK & QTY)
+// =======================================
+document.addEventListener("focusin", e => {
+  const el = e.target;
+
+  if (
+    el.classList.contains("cari-produk") ||
+    el.classList.contains("qty")
+  ) {
+    // tunggu 1 tick biar tidak bentrok dg click / dropdown
+    requestAnimationFrame(() => {
+      el.select();
+    });
+  }
+});
+
+
+
+
+
+    function isMobileDevice() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadOrderList();
+    });
+    </script>
+</body>
+
+</html>

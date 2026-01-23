@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>List Order</title>
+
+<link rel="stylesheet" href="css/sb-admin-2.min.css">
+<link rel="stylesheet" href="css/noscroll.css">
+<!-- <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css"> -->
+
+<style>
+tbody tr { cursor:pointer }
+.table-sm td { vertical-align: middle }
+</style>
+</head>
+
+<body class="bg-light p-4">
+
+<div class="container">
+
+  <!-- ================= LIST ORDER ================= -->
+  <div class="card shadow">
+    <div class="card-header py-2">
+      <h6 class="m-0 font-weight-bold text-primary">List Order</h6>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Nama Mitra</th>
+          </tr>
+        </thead>
+        <tbody id="tbMitra"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= MODAL ORDER ================= -->
+<div class="modal fade" id="modalOrder">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header py-2">
+        <h6 class="modal-title">
+          Order - <span id="lblMitra"></span>
+        </h6>
+        <button class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body p-2">
+
+        <table class="table table-sm table-bordered">
+          <thead class="table-secondary">
+            <tr>
+              <th>Produk</th>
+              <th width="80">Qty</th>
+              <th width="120">Satuan</th>
+              <th width="40"></th>
+            </tr>
+          </thead>
+          <tbody id="tbOrder"></tbody>
+        </table>
+
+        <button class="btn btn-sm btn-primary" onclick="addRow()">
+          <i class="fa fa-plus"></i> Tambah Produk
+        </button>
+
+      </div>
+
+      <div class="modal-footer py-2">
+        <button class="btn btn-success btn-sm" onclick="simpanOrder()">Simpan</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db_supabase.js"></script>
+
+
+<script>
+const tbMitra = document.getElementById("tbMitra");
+let produkList = [];
+let currentMitra = null;
+let currentOrder = null;
+
+/* ================= LOAD MITRA ================= */
+async function loadMitra(){
+  const { data, error } = await db
+    .from("tb_mitra")
+    .select("id_mitra, nama_mitra")
+    .eq("aktif", true)
+    .order("nama_mitra");
+
+  if(error){
+    alert("Gagal load mitra");
+    return;
+  }
+
+  tbMitra.innerHTML = data.map(m=>`
+    <tr onclick="openOrder('${m.id_mitra}','${m.nama_mitra}')">
+      <td>${m.nama_mitra}</td>
+    </tr>
+  `).join("");
+}
+
+/* ================= LOAD PRODUK ================= */
+async function loadProduk(){
+  const { data, error } = await db
+    .from("tb_produk")
+    .select("id_produk, nama_produk, satuan_jual")
+    .eq("aktif", true)
+    .order("nama_produk");
+
+  if(error){
+    alert("Gagal load produk");
+    return;
+  }
+
+  produkList = data;
+}
+
+/* ================= OPEN ORDER ================= */
+async function openOrder(idMitra, namaMitra){
+  currentMitra = idMitra;
+  document.getElementById("lblMitra").innerText = namaMitra;
+  document.getElementById("tbOrder").innerHTML = "";
+
+  const { data:order } = await db
+    .from("tb_order")
+    .select("id_order")
+    .eq("id_mitra", idMitra)
+    .eq("status", "draft")
+    .maybeSingle();
+
+  if(order){
+    currentOrder = order.id_order;
+    await loadOrderItems();
+  } else {
+    const { data:newOrder, error } = await db
+      .from("tb_order")
+      .insert({ id_mitra: idMitra })
+      .select()
+      .single();
+
+    if(error){
+      alert("Gagal membuat order");
+      return;
+    }
+
+    currentOrder = newOrder.id_order;
+    addRow();
+  }
+
+  $('#modalOrder').modal('show');
+}
+
+/* ================= LOAD ORDER ITEM ================= */
+async function loadOrderItems(){
+  const { data } = await db
+    .from("tb_order_item")
+    .select(`
+      id_item,
+      qty,
+      satuan,
+      tb_produk ( id_produk, nama_produk, satuan_jual )
+    `)
+    .eq("id_order", currentOrder);
+
+  if(!data || data.length === 0){
+    addRow();
+    return;
+  }
+
+  data.forEach(item => addRow(item));
+}
+
+/* ================= ADD ROW ================= */
+function addRow(item = null){
+  const tb = document.getElementById("tbOrder");
+
+  tb.insertAdjacentHTML("beforeend",`
+    <tr data-id="${item?.id_item || ''}">
+      <td>
+        <select class="form-control form-control-sm produk">
+          ${produkList.map(p=>`
+            <option value="${p.id_produk}"
+              ${item?.tb_produk?.id_produk === p.id_produk ? 'selected':''}>
+              ${p.nama_produk}
+            </option>
+          `).join("")}
+        </select>
+      </td>
+      <td>
+        <input type="number" class="form-control form-control-sm qty"
+               value="${item?.qty || 1}">
+      </td>
+      <td>
+        <input class="form-control form-control-sm satuan"
+               value="${item?.satuan || item?.tb_produk?.satuan_jual || 'pcs'}">
+      </td>
+      <td class="text-center">
+        <button class="btn btn-danger btn-sm"
+          onclick="hapusRow(this)">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `);
+}
+
+/* ================= HAPUS ROW ================= */
+async function hapusRow(btn){
+  const tr = btn.closest("tr");
+  const id = tr.dataset.id;
+
+  if(id){
+    await db.from("tb_order_item").delete().eq("id_item", id);
+  }
+
+  tr.remove();
+}
+
+/* ================= SIMPAN ================= */
+async function simpanOrder(){
+  const rows = document.querySelectorAll("#tbOrder tr");
+
+  for(const r of rows){
+    const payload = {
+      id_order: currentOrder,
+      id_produk: r.querySelector(".produk").value,
+      qty: Number(r.querySelector(".qty").value),
+      satuan: r.querySelector(".satuan").value
+    };
+
+    const id = r.dataset.id;
+
+    if(id){
+      await db.from("tb_order_item")
+        .update(payload)
+        .eq("id_item", id);
+    } else {
+      const { data } = await db.from("tb_order_item")
+        .insert(payload)
+        .select()
+        .single();
+
+      r.dataset.id = data.id_item;
+    }
+  }
+
+  alert("Order tersimpan");
+  $('#modalOrder').modal('hide');
+}
+
+/* ================= INIT ================= */
+(async function init(){
+  await loadProduk();
+  await loadMitra();
+})();
+</script>
+
+
+</body>
+</html>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Aplikasi Wiguna Teknik</title>
+    <title>Tambah Pembelian</title>
     <link rel="icon" href="img/logo.svg">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/noscroll.css">
@@ -237,6 +237,20 @@ table td {
 #tbl .action-icon {
   cursor: pointer;
 }
+/* ===============================
+   HOVER ICON HAPUS BARIS
+   =============================== */
+/* Hover icon hapus (SVG) */
+#tbl .btn-delete svg {
+  fill: #6c757d;                 /* warna normal */
+  transition: fill 0.15s ease, transform 0.1s ease;
+}
+
+#tbl .btn-delete:hover svg {
+  fill: #e74a3b;                 /* merah */
+  transform: scale(1.15);
+}
+
 
 </style>
 </head>
@@ -251,10 +265,10 @@ table td {
   <div class="card shadow mb-4"> 
     <div class="card-header d-flex justify-content-between align-items-center py-2">
       <!-- JUDUL -->
-      <h6 class="m-0 font-weight-bold text-primary">Tambah Pembelian</h6>
+      <h6 class="m-0 font-weight-bold text-primary">Pembelian</h6>
         <div class="d-flex gap-2 align-items-center">
-            <button type="submit" id="btnSave" form="form" class="btn btn-primary btn-sm">Simpan</button>
-            <a href="h_pembelian_tab.html" class="btn btn-secondary btn-sm">Kembali</a>
+            <button type="button" id="btnSave" class="btn btn-primary btn-sm">Simpan</button>
+            <a href="h_pembelian_tab.html" class="btn btn-secondary btn-sm">Daftar Pembelian</a>
         </div>
     </div>
     <div class="card-body">
@@ -266,16 +280,16 @@ table td {
               </div>
               <div class="col-md-2 mb-2">
                 <!-- <small>Tanggal</small> -->
-                <input type="text" id="tanggal" class="form-control form-control-sm" title="Tanggal Pembelian" placeholder="DD/MM/YYYY" autocomplete="off">
+                <input type="text" id="tanggal" class="form-control form-control-sm" data-toggle="tooltip" data-placement="top" placeholder="DD/MM/YYYY" autocomplete="off">
               </div>
                             <div class="col-md-3 mb-2">
                 <!-- <small>Supplier</small> -->
-                <input id="cari_mitra" class="form-control form-control-sm" placeholder="CASH" title="Pilih Supplier">
+                <input id="cari_mitra" class="form-control form-control-sm" placeholder="CASH" data-toggle="tooltip" data-placement="top" title="Supplier">
                 <div id="dd_mitra" class="dropdown-menu w-100"></div>
               </div>
               <div class="col-md-2 mb-2">
                 <!-- <small>Termin</small> -->
-                <select id="termin" class="form-control form-control-sm" title="Termin Pembelian">
+                <select id="termin" class="form-control form-control-sm" data-toggle="tooltip" data-placement="top" title="Termin Pembelian">
                     <option value="cash">CASH</option>
                     <option value="credit">CREDIT</option>
                 </select>
@@ -283,17 +297,17 @@ table td {
 
             <div class="col-md-1 mb-2" id="col-tempo">
               <!-- <small id="lbl-tempo">Tempo (hari)</small> -->
-              <input id="tempo" type="number" min="0" class="form-control form-control-sm" value="0" title="Durasi Tempo">
+              <input id="tempo" type="number" min="0" class="form-control form-control-sm" value="0" data-toggle="tooltip" data-placement="top" title="Durasi Tempo">
             </div>
 
             <div class="col-md-2 mb-2" id="col-jatuh-tempo">
               <!-- <small>Tanggal Jatuh Tempo</small> -->
-              <input type="text" id="jatuh_tempo" class="form-control form-control-sm" title="Tanggal Jatuh Tempo" placeholder="DD/MM/YYYY" readonly>
+              <input type="text" id="jatuh_tempo" class="form-control form-control-sm" data-toggle="tooltip" data-placement="top" title="Tanggal Jatuh Tempo" placeholder="DD/MM/YYYY" readonly>
             </div>
 
             <div class="col-md-2 mb-2" id="wrap_pembayaran">
               <!-- <small>Pembayaran</small> -->
-              <select id="pembayaran" class="form-control form-control-sm" title="Pilih Cara Bayar">
+              <select id="pembayaran" class="form-control form-control-sm" data-toggle="tooltip" data-placement="top" title="Metode Pembayara">
                 <option value="">Kas Utama</option>
               </select>
             </div>
@@ -313,7 +327,7 @@ table td {
                         <th width="100px">Diskon</th>
                         <th width="110px">Pajak</th>
                         <th width="220px">Subtotal</th>
-                        <th width="30px">Aksi</th>
+                        <th width="30px"></th>
                     </tr>
                 </thead>
                 <tbody class="table-bordered"></tbody>
@@ -427,6 +441,35 @@ table td {
   </div>
 </div>
 
+</div>
+<div class="modal fade" id="modalOrderPicker" tabindex="-1" data-backdrop="static">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header py-2">
+        <h6 class="modal-title">Pilih Order Supplier</h6>
+        <div class="ml-auto">
+          <button class="btn btn-sm btn-primary" onclick="applySelectedOrders()">Save</button>
+          <button class="btn btn-sm btn-light" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+      <div class="modal-body p-2">
+        <table class="table table-sm table-bordered table-tight">
+          <thead>
+            <tr>
+              <th width="30"></th>
+              <th>Produk</th>
+              <th width="60">Qty</th>
+              <th width="80">Satuan</th>
+            </tr>
+          </thead>
+          <tbody id="tbOrderPicker"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
 </div>
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -639,6 +682,7 @@ const wrapDp = document.getElementById("row_dp");
 const dp = document.getElementById("dp");
 intOnlyInput(dp);
 formatRupiahInput(dp);
+
 
 async function preloadSettingAkun() {
   const { data, error } = await db
@@ -935,10 +979,75 @@ dd_mitra.addEventListener('click', e => {
       tempo.select && tempo.select();
     }, 10);
   }
+    async function afterSupplierSelected(idMitra) {
+    const orders = await loadOrderBySupplier(idMitra);
+    if (orders.length > 0) {
+      renderOrderPicker(orders);
+      $('#modalOrderPicker').modal('show');
+    }
+  }
+
 
   dd_mitra.classList.remove('show');
+  afterSupplierSelected(cari_mitra.dataset.id);
   updateJatuhTempo();
 });
+
+async function loadOrderBySupplier(idMitra) {
+  const { data } = await db
+    .from("tb_order_item")
+    .select(`
+      id_item,
+      qty,
+      satuan,
+      nama_manual,
+      tb_order!inner(id_order, status),
+      tb_produk(nama_produk)
+    `)
+    .eq("tb_order.id_mitra", idMitra)
+    .neq("tb_order.status", "done");
+
+  return data || [];
+}
+function renderOrderPicker(items) {
+  const tb = document.getElementById("tbOrderPicker");
+
+  tb.innerHTML = items.map(i => `
+    <tr data-id="${i.id_item}">
+      <td class="text-center">
+        <input type="checkbox" class="pick-order">
+      </td>
+      <td>
+        ${i.tb_produk?.nama_produk || i.nama_manual}
+      </td>
+      <td class="text-right">${i.qty}</td>
+      <td>${i.satuan}</td>
+    </tr>
+  `).join("");
+}
+function applySelectedOrders() {
+  const rows = document.querySelectorAll("#tbOrderPicker tr");
+
+  rows.forEach(r => {
+    const chk = r.querySelector(".pick-order");
+    if (!chk.checked) return;
+
+    const nama = r.children[1].innerText;
+    const qty  = r.children[2].innerText;
+    const satuan = r.children[3].innerText;
+
+    const tr = createRow(); // pakai fungsi row pembelianmu
+    tr.querySelector(".inp-nama").value = nama;
+    tr.querySelector(".inp-qty").value = qty;
+    tr.querySelector(".inp-satuan").value = satuan;
+
+    tblBody.appendChild(tr);
+  });
+
+  refreshRowNumbers();
+  refreshTotals();
+  $('#modalOrderPicker').modal('hide');
+}
 
 // ===================== DYNAMIC ROWS =====================
 const TAX_RATES = { NO:0, PPN:0.10 };
@@ -1234,6 +1343,8 @@ function autoSelectOnFocus(el) {
 }
 
 autoSelectOnFocus(cari_mitra);
+autoSelectOnFocus(diskon_total);
+autoSelectOnFocus(biaya_lain);
 
 
   // ENTER pada kolom satuan → fokus ke harga + select value
@@ -1503,12 +1614,17 @@ inpDiskon.addEventListener('blur', e=>{
   });
 
   // ------------------- DELETE ROW -------------------
-  btnDel.addEventListener("click", ()=>{
-    tr.remove();
-    refreshRowNumbers();
-    refreshTotals();
-    addRowIfNeeded();
-  });
+btnDel.addEventListener("click", ()=>{
+  tr.remove();
+  refreshRowNumbers();
+  refreshTotals();
+
+  if (!tblBody.querySelector("tr.line-row")) {
+    tblBody.appendChild(createRow());
+  }
+});
+
+
 }
 
 // ===================== ADD ROW IF NEEDED =====================
@@ -1522,9 +1638,9 @@ function addRowIfNeeded(){
 
     tblBody.appendChild(createRow());
   }
-
-  refreshRowNumbers();
 }
+
+
 
 // ==================== ROW NUMBERING =====================
 function refreshRowNumbers(){
@@ -1953,14 +2069,13 @@ btnSave.addEventListener("click", async function (e) {
     }
 });
 // END SAVE
-
 // ===================== CTRL + ENTER SUBMIT =====================
-document.addEventListener("keydown", e=>{
-  if(e.ctrlKey && e.key==="Enter"){
-    e.preventDefault();
-    btnSave.click();
-  }
-});
+// document.addEventListener("keydown", e=>{
+//   if(e.ctrlKey && e.key==="Enter"){
+//     e.preventDefault();
+//     btnSave.click();
+//   }
+// });
 
 // ===================== ENTER NAVIGATION FORM (di luar table) =====================
 document.getElementById('form').addEventListener('keydown', function(e){
