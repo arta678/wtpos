@@ -193,6 +193,11 @@
   background-color: #f8f9fc;
 }
 
+/* hover ringan */
+/*#tbl-order tbody tr:hover {
+  background-color: #f1f3f8;
+}*/
+
 /* icon hapus */
 #tbl-order .btn-delete svg {
   fill: #6c757d;
@@ -411,35 +416,34 @@
       }
     }
 
-async function getOrCreateOrder(idMitra) {
-  const { data } = await db
-    .from("tb_order")
-    .select("id_order, status")
-    .eq("id_mitra", idMitra)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    async function getOrCreateOrder(idMitra) {
+        // cari order terakhir supplier
+        const { data } = await db
+            .from("tb_order")
+            .select("id_order")
+            .eq("id_mitra", idMitra)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-  // ✅ kalau masih OPEN / PARTIAL → pakai
-  if (data && data.status !== "done") {
-    return data.id_order;
-  }
+        // kalau sudah ada → pakai
+        if (data && data.id_order) {
+            return data.id_order;
+        }
 
-  // 🆕 kalau tidak ada / DONE → BUAT BARU
-  const { data: newOrder, error } = await db
-    .from("tb_order")
-    .insert({
-      id_mitra: idMitra,
-      status: "open" // 🔥 PASTIKAN
-    })
-    .select()
-    .single();
+        // kalau belum ada → buat baru
+        const { data: newOrder, error } = await db
+            .from("tb_order")
+            .insert({ id_mitra: idMitra })
+            .select()
+            .single();
 
-  if (error) throw error;
+        if (error) {
+            throw new Error("Gagal membuat order");
+        }
 
-  return newOrder.id_order;
-}
-
+        return newOrder.id_order;
+    }
 
     function addRowIfLast(tr) {
         const rows = Array.from(tbItem.querySelectorAll("tr.line-row"));
@@ -525,38 +529,52 @@ function findRowByProduk(idProduk, exceptRow = null) {
     /* ======================================================
        LOAD ITEM ORDER (EDIT MODE)
     ====================================================== */
-async function loadOrderItem(idOrder) {
-  const { data, error } = await db
-    .from("tb_order_item")
-    .select(`
-      id_item,
-      id_produk,
-      nama_manual,
-      qty,
-      qty_sisa,
-      satuan,
-      tb_produk (
-        nama_produk,
-        satuan1,
-        satuan2,
-        satuan3
-      )
-    `)
-    .eq("id_order", idOrder)
-    .gt("qty_sisa", 0); // 🔥 INI KUNCINYA
+    async function loadOrderItem(idOrder) {
+        const { data, error } = await db
+            .from("tb_order_item")
+            .select(`
+              id_item,
+              id_produk,
+              nama_manual,
+              qty,
+              satuan,
+              tb_produk:tb_produk (
+                nama_produk,
+                satuan1,
+                satuan2,
+                satuan3
+              )
+            `)
+            .eq("id_order", idOrder);
 
-  if (error) {
-    alert("Gagal load item order");
-    return;
-  }
+        if (error) {
+            alert("Gagal load item order");
+            return;
+        }
 
-  if (!data || data.length === 0) {
-    addItemRow();
-    return;
-  }
+        if (!data || data.length === 0) {
+            addItemRow();
+            return;
+        }
 
-  data.forEach(i => addItemRow(i));
-}
+        // data.forEach(i => addItemRow(i));
+        data.forEach(i => {
+          addItemRow(i);
+
+          const tr = tbItem.querySelector("tr.line-row:last-child");
+            if (i.tb_produk) {
+              tr.dataset.satuan1 = i.tb_produk.satuan1 || "PCS";
+              tr.dataset.satuan2 = i.tb_produk.satuan2 || "";
+              tr.dataset.satuan3 = i.tb_produk.satuan3 || "";
+            }
+
+          updateManualHighlight(tr);
+        });
+
+
+        refreshOrderRowNumbers();
+    }
+
     /* ======================================================
        BARIS ITEM
     ====================================================== */
@@ -594,7 +612,7 @@ async function loadOrderItem(idOrder) {
   (item.tb_produk && item.tb_produk.nama_produk) ||
   item.nama_manual ||
   "");
-  lastRow.querySelector(".qty").value = item.qty_sisa ?? item.qty ?? 1;
+  lastRow.querySelector(".qty").value = item.qty || 1;
   lastRow.querySelector(".satuan").value = item.satuan || "PCS";
 
   // =====================
@@ -916,11 +934,30 @@ async function simpanOrder() {
     // =========================
     // 1️⃣ Ambil / buat order
     // =========================
-        let orderId = currentOrder;
+    let orderId = currentOrder;
 
-        if (!orderId) {
-          orderId = await getOrCreateOrder(currentMitra);
-        }
+    if (!orderId) {
+      const { data } = await db
+        .from("tb_order")
+        .select("id_order")
+        .eq("id_mitra", currentMitra)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data?.id_order) {
+        orderId = data.id_order;
+      } else {
+        const { data: newOrder, error } = await db
+          .from("tb_order")
+          .insert({ id_mitra: currentMitra })
+          .select()
+          .single();
+
+        if (error) throw error;
+        orderId = newOrder.id_order;
+      }
+    }
 
     // =========================
     // 2️⃣ KUMPULKAN DATA
@@ -940,10 +977,11 @@ async function simpanOrder() {
       if (idItem) {
         updates.push({
           id_item: idItem,
-          id_order: orderId,
+          id_order: orderId, 
           id_produk: idProduk,
           nama_manual: idProduk ? null : namaManual,
           qty,
+          qty_sisa: qty,
           satuan
         });
 
@@ -983,7 +1021,7 @@ async function simpanOrder() {
         .delete()
         .in("id_item", Array.from(deletedItems));
     }
-    await updateOrderStatus([orderId]);
+
     $('#modalOrder').modal('hide');
     loadOrderList();
 
@@ -992,43 +1030,6 @@ async function simpanOrder() {
     alert("Gagal menyimpan order");
   } finally {
     btnSave && (btnSave.disabled = false);
-  }
-}
-
-async function updateOrderStatus(orderIds = []) {
-  const uniqueOrders = [...new Set(orderIds)];
-
-  for (const idOrder of uniqueOrders) {
-    const { data, error } = await db
-      .from("tb_order_item")
-      .select("qty, qty_sisa")
-      .eq("id_order", idOrder);
-
-    if (error || !data || data.length === 0) continue;
-
-    const totalItem = data.length;
-
-    // hitung item yang masih sisa
-    const sisaItem = data.filter(it => {
-      const sisa =
-        it.qty_sisa !== null
-          ? Number(it.qty_sisa)
-          : Number(it.qty);
-      return sisa > 0;
-    }).length;
-
-    let status = "open";
-
-    if (sisaItem === 0) {
-      status = "done";
-    } else if (sisaItem < totalItem) {
-      status = "partial";
-    }
-
-    await db
-      .from("tb_order")
-      .update({ status })
-      .eq("id_order", idOrder);
   }
 }
 
@@ -1053,55 +1054,59 @@ async function updateOrderStatus(orderIds = []) {
 ====================================================== */
     const tbOrderList = document.getElementById("tbOrderList");
 
-async function loadOrderList() {
-  const { data, error } = await db
-    .from("tb_order")
-    .select(`
+    async function loadOrderList() {
+        const { data, error } = await db
+            .from("tb_order")
+            .select(`
       id_order,
       id_mitra,
       created_at,
-      status,
       tb_mitra ( nama_mitra )
     `)
-    .neq("status", "done")        // 🔥 hanya order aktif
-    .order("created_at", { ascending: false });
+            .order("created_at", { ascending: false }); // penting: terbaru dulu
 
-  if (error) {
-    console.error(error);
-    alert("Gagal load order");
-    return;
-  }
+        if (error) {
+            console.error(error);
+            alert("Gagal load order");
+            return;
+        }
 
-  if (!data || data.length === 0) {
-    tbOrderList.innerHTML = `
+        if (!data || data.length === 0) {
+            tbOrderList.innerHTML = `
       <tr>
         <td class="text-center text-muted py-3">
-          Tidak ada order aktif
+          Belum ada order
         </td>
       </tr>
     `;
-    return;
-  }
+            return;
+        }
 
-  // ❌ HAPUS mapSupplier
-  // ✅ TAMPILKAN SEMUA ORDER AKTIF
+        // ==============================
+        // FILTER: 1 SUPPLIER = 1 BARIS
+        // ==============================
+        const mapSupplier = new Map();
 
-  tbOrderList.innerHTML = data.map(o => `
+        data.forEach(o => {
+            if (!mapSupplier.has(o.id_mitra)) {
+                mapSupplier.set(o.id_mitra, o);
+            }
+        });
+
+        const uniqueOrders = Array.from(mapSupplier.values());
+
+        tbOrderList.innerHTML = uniqueOrders.map(o => `
     <tr class="jurnal-row"
         onclick="openEditOrder(
           '${o.id_order}',
           '${o.id_mitra}',
           '${(o.tb_mitra?.nama_mitra || '').replace(/'/g, "\\'")}'
         )">
-      <td>
-        ${o.tb_mitra?.nama_mitra || '-'}
-
-      </td>
+      <td>${o.tb_mitra?.nama_mitra || '-'}</td>
     </tr>
   `).join("");
-}
-
-
+    }
+    
     $('#modalOrder').on('shown.bs.modal', function() {
         const inp = document.getElementById('inpMitra');
         if (inp && !inp.disabled) {
@@ -1207,7 +1212,8 @@ async function loadOrderList() {
             text += `(${qty} ${satuan}) ${produk}\n`;
         });
 
-        text += "\nTerima kasih 🙏 \n(Jangan tambah Orderan jika produk sudah masuk nota, takutnya double order!)";
+        text += "\nTerima kasih 🙏 \n(Jangan tambah Orderan jika produk sudah masuk nota!)";
+
         return text;
     }
 

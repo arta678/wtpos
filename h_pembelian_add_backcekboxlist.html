@@ -16,24 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
 
     <style>
-      /* ================================
-   HILANGKAN PANAH INPUT NUMBER
-   (SEMUA BROWSER)
-================================ */
-
-/* Chrome, Edge, Safari */
-#tbl-order input[type=number]::-webkit-inner-spin-button,
-#tbl-order input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-#tbl-order input[type=number] {
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
 .dropdown-menu.show {
     display:block;
     max-height:200px;
@@ -326,55 +308,6 @@ table td {
   pointer-events: none;
 }
 
-/* =========================
-   ORDER MODAL – UX UPGRADE
-========================= */
-
-/* Nama produk lebih jelas */
-#tbl-order .order-name {
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-/* Wrapper qty terima */
-.qty-terima-wrap {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Input qty terima */
-#tbl-order .inp-terima {
-  width: 55px;
-  height: 26px;
-  font-weight: 700;
-  font-size: 15px;
-  border-radius: 6px;
-  border: 1px solid #d1d3e2;
-  background: #fff;
-  transition: all 0.15s ease;
-}
-
-/* Fokus = biru lembut */
-#tbl-order .inp-terima:focus {
-  border-color: #4e73df;
-  box-shadow: 0 0 0 2px rgba(78,115,223,0.15);
-}
-
-/* Baris aktif */
-#tbl-order tr:not(.order-used):hover {
-  background-color: #f8f9fc;
-}
-
-/* Order yang sudah dipakai */
-.order-used .inp-terima {
-  background: #f1f3f8;
-  border-color: transparent;
-  font-weight: 600;
-}
-
-
 </style>
 </head>
 <body id="page-top">
@@ -398,7 +331,7 @@ table td {
     📦 Orderan
   </button>
             <button type="button" id="btnSave" class="btn btn-primary btn-sm">Simpan</button>
-            <a href="h_pembelian_tab.html" class="btn-outline-dark btn-sm">Daftar Pembelian</a>
+            <a href="h_pembelian_tab.html" class="btn btn-secondary btn-sm">Daftar Pembelian</a>
         </div>
     </div>
     <div class="card-body">
@@ -441,6 +374,8 @@ table td {
                 <option value="">Kas Utama</option>
               </select>
             </div>
+
+
               <input id="keterangan" class="form-control form-control-sm" type="hidden" >
             </div>
             <div class="table-responsive mt-2">
@@ -586,8 +521,7 @@ table td {
             <tr>
               <th width="30"></th>
               <th>Produk</th>
-              <th width="60">Pesan</th>
-              <th width="60">Terima</th>
+              <th width="60">Qty</th>
               <th width="70">Satuan</th>
             </tr>
           </thead>
@@ -808,7 +742,6 @@ const wrapDp = document.getElementById("row_dp");
 const dp = document.getElementById("dp");
 const btnOrderan = document.getElementById("btnOrderan");
 let cachedOrders = []; // cache order supplier aktif
-const orderQtyDraft = {}; 
 intOnlyInput(dp);
 formatRupiahInput(dp);
 
@@ -1045,7 +978,6 @@ cari_mitra.addEventListener('input', function (e) {
     // 🔥 RESET ORDER STATE
   cachedOrders = [];
   document.getElementById("btnOrderan").disabled = true;
-  Object.keys(orderQtyDraft).forEach(k => delete orderQtyDraft[k]);
 
   if (this.value.trim() === "") {
     termin.value = "cash";
@@ -1135,11 +1067,46 @@ dd_mitra.addEventListener('click', e => {
       tempo.select && tempo.select();
     }, 10);
   }
+
+async function afterSupplierSelected(idMitra) {
+  cachedOrders = await loadOrderBySupplier(idMitra);
+
+  if (cachedOrders.length > 0) {
+    btnOrderan.disabled = false;
+    btnOrderan.title = "Lihat orderan supplier";
+
+    // 🔥 AUTO POPUP SEKALI
+    renderOrderPicker(cachedOrders);
+    $('#modalOrderPicker').modal('show');
+  } else {
+    btnOrderan.disabled = true;
+    btnOrderan.title = "Supplier tidak memiliki order aktif";
+  }
+}
+
+
   dd_mitra.classList.remove('show');
   afterSupplierSelected(cari_mitra.dataset.id);
   updateJatuhTempo();
 });
 
+// async function loadOrderBySupplier(idMitra) {
+//   const { data } = await db
+//     .from("tb_order_item")
+//     .select(`
+//       id_item,
+//       qty,
+//       qty_sisa,
+//       satuan,
+//       nama_manual,
+//       tb_order!inner(id_order, status),
+//       tb_produk(nama_produk)
+//     `)
+//     .eq("tb_order.id_mitra", idMitra)
+//     .neq("tb_order.status", "done");
+
+//   return data || [];
+// }
 async function loadOrderBySupplier(idMitra) {
   const { data, error } = await db
     .from("tb_order_item")
@@ -1176,7 +1143,7 @@ function renderOrderPicker(items) {
   if (filtered.length === 0) {
     tb.innerHTML = `
       <tr>
-        <td colspan="5" class="text-center text-muted">
+        <td colspan="4" class="text-center text-muted">
           Tidak ada item order yang tersisa
         </td>
       </tr>
@@ -1187,46 +1154,21 @@ function renderOrderPicker(items) {
   tb.innerHTML = filtered.map(i => {
     const isUsed = usedIds.has(String(i.id_item));
 
-  return `
-<tr class="${isUsed ? 'order-used' : ''}"
-    data-id="${i.id_item}"
-    data-order="${i.tb_order.id_order}"
-    data-max="${i.qty_sisa}">
-
-  <td class="text-center">
-    <input type="checkbox"
-           class="pick-order"
-           ${isUsed ? 'disabled checked' : ''}>
-  </td>
-
-  <td class="order-name">
-    ${i.tb_produk?.nama_produk || i.nama_manual}
-  </td>
-
-  <!-- QTY PESAN -->
-  <td class="text-center text-muted small">
-    ${i.qty}
-  </td>
-
-  <!-- QTY TERIMA -->
-  <td>
-    <div class="qty-terima-wrap">
-      <input type="number"
-             class="form-control form-control-sm inp-terima text-center"
-             min="1"
-             max="${i.qty_sisa}"
-             value="${orderQtyDraft[i.id_item] ?? i.qty_sisa}"
-             ${isUsed ? 'disabled' : ''}>
-    </div>
-  </td>
-
-  <td class="text-muted small text-center">
-    ${i.satuan}
-  </td>
-</tr>
-`;
-
-
+    return `
+      <tr class="${isUsed ? 'order-used' : ''}"
+          data-id="${i.id_item}"
+          data-order="${i.tb_order.id_order}"
+          ${isUsed ? 'title="Item order sudah di-import"' : ''}>
+        <td class="text-center">
+          <input type="checkbox"
+                 class="pick-order"
+                 ${isUsed ? 'disabled checked' : ''}>
+        </td>
+        <td>${i.tb_produk?.nama_produk || i.nama_manual}</td>
+        <td class="text-right">${i.qty_sisa}</td>
+        <td>${i.satuan}</td>
+      </tr>
+    `;
   }).join("");
 
   // 🔥 AUTO SCROLL ke item pertama yang masih bisa dipilih
@@ -1238,62 +1180,7 @@ function renderOrderPicker(items) {
   }, 50);
   updateSaveOrderButton();
 }
-document.addEventListener("input", e => {
-  if (!e.target.classList.contains("inp-terima")) return;
-  const tr = e.target.closest("tr");
-  const id = tr.dataset.id;
-  const max = Number(tr.dataset.max);
-  let val = Number(e.target.value);
-  if (val < 1) val = 1;
-  if (val > max) val = max;
-  e.target.value = val;
-  orderQtyDraft[id] = val;
-});
 
-document.addEventListener("change", e => {
-  if (!e.target.classList.contains("pick-order")) return;
-
-  const chk = e.target;
-  if (!chk.checked || chk.disabled) return;
-
-  const tr = chk.closest("tr");
-  if (!tr) return;
-
-  const inpQty = tr.querySelector(".inp-terima");
-  if (!inpQty || inpQty.disabled) return;
-
-  // 🔥 fokus & select agar langsung bisa ketik
-  setTimeout(() => {
-    inpQty.focus();
-    inpQty.select();
-  }, 10);
-});
-document.addEventListener("focusin", e => {
-  if (!e.target.classList.contains("inp-terima")) return;
-
-  const tr = e.target.closest("tr");
-  const chk = tr?.querySelector(".pick-order");
-  if (chk && !chk.checked && !chk.disabled) {
-    chk.checked = true;
-  }
-});
-
-async function afterSupplierSelected(idMitra) {
-  if (!cachedOrders.length) {
-    cachedOrders = await loadOrderBySupplier(idMitra);
-  }
-
-  if (cachedOrders.length > 0) {
-    btnOrderan.disabled = false;
-    btnOrderan.title = "Lihat orderan supplier";
-
-    renderOrderPicker(cachedOrders);
-    $('#modalOrderPicker').modal('show');
-  } else {
-    btnOrderan.disabled = true;
-    btnOrderan.title = "Supplier tidak memiliki order aktif";
-  }
-}
 
 function applySelectedOrders() {
   const available = document.querySelectorAll("#tbOrderPicker .pick-order:not(:disabled)");
@@ -1305,10 +1192,8 @@ function applySelectedOrders() {
     if (!chk || chk.disabled || !chk.checked) return;
 
     const nama   = r.children[1].innerText.trim();
-    const qtyTerima = Number(r.querySelector(".inp-terima").value);
-    const qtySisa = Number(r.dataset.max);
-    const satuan = r.children[4].innerText.trim();
-    if (qtyTerima <= 0 || qtyTerima > qtySisa) return;
+    const qtySisa = Number(r.children[2].innerText);
+    const satuan = r.children[3].innerText.trim();
 
     // 🔍 cari baris kosong pertama
     let tr = Array.from(tblBody.querySelectorAll("tr.line-row"))
@@ -1319,23 +1204,16 @@ function applySelectedOrders() {
       tr = createRow();
       tblBody.appendChild(tr);
     }
+
     // isi data
     tr.dataset.order_item_id = r.dataset.id;
     tr.dataset.order_id = r.dataset.order;
-    tr.dataset.qty_sisa = qtySisa - qtyTerima;
+    tr.dataset.qty_sisa = qtySisa;
 
-    const idx = cachedOrders.findIndex(
-      o => String(o.id_item) === String(r.dataset.id)
-    );
-    if (idx !== -1) {
-      cachedOrders[idx].qty_sisa =
-        Number(cachedOrders[idx].qty_sisa) - qtyTerima;
-    }
-    r.dataset.max = Number(r.dataset.max) - qtyTerima;
 
     tr.querySelector(".inp-nama").value = nama;
-    tr.querySelector(".inp-qty").value = qtyTerima;
-    delete orderQtyDraft[r.dataset.id];
+    tr.querySelector(".inp-qty").value = qtySisa;
+
     // 🔥 ISI SATUAN (lihat bug 2)
     const selSatuan = tr.querySelector(".inp-satuan");
     selSatuan.innerHTML = `<option value="${satuan}">${satuan}</option>`;
@@ -2513,8 +2391,6 @@ btnOrderan.addEventListener("click", () => {
   renderOrderPicker(cachedOrders);
   $('#modalOrderPicker').modal('show');
 });
-
-
 
 // ===================== INITIALIZE =====================
 (async function initPage() {
