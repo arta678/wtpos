@@ -1141,28 +1141,56 @@ dd_mitra.addEventListener('click', e => {
 });
 
 async function loadOrderBySupplier(idMitra) {
+  // 🔥 Ambil order aktif TERBATAS
+  const { data: orders, error: oErr } = await db
+    .from("tb_order")
+    .select("id_order")
+    .eq("id_mitra", idMitra)
+    .neq("status", "done")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (oErr) {
+    console.error("Gagal load order header", oErr);
+    return [];
+  }
+
+  if (!orders || orders.length === 0) return [];
+
+  const orderIds = orders.map(o => o.id_order);
+
+  // lanjut query item (tetap seperti sekarang)
   const { data, error } = await db
     .from("tb_order_item")
     .select(`
       id_item,
+      id_order,
       qty,
       qty_sisa,
       satuan,
+      id_produk,
       nama_manual,
-      tb_order!inner(id_order, status),
-      tb_produk(nama_produk)
+      tb_produk (
+        nama_produk,
+        satuan1,
+        satuan2,
+        satuan3,
+        konversi2,
+        konversi3,
+        satuan_beli
+      )
     `)
-    .eq("tb_order.id_mitra", idMitra)
-    .neq("tb_order.status", "done")
-    .gt("qty_sisa", 0); // 🔥 INI KUNCINYA
+    .in("id_order", orderIds)
+    .gt("qty_sisa", 0);
 
   if (error) {
-    console.error("Gagal load order supplier", error);
+    console.error("Gagal load order item", error);
     return [];
   }
 
   return data || [];
 }
+
 
 function renderOrderPicker(items) {
   const tb = document.getElementById("tbOrderPicker");
@@ -1190,7 +1218,7 @@ function renderOrderPicker(items) {
   return `
 <tr class="${isUsed ? 'order-used' : ''}"
     data-id="${i.id_item}"
-    data-order="${i.tb_order.id_order}"
+    data-order="${i.id_order}"
     data-max="${i.qty_sisa}">
 
   <td class="text-center">
@@ -1280,6 +1308,7 @@ document.addEventListener("focusin", e => {
 
 async function afterSupplierSelected(idMitra) {
   if (!cachedOrders.length) {
+    cachedOrders = [];
     cachedOrders = await loadOrderBySupplier(idMitra);
   }
 
@@ -1296,18 +1325,22 @@ async function afterSupplierSelected(idMitra) {
 }
 
 function applySelectedOrders() {
-  const available = document.querySelectorAll("#tbOrderPicker .pick-order:not(:disabled)");
+  const available = document.querySelectorAll(
+    "#tbOrderPicker .pick-order:not(:disabled)"
+  );
   if (available.length === 0) return;
-  const rows = document.querySelectorAll("#tbOrderPicker tr");
 
+  const rows = document.querySelectorAll("#tbOrderPicker tr");
+  const usedOrderItems = getUsedOrderItemIds();
   rows.forEach(r => {
     const chk = r.querySelector(".pick-order");
     if (!chk || chk.disabled || !chk.checked) return;
 
-    const nama   = r.children[1].innerText.trim();
+    const nama = r.children[1].innerText.trim();
     const qtyTerima = Number(r.querySelector(".inp-terima").value);
     const qtySisa = Number(r.dataset.max);
     const satuan = r.children[4].innerText.trim();
+
     if (qtyTerima <= 0 || qtyTerima > qtySisa) return;
 
     // 🔍 cari baris kosong pertama
@@ -1319,11 +1352,15 @@ function applySelectedOrders() {
       tr = createRow();
       tblBody.appendChild(tr);
     }
-    // isi data
+
+    // ===============================
+    // SIMPAN INFO ORDER
+    // ===============================
     tr.dataset.order_item_id = r.dataset.id;
     tr.dataset.order_id = r.dataset.order;
     tr.dataset.qty_sisa = qtySisa - qtyTerima;
 
+    // update cache order
     const idx = cachedOrders.findIndex(
       o => String(o.id_item) === String(r.dataset.id)
     );
@@ -1333,13 +1370,56 @@ function applySelectedOrders() {
     }
     r.dataset.max = Number(r.dataset.max) - qtyTerima;
 
-    tr.querySelector(".inp-nama").value = nama;
-    tr.querySelector(".inp-qty").value = qtyTerima;
-    delete orderQtyDraft[r.dataset.id];
-    // 🔥 ISI SATUAN (lihat bug 2)
+    // ===============================
+    // ISI DATA KE BARIS PEMBELIAN
+    // ===============================
+    const inpNama = tr.querySelector(".inp-nama");
+    const inpQty  = tr.querySelector(".inp-qty");
     const selSatuan = tr.querySelector(".inp-satuan");
-    selSatuan.innerHTML = `<option value="${satuan}">${satuan}</option>`;
-    selSatuan.value = satuan;
+
+    inpNama.value = nama;
+    inpQty.value = qtyTerima;
+
+    // ===============================
+    // 🔥 AMBIL DATA PRODUK (PENTING)
+    // ===============================
+    const p = cachedOrders.find(
+      o => String(o.id_item) === String(r.dataset.id)
+    );
+
+    if (p && p.tb_produk) {
+      // ID PRODUK (WAJIB UNTUK HPP)
+      inpNama.dataset.id = p.id_produk;
+
+      // DATA SATUAN & KONVERSI (WAJIB UNTUK HPP)
+      tr.dataset.s1 = p.tb_produk.satuan1 || "";
+      tr.dataset.s2 = p.tb_produk.satuan2 || "";
+      tr.dataset.s3 = p.tb_produk.satuan3 || "";
+      tr.dataset.k2 = Number(p.tb_produk.konversi2 || 1);
+      tr.dataset.k3 = Number(p.tb_produk.konversi3 || 1);
+
+      // isi pilihan satuan sesuai produk
+      selSatuan.innerHTML = `<option value="">Pilih Satuan</option>`;
+      if (p.tb_produk.satuan1)
+        selSatuan.add(new Option(p.tb_produk.satuan1, p.tb_produk.satuan1));
+      if (p.tb_produk.satuan2)
+        selSatuan.add(new Option(p.tb_produk.satuan2, p.tb_produk.satuan2));
+      if (p.tb_produk.satuan3)
+        selSatuan.add(new Option(p.tb_produk.satuan3, p.tb_produk.satuan3));
+
+      // default ke satuan order / satuan beli
+      selSatuan.value =
+        satuan ||
+        p.tb_produk.satuan_beli ||
+        p.tb_produk.satuan1 ||
+        "";
+    } else {
+      // fallback (order manual tanpa produk)
+      selSatuan.innerHTML = `<option value="${satuan}">${satuan}</option>`;
+      selSatuan.value = satuan;
+    }
+
+    delete orderQtyDraft[r.dataset.id];
   });
 
   refreshRowNumbers();
@@ -1911,15 +1991,47 @@ inpDiskon.addEventListener('blur', e=>{
   });
 
   // ------------------- DELETE ROW -------------------
-btnDel.addEventListener("click", ()=>{
+btnDel.addEventListener("click", () => {
+
+  // ===============================
+  // 🔥 KEMBALIKAN ORDER JIKA ADA
+  // ===============================
+  const orderItemId = tr.dataset.order_item_id;
+  const orderId = tr.dataset.order_id;
+  const qtyDipakai = parseInt(tr.querySelector(".inp-qty")?.value) || 0;
+
+  if (orderItemId && qtyDipakai > 0) {
+    const idx = cachedOrders.findIndex(
+      o => String(o.id_item) === String(orderItemId)
+    );
+
+    if (idx !== -1) {
+      // 🔄 kembalikan qty_sisa
+      cachedOrders[idx].qty_sisa =
+        Number(cachedOrders[idx].qty_sisa || 0) + qtyDipakai;
+    }
+  }
+
+  // ===============================
+  // HAPUS BARIS
+  // ===============================
   tr.remove();
   refreshRowNumbers();
   refreshTotals();
 
+  // ===============================
+  // 🔥 REFRESH ORDER PICKER
+  // ===============================
+  if (cachedOrders.length > 0) {
+    renderOrderPicker(cachedOrders);
+  }
+
+  // jaga minimal 1 baris
   if (!tblBody.querySelector("tr.line-row")) {
     tblBody.appendChild(createRow());
   }
 });
+
 }
 
 // ===================== ADD ROW IF NEEDED =====================

@@ -123,7 +123,59 @@
     cursor: pointer;
     padding: 2px;
 }
-tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+.table-noselect,
+.table-noselect *{
+    user-select:none;
+}
+
+tr.barisdata{
+    cursor:pointer;
+}
+
+tr.barisdata.baris-aktif{
+    background:#dbe7ff !important;
+}
+
+.context-menu{
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    display: none;
+    z-index: 9999;
+    min-width:150px;
+    font-size:13px;
+}
+
+.context-item{
+    padding:8px 12px;
+    cursor:pointer;
+}
+
+.context-item:hover{
+    background:#f1f5ff;
+}
+
+.context-item.danger:hover{
+    background:#ffe6e6;
+    color:#d00;
+}
+
+.table-wrapper{
+    max-width:500px;
+}
+
+.table-narrow{
+    width:100%;
+    table-layout:fixed;
+}
+
+#tbodyData td:nth-child(1){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 </style>
 </head>
 <body id="page-top">
@@ -146,9 +198,9 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
                         <a class="dropdown-item" href="#" onclick="setFilterStatus('nonactive')">Nonaktif</a>
                     </div>
                 </div>
-              <input type="text" id="cari_grup_mitra" class="form-control form-control-sm" placeholder="Cari Mitra Grup..." style="max-width: 200px;">
-              <div class="dropdown">
-                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">Tambah</button>
+              <input type="text" id="cari_grup_mitra" class="form-control form-control-sm" placeholder="Search..." style="max-width: 90px;">
+              <div class="dropdown no-arrow">
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">+ Add</button>
                   <div class="dropdown-menu shadow border-0" aria-labelledby="dropdownTambahHeader">
                       <a class="dropdown-item" href="h_mitra_add.html?jenis=customer">Customer</a>
                       <a class="dropdown-item" href="h_mitra_add.html?jenis=supplier">Supplier</a>
@@ -157,13 +209,12 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
               </div>
           </div>
       </div>
-      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap">
-    <table class="table table-hover table-sm table-bordered table-tight">
+      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap table-wrapper">
+    <table class="table table-sm table-bordered table-tight table-narrow table-noselect">
             <thead>
                 <tr>
                     <th>Nama Grup</th>
                     <th width="50px">Aktif</th>
-                    <th width="100px" style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody id="tbodyData"></tbody>
@@ -190,6 +241,10 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
 </div>
 </div>
 </div>
+</div>
+<div id="contextMenu" class="context-menu">
+<div class="context-item" onclick="menuEdit()">Edit</div>
+<div id="menuToggleAktif" class="context-item" onclick="menuToggleAktif()">Nonaktifkan</div>
 </div>
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -265,6 +320,9 @@ let totalPages = 1;
 let lastCount = 0;
 let filterStatus = "all"; // all | active | nonactive
 let allGrup = [];
+let selectedGrupId = null;
+let selectedRow = null;
+let selectedGrupAktif = null;
 
 /* ===============================
    CACHE
@@ -361,46 +419,31 @@ function applyFilterGrup(q) {
 /* ===============================
    RENDER TABEL
 ================================ */
-function renderGrup(list) {
-    const tbody = document.getElementById("tbodyData");
+function renderGrup(list){
 
-    if (!list.length) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center text-muted py-3">
-                    Tidak ada data
-                </td>
-            </tr>`;
+const tbody = document.getElementById("tbodyData");
+    if(!list.length){
+        tbody.innerHTML=`
+        <tr>
+        <td colspan="2" class="text-center text-muted py-3">
+        Tidak ada data
+        </td>
+        </tr>`;
         return;
     }
-
-    tbody.innerHTML = list.map(g => `
-      <tr class="barisdata">
-        <td>${g.nama_grup}</td>
-
-        <!-- STATUS AKTIF -->
-        <td class="text-center ${g.aktif ? 'text-primary' : 'text-danger'}"
-            title="${g.aktif ? 'Aktif' : 'Nonaktif'}">
-          ${g.aktif ? ICON_CHECK : ICON_SILANG}
-        </td>
-
-        <!-- AKSI -->
-        <td class="text-center">
-          <span class="action-icon text-dark mr-2"
-                title="Edit"
-                onclick="goEdit('${g.id_grup_mitra}')">
-            ${ICON_EDIT}
-          </span>
-
-          <span class="action-icon text-dark"
-                title="Hapus"
-                onclick="hapusGrup('${g.id_grup_mitra}')">
-            ${ICON_DELETE}
-          </span>
-        </td>
-      </tr>
+    tbody.innerHTML = list.map(g=>`
+    <tr class="barisdata"
+    data-id="${g.id_grup_mitra}"
+    data-aktif="${g.aktif}">
+    <td title="${g.nama_grup}">
+    ${g.nama_grup}
+    </td>
+    <td class="text-center ${g.aktif ? 'text-primary':'text-danger'}"
+    title="${g.aktif ? 'Aktif':'Nonaktif'}">
+    ${g.aktif ? ICON_CHECK : ICON_SILANG}
+    </td>
+    </tr>
     `).join("");
-
 }
 
 /* ===============================
@@ -470,9 +513,68 @@ document.getElementById("cari_grup_mitra")
         }
     });
 
-/* ===============================
-   INIT
-================================ */
+const menu = document.getElementById("contextMenu");
+document.addEventListener("contextmenu",function(e){
+const row = e.target.closest(".barisdata");
+if(row){
+e.preventDefault();
+if(selectedRow){
+selectedRow.classList.remove("baris-aktif");
+}
+selectedRow = row;
+selectedRow.classList.add("baris-aktif");
+selectedGrupId = row.dataset.id;
+selectedGrupAktif = row.dataset.aktif === "true";
+const menuToggle = document.getElementById("menuToggleAktif");
+menuToggle.innerText =
+selectedGrupAktif ? "Nonaktifkan" : "Aktifkan";
+menu.style.top = e.clientY + "px";
+menu.style.left = e.clientX + "px";
+menu.style.display = "block";
+}else{
+menu.style.display="none";
+}
+});
+
+document.addEventListener("click",function(e){
+const row = e.target.closest(".barisdata");
+if(row){
+if(selectedRow){
+selectedRow.classList.remove("baris-aktif");
+}
+selectedRow = row;
+selectedRow.classList.add("baris-aktif");
+selectedGrupId = row.dataset.id;
+selectedGrupAktif = row.dataset.aktif === "true";
+}
+menu.style.display="none";
+});
+
+function menuEdit(){
+goEdit(selectedGrupId);
+}
+
+async function menuToggleAktif(){
+const statusBaru = !selectedGrupAktif;
+const { error } = await db
+.from("tb_grup_mitra")
+.update({aktif:statusBaru})
+.eq("id_grup_mitra",selectedGrupId);
+if(error){
+alert("Gagal mengubah status");
+return;
+}
+selectedGrupAktif = statusBaru;
+selectedRow.dataset.aktif = statusBaru;
+const cell = selectedRow.children[1];
+cell.className =
+"text-center " +
+(statusBaru ? "text-primary":"text-danger");
+cell.innerHTML =
+statusBaru ? ICON_CHECK : ICON_SILANG;
+clearCacheGrup();
+}
+
 loadGrup();
 </script>
 

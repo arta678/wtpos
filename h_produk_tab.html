@@ -123,7 +123,13 @@
     cursor: pointer;
     padding: 2px;
 }
-tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+
+tr.barisdata{
+    cursor:pointer;
+}
+tr.barisdata.baris-aktif{
+    background:#dbe7ff !important;
+}
 .table-noselect,
 .table-noselect * {
     user-select: none;
@@ -131,9 +137,163 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
     -moz-user-select: none;    /* Firefox */
     -ms-user-select: none;     /* Edge lama */
 }
+.context-menu{
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    display: none;
+    z-index: 9999;
+    min-width: 150px;
+    font-size: 13px;
+}
+
+.context-item{
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.context-item:hover{
+    background: #f1f5ff;
+}
+
+.context-item.danger:hover{
+    background:#ffe6e6;
+    color:#d00;
+}
+
+.dropdown-menu.show{
+display:block;
+max-height:200px;
+overflow-y:auto;
+cursor:pointer;
+scroll-behavior:smooth;
+}
+.modal-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.25);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:10000;
+}
+
+.modal-box{
+background:white;
+padding:18px;
+border-radius:8px;
+width:260px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+.modal-title{
+font-weight:600;
+margin-bottom:6px;
+}
+
+.modal-text{
+font-size:13px;
+color:#666;
+margin-bottom:15px;
+}
+
+.modal-buttons{
+display:flex;
+gap:8px;
+justify-content:center;
+}
+#panelDetailProduk{
+position:fixed;
+top:120px;
+right:-420px;
+width:420px;
+
+height:auto;              /* tinggi mengikuti isi */
+max-height:calc(100vh - 90px); /* tetap tidak lebih dari layar */
+
+background:white;
+box-shadow:-4px 0 20px rgba(0,0,0,0.15);
+transition:all .25s;
+z-index:9998;
+padding:16px;
+overflow:auto;
+font-size:13px;
+border-radius:6px 0 0 6px;
+}
+.panel-section{
+margin-bottom:12px;
+}
+.panel-title{
+font-weight:600;
+font-size:13px;
+color:#4e73df;
+margin-bottom:6px;
+border-bottom:1px solid #eee;
+padding-bottom:3px;
+}
+.panel-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:4px 10px;
+}
+.panel-row{
+display:flex;
+justify-content:space-between;
+}
+.panel-label{
+color:#666;
+}
+.panel-value{
+font-weight:500;
+}
+.panel-product-name{
+font-size:14px;
+font-weight:800;
+margin-bottom:8px;
+line-height:1.3;
+word-break:break-word;
+}
+.panel-grid-2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:4px 10px;
+}
+.panel-item{
+display:flex;
+justify-content:space-between;
+}
+.panel-label{
+color:#666;
+}
+.panel-value{
+font-weight:500;
+}
+.hl {
+  background: #fff3cd;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.filter-active {
+  background-color: #fff8e1 !important;
+}
+.stat-warning{
+color:#e67e22;
+font-weight:500;
+}
+
+.stat-danger{
+color:#d9534f;
+font-weight:500;
+}
 </style>
 </head>
-
 <body id="page-top">
     <div id="navbar"></div>
     <div id="wrapper">
@@ -145,17 +305,35 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
                         <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap">
                             <h6 class="m-0 font-weight-bold text-primary">Produk</h6>
                             <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+<button id="btnStatProduk"
+class="btn btn-outline-secondary btn-sm"
+data-toggle="tooltip"
+data-placement="bottom"
+data-html="true"
+disabled>
+Statistik
+</button>
+                                <button id="btnMultiSelect" class="btn btn-outline-secondary btn-sm">Multi Select</button>
+                                <button id="btnSelectAll" class="btn btn-outline-secondary btn-sm" style="display:none">Pilih Semua</button>                                
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterStatusBtn" data-toggle="dropdown" style="width: 80px; text-align: left;">Semua</button>
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterStatusBtn" data-toggle="dropdown" style="width: 80px; text-align: left;">Status</button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="#" onclick="setFilterStatus('all')">Semua</a>
                                         <a class="dropdown-item" href="#" onclick="setFilterStatus('active')">Aktif</a>
                                         <a class="dropdown-item" href="#" onclick="setFilterStatus('nonactive')">Nonaktif</a>
                                     </div>
                                 </div>
-                                <input type="text" id="cari_produk" class="form-control form-control-sm" placeholder="Search..." style="max-width: 90px;">
+                                <div class="position-relative" style="width:140px">
+                                  <input id="filter_merek" class="form-control form-control-sm" placeholder="Merek" autocomplete="off">
+                                  <div id="dd_filter_merek" class="dropdown-menu"></div>
+                                </div>
+                                <div class="position-relative" style="width:140px">
+                                  <input id="filter_kategori" class="form-control form-control-sm" placeholder="Kategori" autocomplete="off">
+                                  <div id="dd_filter_kategori" class="dropdown-menu"></div>
+                                </div>
+                                <input type="text" id="cari_produk" class="form-control form-control-sm" placeholder="Search..." style="max-width:90px;">
                                 <div class="dropdown no-arrow">
-                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">Tambah</button>
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">+ Add</button>
                                     <div class="dropdown-menu shadow border-0" aria-labelledby="dropdownTambahHeader">
                                         <a class="dropdown-item" href="h_produk_add.html">Produk</a>
                                         <a class="dropdown-item" href="h_merek_add.html">Merek</a>
@@ -165,16 +343,14 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
                             </div>
                         </div>
                         <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap ">
-                            <table class="table table-hover table-sm table-bordered table-tight table-noselect">
+                            <table class="table table-sm table-bordered table-tight table-noselect">
                                 <thead>
                                     <tr>
                                         <th width="50px">Kode</th>
-                                        <th width="70px" style="text-align: center;"></th>
                                         <th>Nama</th>
                                         <th width="150px">Merek</th>
                                         <th width="150px">Kategori</th>
                                         <th width="50px">Aktif</th>
-                                        
                                     </tr>
                                 </thead>
                                 <tbody id="tabel_produk"></tbody>
@@ -186,11 +362,140 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
                                     <li class="page-item"><a class="page-link" href="#" onclick="nextPage()">&raquo;</a></li>
                                 </ul>
                             </nav>
+<div id="panelDetailProduk">
+    <h6 id="d_nama" class="panel-title panel-product-name"></h6>
+    <div class="panel-grid-2">
+        <div class="panel-item">
+            <span class="panel-label">Kode</span>
+            <span id="d_kode" class="panel-value"></span>
+        </div>
+        <div class="panel-item">
+            <span class="panel-label">Barcode 1</span>
+            <span id="d_barcode1" class="panel-value"></span>
+        </div>
+        <div class="panel-item">
+            <span class="panel-label">Merek</span>
+            <span id="d_merek" class="panel-value"></span>
+        </div>
+        <div class="panel-item">
+            <span class="panel-label">Barcode 2</span>
+            <span id="d_barcode2" class="panel-value"></span>
+        </div>
+        <div class="panel-item">
+            <span class="panel-label">Kategori</span>
+            <span id="d_kategori" class="panel-value"></span>
+        </div>
+    </div>
+    <br>
+    <div class="panel-section">
+        <div class="panel-title">Satuan</div>
+        <div class="panel-grid">
+            <div class="panel-row">
+                <span class="panel-label">Satuan</span>
+                <span id="d_satuan"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Beli</span>
+                <span id="d_satuan_beli"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Jual</span>
+                <span id="d_satuan_jual"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Satuan 2</span>
+                <span id="d_satuan2"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Konver 2</span>
+                <span id="d_konversi2"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Satuan 3</span>
+                <span id="d_satuan3"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Konver 3</span>
+                <span id="d_konversi3"></span>
+            </div>
+        </div>
+    </div>
+    <div class="panel-section">
+        <div class="panel-title">Harga</div>
+        <div class="panel-grid">
+            <div class="panel-row">
+                <span class="panel-label">Beli Terakhir</span>
+                <span id="d_harga_beli"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Grosir</span>
+                <span id="d_harga_grosir"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Eceran</span>
+                <span id="d_harga_eceran"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Toko</span>
+                <span id="d_harga_toko"></span>
+            </div>
+        </div>
+    </div>
+    <div class="panel-section">
+        <div class="panel-title">Stok</div>
+        <div class="panel-grid">
+            <div class="panel-row">
+                <span class="panel-label">Stok</span>
+                <span id="d_stok"></span>
+            </div>
+            <div class="panel-row">
+                <span class="panel-label">Terakhir Dibeli</span>
+                <span id="d_terakhir_beli"></span>
+            </div>
+        </div>
+    </div>
+</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div id="contextMenu" class="context-menu">
+      <div id="menuEdit" class="context-item" onclick="menuEdit()">Edit</div>
+      <div class="context-item" onclick="openUpdateMerek()">Update Merek</div>
+      <div class="context-item" onclick="openUpdateKategori()">Update Kategori</div>
+      <div id="menuToggleAktif" class="context-item" onclick="menuToggleAktif()">Nonaktifkan</div>
+      <div id="menuHapus" class="context-item danger" onclick="menuHapus()">Hapus</div>
+    </div>
+    <div id="popupUpdate" class="context-menu" style="width:300px;padding:12px;display:none">
+        <div style="font-weight:600;margin-bottom:8px" id="popupTitle"></div>
+        <div class="position-relative">
+        <input id="popupInput" class="form-control form-control-sm" placeholder="Ketik untuk mencari...">
+        <div id="popupDropdown" class="dropdown-menu w-100"></div>
+        </div>
+        <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px">
+        <button class="btn btn-sm btn-secondary" onclick="closePopupUpdate()">Batal</button>
+        </div>
+    </div>
+    <div id="modalHapus" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-title">Hapus Produk?</div>
+        <div class="modal-text">Data yang dihapus tidak dapat dikembalikan.</div>
+        <div class="modal-buttons">
+            <button class="btn btn-sm btn-danger" onclick="konfirmasiHapus()">Hapus</button>
+            <button class="btn btn-sm btn-secondary" onclick="tutupModalHapus()">Batal</button>
+        </div>
+      </div>
     </div>
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -265,21 +570,52 @@ loadShortcut();
     let totalPages = 1;
     let totalRows = 0;
     let isSearching = false;
+    let selectedProdukId = null;
+    let selectedRow = null;
+    let selectedProdukAktif = null;
+    let multiSelectMode = false;
+    let selectedRows = new Set();
+    let popupMode = null;
+    let popupItems = []
+    let popupIndex = -1
+    let popupSelectedId = null
+    let timerPopup = null
+    const popupInput = document.getElementById("popupInput")
+    const popupDropdown = document.getElementById("popupDropdown")
+    let lastSelectedIndex = null;
+    let filterMerekId = null;
+    let filterKategoriId = null;
 
-function getCacheKey() {
-  return `produk:${filterStatus}:page:${page}`;
+function updateFilterStyle(inputId, isActive){
+  const el = document.getElementById(inputId);
+  el.classList.toggle("filter-active", isActive);
 }
 
-function getCachedPage() {
-  const raw = sessionStorage.getItem(getCacheKey());
-  return raw ? JSON.parse(raw) : null;
+function getCacheKey() {
+  return `produk:${filterStatus}:page:${page}:merek:${filterMerekId}:kategori:${filterKategoriId}`;
 }
 
 function setCachedPage(data, count) {
   sessionStorage.setItem(
     getCacheKey(),
-    JSON.stringify({ data, count })
+    JSON.stringify({
+      data,
+      count,
+      time: Date.now()
+    })
   );
+}
+
+function getCachedPage() {
+  const raw = sessionStorage.getItem(getCacheKey());
+  if(!raw) return null;
+  const cache = JSON.parse(raw);
+  const maxAge = 20000; // 10 detik
+  if(Date.now() - cache.time > maxAge){
+      sessionStorage.removeItem(getCacheKey());
+      return null;
+  }
+  return cache;
 }
 
 function clearProdukCache() {
@@ -290,40 +626,29 @@ function clearProdukCache() {
 
 
 async function loadProduk() {
-
-  // 1️⃣ Ambil nilai search
   const q = document.getElementById("cari_produk").value.trim().toLowerCase();
   const keywords = q.split(/\s+/).filter(Boolean);
-
-  // 2️⃣ Tentukan mode search
   isSearching = keywords.length > 0;
-
-  // 3️⃣ HITUNG RANGE PAGINATION
   const from = (page - 1) * perPage;
   const to   = from + perPage - 1;
+  const isFiltering =
+  !!filterMerekId ||
+  !!filterKategoriId ||
+  keywords.length > 0;
 
-  // ============================
-  // 🚀 CEK CACHE DI SINI (WAJIB)
-  // ============================
   if (!isSearching) {
     const cached = getCachedPage();
     if (cached) {
       totalRows  = cached.count;
       totalPages = Math.ceil(totalRows / perPage);
-
-      renderTabel(cached.data);
+      renderTabel(cached.data, keywords);
       updatePagination();
-
-      document.getElementById("pagination").style.display =
-        totalPages > 1 ? "flex" : "none";
-
-      return; // ⛔ STOP, JANGAN QUERY SUPABASE
+    document.getElementById("pagination").style.display =
+      isFiltering ? "none" : (totalPages > 1 ? "flex" : "none");
+      return;
     }
   }
-
-  // ============================
   // 4️⃣ BARU QUERY SUPABASE
-  // ============================
   let dataQuery = db
     .from("tb_produk")
     .select(`
@@ -331,146 +656,132 @@ async function loadProduk() {
       kode_produk,
       nama_produk,
       aktif,
+      pernah_dibeli,
       tb_kategori ( nama_kategori ),
       tb_merek ( nama_merek )
     `, { count: "exact" })
-    .order("created_at", { ascending: false });
-
-  if (!isSearching) {
-    dataQuery = dataQuery.range(from, to);
-  }
-
+    .order("created_at", { ascending: false })
+    .order("id_produk", { ascending: false });
+if (!isFiltering) {
+  dataQuery = dataQuery.range(from, to);
+}
   if (filterStatus === "active") {
     dataQuery = dataQuery.eq("aktif", true);
   }
   if (filterStatus === "nonactive") {
     dataQuery = dataQuery.eq("aktif", false);
   }
+  if(filterMerekId){
+      dataQuery = dataQuery.eq("id_merek",filterMerekId);
+    }
 
+    if(filterKategoriId){
+      dataQuery = dataQuery.eq("id_kategori",filterKategoriId);
+    }
   if (keywords.length > 0) {
     keywords.forEach(k => {
       dataQuery = dataQuery.ilike("nama_produk", `%${k}%`);
     });
   }
-
   const { data, count, error } = await dataQuery;
   if (error) {
     console.error(error);
     return;
   }
-
-  // ============================
   // 5️⃣ SIMPAN KE CACHE (DI SINI)
-  // ============================
   if (!isSearching) {
     setCachedPage(data || [], count || 0);
   }
-
   totalRows  = count || 0;
   totalPages = Math.ceil(totalRows / perPage);
-
   if (page > totalPages) page = totalPages || 1;
   if (page < 1) page = 1;
-
-  renderTabel(data || []);
+  renderTabel(data || [], keywords);
   updatePagination();
-
-  document.getElementById("pagination").style.display =
-    isSearching ? "none" : (totalPages > 1 ? "flex" : "none");
+    document.getElementById("pagination").style.display =
+     isFiltering ? "none" : (totalPages > 1 ? "flex" : "none");
+     updateFilterStyle("filter_merek", !!filterMerekId);
+updateFilterStyle("filter_kategori", !!filterKategoriId);
+}
+    function highlightText(text, keywords){
+  if(!keywords || keywords.length === 0) return text;
+  let result = text;
+  keywords.forEach(k => {
+    const regex = new RegExp(`(${k})`, "gi");
+    result = result.replace(regex, `<span class="hl">$1</span>`);
+  });
+  return result;
 }
 
-
-    // =========================
-    // RENDER TABEL (DIPISAH)
-    // =========================
-    function renderTabel(list) {
+    function renderTabel(list, keywords = []) {
         if (!list || list.length === 0) {
             document.getElementById("tabel_produk").innerHTML = `
             <tr>
-                <td colspan="6" class="text-center text-muted py-3">
+                <td colspan="5" class="text-center text-muted py-3">
                     Tidak ada data ditemukan
                 </td>
             </tr>`;
             return;
         }
-
         document.getElementById("tabel_produk").innerHTML = list.map(p => `
-        <tr class="barisdata">
+        <tr class="barisdata" 
+            data-id="${p.id_produk}" 
+            data-aktif="${p.aktif}"
+            data-dipakai="${p.pernah_dibeli ? 'true' : 'false'}">
           <td>${p.kode_produk}</td>
-                  <!-- AKSI -->
-          <td class="text-center">
-            <span class="text-dark action-icon mr-2"
-                  title="Edit"
-                  onclick="goEdit('${p.id_produk}')">
-              ${ICON_EDIT}
-            </span>
-
-            <span class="text-dark action-icon"
-                  title="Hapus"
-                  onclick="hapusProduk('${p.id_produk}')">
-              ${ICON_DELETE}
-            </span>
-          </td>
-          <td>${p.nama_produk}</td>
+          <td>${highlightText(p.nama_produk, keywords)}</td>
           <td>${p.tb_merek?.nama_merek || ""}</td>
           <td>${p.tb_kategori?.nama_kategori || ""}</td>
-
-          <!-- STATUS AKTIF -->
           <td class="text-center">
             <span class="${p.aktif ? 'text-primary' : 'text-danger'}"
                   title="${p.aktif ? 'Aktif' : 'Nonaktif'}">
               ${p.aktif ? ICON_CHECK : ICON_SILANG}
             </span>
           </td>
-
-
         </tr>
         `).join("");
 
     }
 
-
 function setFilterStatus(status) {
   filterStatus = status;
-  clearProdukCache(); // ⬅️ TAMBAHKAN INI
-
+  clearProdukCache();
   const txt =
     status === "active" ? "Aktif" :
     status === "nonactive" ? "Nonaktif" :
     "Semua";
-
   document.getElementById("filterStatusBtn").innerText = txt;
-
   page = 1;
   loadProduk();
 }
 
-
 document.getElementById("cari_produk")
-  .addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      page = 1;
-      loadProduk();
-    }
-  });
+.addEventListener("keydown", async e => {
+if(e.key === "Enter"){
+    e.preventDefault();
+    page = 1;
+    await loadProduk();
+    document.getElementById("cari_produk").blur();
+}
+});
 
-    function goEdit(id) {
-        localStorage.setItem("produk_page", page);
-        location.href = "h_produk_edit.html?id=" + id;
-    }
+function goEdit(id) {
+    localStorage.setItem("produk_page", page);
+    location.href = "h_produk_edit.html?id=" + id;
+}
 
-        async function hapusProduk(id) {
-          if (!confirm("Yakin ingin menghapus produk?")) return;
-
-          const { error } = await db.from("tb_produk").delete().eq("id_produk", id);
-          if (error) {
-            alert("Gagal menghapus");
-            return;
-          }
-
-          clearProdukCache(); // ⬅️ GANTI KE INI
-          loadProduk();
-        }
+async function hapusProduk(id){
+const { error } = await db
+.from("tb_produk")
+.delete()
+.eq("id_produk", id);
+if (error) {
+alert("Gagal menghapus");
+return;
+}
+clearProdukCache();
+loadProduk();
+}
 
 function nextPage() {
   if (page >= totalPages) return;
@@ -486,17 +797,794 @@ function prevPage() {
 
 function updatePagination() {
   document.getElementById("page-number").innerText = page;
-
   document.querySelector("#pagination li:first-child")
     .classList.toggle("disabled", page <= 1);
-
   document.querySelector("#pagination li:last-child")
     .classList.toggle("disabled", page >= totalPages);
 }
 
+const menu = document.getElementById("contextMenu");
+document.addEventListener("contextmenu", function(e){
+  const row = e.target.closest(".barisdata");
+if(multiSelectMode){
+    if(!row) return;
 
+    e.preventDefault();
+
+    const id = row.dataset.id;
+
+    // pilih otomatis jika belum dipilih
+    if(!selectedRows.has(id)){
+        selectedRows.add(id);
+        row.classList.add("baris-aktif");
+    }
+
+    document.getElementById("menuEdit").style.display = "none";
+
+    // cek apakah ada produk aktif
+    let adaAktif = false;
+
+    selectedRows.forEach(id=>{
+        const r = document.querySelector(`tr[data-id="${id}"]`);
+        if(r && r.dataset.aktif === "true"){
+            adaAktif = true;
+        }
+    });
+
+    const menuToggle = document.getElementById("menuToggleAktif");
+    menuToggle.innerText = adaAktif ? "Nonaktifkan" : "Aktifkan";
+
+    menu.style.top = e.clientY + "px";
+    menu.style.left = e.clientX + "px";
+    menu.style.display = "block";
+    return;
+}
+  if(row){
+    const dipakai = row.dataset.dipakai === "true";
+    console.log("pernah dibeli:", row.dataset.dipakai);
+    e.preventDefault();
+    document.getElementById("menuEdit").style.display = "block";
+    const menuHapus = document.getElementById("menuHapus");
+    if(dipakai){
+        menuHapus.style.display = "none";
+    }else{
+        menuHapus.style.display = "block";
+    }
+    // hapus highlight lama
+    if(selectedRow){
+        selectedRow.classList.remove("baris-aktif");
+    }
+    // simpan baris yang dipilih
+    selectedRow = row;
+    // beri highlight
+    selectedRow.classList.add("baris-aktif");
+    // simpan id produk
+    selectedProdukId = row.dataset.id;
+    selectedProdukAktif = row.dataset.aktif === "true";
+    const menuToggle = document.getElementById("menuToggleAktif");
+    menuToggle.innerText = selectedProdukAktif
+    ? "Nonaktifkan"
+    : "Aktifkan";
+    // tampilkan menu
+    menu.style.top = e.clientY + "px";
+    menu.style.left = e.clientX + "px";
+    menu.style.display = "block";
+  }else{
+    menu.style.display = "none";
+  }
+});
+
+document.addEventListener("click", function(e){
+    if(e.target.closest("#contextMenu")) return;
+    if(e.target.closest("#popupUpdate")) return;
+    menu.style.display = "none";
+});
+
+function menuEdit(){
+    menu.style.display = "none"; 
+    if(multiSelectMode) return;
+    window.open("h_produk_edit.html?id=" + selectedProdukId, "_blank");
+}
+
+function menuHapus(){
+menu.style.display = "none";
+bukaModalHapus();
+}
+
+document.addEventListener("click", function(e){
+const row = e.target.closest(".barisdata");
+if(!row) return;
+const rows = [...document.querySelectorAll("#tabel_produk tr.barisdata")];
+const index = rows.indexOf(row);
+const id = row.dataset.id;
+if(multiSelectMode){
+    if(e.shiftKey && lastSelectedIndex !== null){
+        const start = Math.min(lastSelectedIndex, index);
+        const end = Math.max(lastSelectedIndex, index);
+        for(let i=start;i<=end;i++){
+            const r = rows[i];
+            const rid = r.dataset.id;
+
+            selectedRows.add(rid);
+            r.classList.add("baris-aktif");
+        }
+        lastSelectedIndex = index;
+    }else{
+        if(selectedRows.has(id)){
+            selectedRows.delete(id);
+            row.classList.remove("baris-aktif");
+        }else{
+            selectedRows.add(id);
+            row.classList.add("baris-aktif");
+        }
+        lastSelectedIndex = index;
+    }
+}else{
+    if(selectedRow){
+        selectedRow.classList.remove("baris-aktif");
+    }
+    selectedRow = row;
+    selectedRow.classList.add("baris-aktif");
+    selectedProdukId = id;
+}
+});
+
+async function menuToggleAktif(){
+menu.style.display = "none"; 
+if(multiSelectMode){
+if(selectedRows.size === 0) return;
+const ids = Array.from(selectedRows);
+let adaAktif = false;
+selectedRows.forEach(id=>{
+const r = document.querySelector(`tr[data-id="${id}"]`);
+if(r && r.dataset.aktif === "true"){
+adaAktif = true;
+}
+});
+const statusBaru = !adaAktif;
+const { error } = await db
+.from("tb_produk")
+.update({ aktif: statusBaru })
+.in("id_produk", ids);
+if(error){
+alert("Gagal update");
+return;
+}
+clearProdukCache();
+const keepSelected = [...selectedRows];
+await loadProduk();
+keepSelected.forEach(id=>{
+const row = document.querySelector(`tr[data-id="${id}"]`);
+if(row){
+row.classList.add("baris-aktif");
+}
+});
+return;
+}
+
+const statusBaru = !selectedProdukAktif;
+const { error } = await db
+.from("tb_produk")
+.update({ aktif: statusBaru })
+.eq("id_produk", selectedProdukId);
+if(error){
+alert("Gagal mengubah status");
+return;
+}
+selectedProdukAktif = statusBaru;
+selectedRow.dataset.aktif = statusBaru;
+const cell = selectedRow.children[4];
+cell.innerHTML = `
+<span class="${statusBaru ? 'text-primary' : 'text-danger'}">
+${statusBaru ? ICON_CHECK : ICON_SILANG}
+</span>
+`;
+clearProdukCache();
+}
+
+document
+.getElementById("btnMultiSelect")
+.addEventListener("click", function(){
+multiSelectMode = !multiSelectMode;
+this.classList.toggle("btn-secondary");
+this.classList.toggle("btn-outline-secondary");
+const btnSelectAll = document.getElementById("btnSelectAll");
+btnSelectAll.style.display = multiSelectMode ? "inline-block" : "none";
+if(multiSelectMode){
+    if(selectedProdukId){
+        selectedRows.add(selectedProdukId);
+        const row = document.querySelector(
+        `tr[data-id="${selectedProdukId}"]`
+        );
+        if(row){
+            row.classList.add("baris-aktif");
+        }
+    }
+}else{
+    clearMultiSelection();
+}
+});
+
+function clearMultiSelection(){
+selectedRows.clear();
+lastSelectedIndex = null;
+document
+.querySelectorAll(".barisdata")
+.forEach(r => r.classList.remove("baris-aktif"));
+document.getElementById("btnSelectAll").innerText = "Pilih Semua";
+}
+
+async function bulkNonaktifkan(){
+if(selectedRows.size === 0) return;
+const ids = Array.from(selectedRows);
+const { error } = await db
+.from("tb_produk")
+.update({ aktif:false })
+.in("id_produk", ids);
+if(error){
+alert("Gagal update");
+return;
+}
+clearProdukCache();
+loadProduk();
+clearMultiSelection();
+}
+
+async function openUpdateMerek(){
+    popupMode = "merek";
+    popupInput.value = "";
+    popupDropdown.classList.remove("show");
+    const menu = document.getElementById("contextMenu");
+    menu.style.display = "none";
+    const popup = document.getElementById("popupUpdate");
+    popup.style.display = "block";
+    popup.style.top = "200px";
+    popup.style.left = "50%";
+    popup.style.transform = "translateX(-50%)";
+    document.getElementById("popupTitle").innerText = "Update Merek";
+    setTimeout(()=>popupInput.focus(),50)
+}
+
+async function openUpdateKategori(){
+    popupMode = "kategori";
+    popupInput.value = "";
+    popupDropdown.classList.remove("show");
+    const menu = document.getElementById("contextMenu");
+    menu.style.display = "none";
+    const popup = document.getElementById("popupUpdate");
+    popup.style.display = "block";
+    popup.style.top = "200px";
+    popup.style.left = "50%";
+    popup.style.transform = "translateX(-50%)";
+    document.getElementById("popupTitle").innerText = "Update Kategori";
+    setTimeout(()=>popupInput.focus(),50)
+}
+
+function closePopupUpdate(){
+    document.getElementById("popupUpdate").style.display="none";
+}
+
+document.addEventListener("keydown",function(e){
+    if(e.key === "Escape"){
+    document.getElementById("popupUpdate").style.display="none";
+    }
+});
+
+popupInput.addEventListener("input",()=>{
+    clearTimeout(timerPopup)
+    const q = popupInput.value.trim()
+    if(q.length < 1){
+    popupDropdown.classList.remove("show")
+    return
+    }
+    timerPopup = setTimeout(loadPopupData,200)
+})
+
+async function loadPopupData(){
+    const q = popupInput.value.trim()
+    let table = popupMode === "merek"
+    ? "tb_merek"
+    : "tb_kategori"
+    let field = popupMode === "merek"
+    ? "nama_merek"
+    : "nama_kategori"
+    const {data,error} = await db
+    .from(table)
+    .select(`id_${popupMode},${field}`)
+    .ilike(field,`%${q}%`)
+    .limit(20)
+    popupDropdown.innerHTML=""
+    popupItems=[]
+    popupIndex=-1
+    if(!data || !data.length){
+    popupDropdown.innerHTML=`<div class="dropdown-item text-muted">Tidak ada</div>`
+    popupDropdown.classList.add("show")
+    return
+    }
+    data.forEach(r=>{
+    const id = r[`id_${popupMode}`]
+    const nama = r[field]
+    const a=document.createElement("a")
+    a.className="dropdown-item"
+    a.href="#"
+    a.textContent=nama
+    a.onclick=e=>{
+    e.preventDefault()
+    pilihPopupItem(id,nama)
+    }
+    popupDropdown.appendChild(a)
+    })
+    popupItems=[...popupDropdown.querySelectorAll(".dropdown-item")]
+    popupDropdown.classList.add("show")
+}
+
+async function pilihPopupItem(id,nama){
+    popupSelectedId = id
+    popupInput.value = nama
+    popupDropdown.classList.remove("show")
+    let ids = []
+    if(selectedRows.size > 0){
+        ids = [...selectedRows]
+    }else if(selectedProdukId){
+        ids = [selectedProdukId]
+    }else{
+        return
+    }
+    let updateData={}
+    if(popupMode==="merek"){
+        updateData.id_merek=id
+    }
+    if(popupMode==="kategori"){
+        updateData.id_kategori=id
+    }
+    console.log("SelectedRows:", selectedRows)
+    console.log("IDS dikirim:", ids)
+    const {error}=await db
+        .from("tb_produk")
+        .update(updateData)
+        .in("id_produk",ids)
+    if(error){
+        alert("Gagal update")
+        return
+    }
+    closePopupUpdate()
+    clearProdukCache()
+    if(ids.length === 1 && selectedRow){
+        if(popupMode==="merek"){
+            selectedRow.children[2].innerText = nama
+        }
+        if(popupMode==="kategori"){
+            selectedRow.children[3].innerText = nama
+        }
+        clearMultiSelection()
+        selectedRow.classList.add("baris-aktif")
+    }else{
+    const keepSelected = [...selectedRows]
+    await loadProduk()
+    keepSelected.forEach(id=>{
+        const row = document.querySelector(`tr[data-id="${id}"]`)
+        if(row){
+            row.classList.add("baris-aktif")
+        }
+    })
+    }
+}
+
+popupInput.addEventListener("keydown",e=>{
+    if(!popupDropdown.classList.contains("show")) return
+    if(["ArrowDown","ArrowUp","Enter"].includes(e.key)){
+        e.preventDefault()
+    }
+    if(e.key==="ArrowDown"){
+        popupIndex=(popupIndex+1)%popupItems.length
+        updatePopupHighlight()
+    }
+    if(e.key==="ArrowUp"){
+        popupIndex=(popupIndex-1+popupItems.length)%popupItems.length
+        updatePopupHighlight()
+    }
+    if(e.key==="Enter" && popupIndex>=0){
+        popupItems[popupIndex].click()
+    }
+})
+
+function updatePopupHighlight(){
+    popupItems.forEach(el=>el.classList.remove("active-highlight"))
+    if(popupItems[popupIndex]){
+        popupItems[popupIndex].classList.add("active-highlight")
+        popupItems[popupIndex].scrollIntoView({block:"nearest"})
+    }
+}
+
+document.addEventListener("click",e=>{
+if(!e.target.closest("#popupUpdate")){
+popupDropdown.classList.remove("show")
+}
+})
+
+function bukaModalHapus(){
+document.getElementById("modalHapus").style.display="flex";
+}
+
+function tutupModalHapus(){
+document.getElementById("modalHapus").style.display="none";
+}
+
+async function konfirmasiHapus(){
+
+tutupModalHapus();
+
+if(multiSelectMode){
+
+if(selectedRows.size === 0) return;
+
+const ids = Array.from(selectedRows);
+
+const { error } = await db
+.from("tb_produk")
+.delete()
+.in("id_produk", ids);
+
+if(error){
+alert("Gagal menghapus");
+return;
+}
+
+clearProdukCache();
+loadProduk();
+clearMultiSelection();
+return;
+}
+
+hapusProduk(selectedProdukId);
+
+}
+
+document.getElementById("btnSelectAll").addEventListener("click", function(){
+const rows = document.querySelectorAll("#tabel_produk tr.barisdata");
+let allSelected = true;
+rows.forEach(row=>{
+    const id = row.dataset.id;
+    if(!selectedRows.has(id)){
+        allSelected = false;
+    }
+});
+if(allSelected){
+    rows.forEach(row=>{
+        const id = row.dataset.id;
+        selectedRows.delete(id);
+        row.classList.remove("baris-aktif");
+    });
+    this.innerText = "Pilih Semua";
+    return;
+}
+rows.forEach(row=>{
+    const id = row.dataset.id;
+    selectedRows.add(id);
+    row.classList.add("baris-aktif");
+});
+this.innerText = "Batal Pilih";
+});
+
+document.addEventListener("dblclick", function(e){
+const row = e.target.closest(".barisdata");
+if(!row) return;
+if(selectedRow){
+    selectedRow.classList.remove("baris-aktif");
+}
+selectedRow = row;
+selectedRow.classList.add("baris-aktif");
+selectedProdukId = row.dataset.id;
+bukaDetailProduk(selectedProdukId);
+});
+
+document.addEventListener("keydown", function(e){
+if(e.ctrlKey && e.key.toLowerCase() === "m"){
+    e.preventDefault();
+    const el = document.getElementById("filter_merek");
+    el.focus();
+    el.select();
+    return;
+}
+if(e.ctrlKey && e.key.toLowerCase() === "k"){
+    e.preventDefault();
+    const el = document.getElementById("filter_kategori");
+    el.focus();
+    el.select();
+    return;
+}    
+if(e.ctrlKey && e.key === "a"){
+    e.preventDefault();
+    const btnSelectAll = document.getElementById("btnSelectAll");
+    if(!multiSelectMode){
+        document.getElementById("btnMultiSelect").click();
+    }
+    btnSelectAll.click();
+}
+if(e.ctrlKey && e.key === "f"){
+    e.preventDefault();
+    const search = document.getElementById("cari_produk");
+    search.focus();
+    search.select();
+}
+if(e.key === "Escape"){
+
+clearMultiSelection()
+
+document.getElementById("panelDetailProduk").style.right = "-420px"
+
+if(multiSelectMode){
+document.getElementById("btnMultiSelect").click()
+}
+
+}
+if(e.key === "Enter"){
+
+const active = document.activeElement;
+
+// hanya blok jika masih fokus di search
+if(active && active.id === "cari_produk"){
+    return;
+}
+
+if(selectedProdukId && !multiSelectMode){
+    bukaDetailProduk(selectedProdukId);
+}
+
+}
+if(e.key === "ArrowDown"){
+    const rows = [...document.querySelectorAll("#tabel_produk tr.barisdata")];
+    if(rows.length === 0) return;
+    let index = rows.findIndex(r => r.dataset.id == selectedProdukId);
+    if(index < rows.length - 1){
+        index++;
+        if(selectedRow){
+            selectedRow.classList.remove("baris-aktif");
+        }
+        selectedRow = rows[index];
+        selectedProdukId = selectedRow.dataset.id;
+        selectedRow.classList.add("baris-aktif");
+        selectedRow.scrollIntoView({block:"nearest"});
+    }
+}
+if(e.key === "ArrowUp"){
+    const rows = [...document.querySelectorAll("#tabel_produk tr.barisdata")];
+    if(rows.length === 0) return;
+    let index = rows.findIndex(r => r.dataset.id == selectedProdukId);
+    if(index > 0){
+        index--;
+        if(selectedRow){
+            selectedRow.classList.remove("baris-aktif");
+        }
+        selectedRow = rows[index];
+        selectedProdukId = selectedRow.dataset.id;
+        selectedRow.classList.add("baris-aktif");
+        selectedRow.scrollIntoView({block:"nearest"});
+    }
+}
+
+});
+
+function rupiah(n){
+return new Intl.NumberFormat('id-ID').format(n)
+}
+
+async function bukaDetailProduk(id){
+const { data, error } = await db
+.from("v_produk_detail")
+.select("*")
+.eq("id_produk", id)
+.single()
+if(error){
+console.error(error)
+return
+}
+document.getElementById("d_kode").innerText = data.kode_produk
+document.getElementById("d_nama").innerText = data.nama_produk
+document.getElementById("d_kategori").innerText = data.nama_kategori || "-"
+document.getElementById("d_merek").innerText = data.nama_merek || "-"
+document.getElementById("d_barcode1").innerText = data.barcode1 || "-"
+document.getElementById("d_barcode2").innerText = data.barcode2 || "-"
+document.getElementById("d_satuan").innerText = data.satuan1 || "-"
+document.getElementById("d_satuan2").innerText = data.satuan2 || "-"
+document.getElementById("d_konversi2").innerText = data.konversi2 || "-"
+document.getElementById("d_satuan3").innerText = data.satuan3 || "-"
+document.getElementById("d_konversi3").innerText = data.konversi3 || "-"
+document.getElementById("d_satuan_beli").innerText = data.satuan_beli || "-"
+document.getElementById("d_satuan_jual").innerText = data.satuan_jual || "-"
+document.getElementById("d_harga_eceran").innerText = rupiah(data.harga_eceran) || "-"
+document.getElementById("d_harga_grosir").innerText = rupiah(data.harga_grosir) || "-"
+document.getElementById("d_harga_toko").innerText = rupiah(data.harga_toko) || "-"
+document.getElementById("d_harga_beli").innerText = rupiah(data.harga_beli_terakhir) || "-"
+document.getElementById("d_terakhir_beli").innerText = data.terakhir_dibeli || "-"
+document.getElementById("d_stok").innerText = data.stok || "-"
+document.getElementById("panelDetailProduk").style.right = "24px"
+}
+
+function setupDropdown(inputId, dropdownId, table, idField, nameField, onSelect){
+
+  const input = document.getElementById(inputId);
+  const dd = document.getElementById(dropdownId);
+  let ddItems = [];
+let ddIndex = -1;
+
+  input.addEventListener("input", async () => {
+
+    const q = input.value.trim();
+
+    if(q.length < 2){
+      dd.classList.remove("show");
+      return;
+    }
+
+    const {data} = await db
+      .from(table)
+      .select(`${idField},${nameField}`)
+      .ilike(nameField,`%${q}%`)
+      .limit(8);
+
+    if(!data?.length){
+      dd.classList.remove("show");
+      return;
+    }
+
+    dd.innerHTML = data.map(r =>
+      `<div class="dropdown-item" data-id="${r[idField]}">${r[nameField]}</div>`
+    ).join("");
+    ddItems = [...dd.querySelectorAll(".dropdown-item")];
+    ddIndex = -1;
+
+    dd.classList.add("show");
+  });
+
+  dd.addEventListener("click", e => {
+
+    const item = e.target.closest(".dropdown-item");
+    if(!item) return;
+
+    input.value = item.innerText;
+    dd.classList.remove("show");
+
+    onSelect(item.dataset.id);
+    updateFilterStyle(inputId,true);
+    setTimeout(() => input.select(), 0);
+
+  });
+  function updateHighlight(){
+
+  ddItems.forEach(el => el.classList.remove("active-highlight"));
+
+  if(ddItems[ddIndex]){
+    ddItems[ddIndex].classList.add("active-highlight");
+    ddItems[ddIndex].scrollIntoView({block:"nearest"});
+  }
+
+}
+  input.addEventListener("keydown", e => {
+
+  if(!dd.classList.contains("show")) return;
+
+    if(["ArrowDown","ArrowUp","Enter"].includes(e.key)){
+      e.preventDefault();
+      e.stopPropagation();   // 🔥 ini yang penting
+    }
+
+  if(e.key === "ArrowDown"){
+    ddIndex = (ddIndex + 1) % ddItems.length;
+    updateHighlight();
+  }
+
+  if(e.key === "ArrowUp"){
+    ddIndex = (ddIndex - 1 + ddItems.length) % ddItems.length;
+    updateHighlight();
+  }
+
+  if(e.key === "Enter" && ddIndex >= 0){
+    ddItems[ddIndex].click();
+  }
+
+});
+}
+document.getElementById("filter_merek").addEventListener("input", e=>{
+  if(e.target.value.trim()==="" && filterMerekId){
+    filterMerekId = null;
+    updateFilterStyle("filter_merek",false);
     loadProduk();
-    </script>
-</body>
+  }
+});
 
+document.getElementById("filter_kategori").addEventListener("input", e=>{
+  if(e.target.value.trim()==="" && filterKategoriId){
+    filterKategoriId = null;
+    updateFilterStyle("filter_kategori",false);
+    loadProduk();
+  }
+});
+
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".position-relative")){
+    document.querySelectorAll(".dropdown-menu.show")
+      .forEach(dd=>dd.classList.remove("show"));
+  }
+});
+
+["filter_merek","filter_kategori","cari_produk"].forEach(id=>{
+  const el=document.getElementById(id);
+
+  el.addEventListener("focus",()=>{
+    if(el.value.trim()!==""){
+      el.select();
+    }
+  });
+});
+
+async function loadStatProduk(){
+
+const total = await db
+.from("tb_produk")
+.select("*",{count:"exact",head:true})
+
+const nonaktif = await db
+.from("tb_produk")
+.select("*",{count:"exact",head:true})
+.eq("aktif",false)
+
+const nomerek = await db
+.from("tb_produk")
+.select("*",{count:"exact",head:true})
+.is("id_merek",null)
+
+const nokategori = await db
+.from("tb_produk")
+.select("*",{count:"exact",head:true})
+.is("id_kategori",null)
+
+const tooltip = `
+<div style="text-align:left;font-size:12px;line-height:1.5">
+<b>Produk</b> : ${total.count}<br>
+NonAktif : ${nonaktif.count}<br>
+Tanpa Merek : ${nomerek.count}<br>
+Tanpa Kategori : ${nokategori.count}
+</div>
+`
+
+$("#btnStatProduk")
+.attr("data-original-title", tooltip)
+.tooltip('dispose')
+.tooltip()
+
+}
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+});
+loadStatProduk()
+clearProdukCache();
+loadProduk();
+setupDropdown(
+  "filter_merek",
+  "dd_filter_merek",
+  "tb_merek",
+  "id_merek",
+  "nama_merek",
+  id => {
+    filterMerekId = id;
+    page = 1;
+    loadProduk();
+  }
+);
+
+setupDropdown(
+  "filter_kategori",
+  "dd_filter_kategori",
+  "tb_kategori",
+  "id_kategori",
+  "nama_kategori",
+  id => {
+    filterKategoriId = id;
+    page = 1;
+    loadProduk();
+  }
+);
+</script>
+</body>
 </html>

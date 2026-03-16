@@ -123,7 +123,60 @@
     cursor: pointer;
     padding: 2px;
 }
-tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
+.table-noselect,
+.table-noselect *{
+    user-select:none;
+}
+
+tr.barisdata{
+    cursor:pointer;
+}
+
+tr.barisdata.baris-aktif{
+    background:#dbe7ff !important;
+}
+
+.context-menu{
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    display: none;
+    z-index: 9999;
+    min-width: 150px;
+    font-size: 13px;
+}
+
+.context-item{
+    padding: 8px 12px;
+    cursor:pointer;
+}
+
+.context-item:hover{
+    background:#f1f5ff;
+}
+
+.context-item.danger:hover{
+    background:#ffe6e6;
+    color:#d00;
+}
+
+.table-wrapper{
+    max-width:500px;
+}
+
+.table-narrow{
+    width:100%;
+    table-layout:fixed;
+}
+
+#tabel_kategori td:nth-child(2){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 </style>
 </head>
 <body id="page-top">
@@ -148,7 +201,7 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
                 </div>
               <input type="text" id="cari_kategori" class="form-control form-control-sm" placeholder="Search.." style="max-width: 90px;">
               <div class="dropdown no-arrow">
-                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">Tambah</button>
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownTambahHeader" data-toggle="dropdown">+ Add</button>
                   <div class="dropdown-menu shadow border-0" aria-labelledby="dropdownTambahHeader">
                       <a class="dropdown-item" href="h_produk_add.html">Produk</a>
                       <a class="dropdown-item" href="h_merek_add.html">Merek</a>
@@ -157,14 +210,13 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
               </div>
           </div>
       </div>
-      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap">
-    <table class="table table-hover table-sm table-bordered table-tight">
+      <div class="card-body table-responsive d-flex justify-content-between align-items-center mb-3 flex-wrap table-wrapper">
+    <table class="table table-sm table-bordered table-tight table-narrow table-noselect">
             <thead>
                 <tr>
                     <th width="50px">Kode</th>
                     <th>Nama</th>
                     <th width="50px">Aktif</th>
-                    <th width="100px" style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody id="tabel_kategori"></tbody>
@@ -191,6 +243,11 @@ tr.barisdata:hover { background:#f1f5ff; cursor:pointer }
 </div>
 </div>
 </div>
+</div>
+<div id="contextMenu" class="context-menu">
+<div class="context-item" onclick="menuEdit()">Edit</div>
+<div id="menuToggleAktif" class="context-item" onclick="menuToggleAktif()">Nonaktifkan</div>
+<div class="context-item danger" onclick="menuHapus()">Hapus</div>
 </div>
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -262,6 +319,9 @@ const perPage = 10;
 let page = 1;
 let lastCount = 0;
 let allKategori = [];
+let selectedKategoriId = null;
+let selectedRow = null;
+let selectedKategoriAktif = null;
 
 // ===============================
 // FILTER STATUS
@@ -289,47 +349,38 @@ function clearCacheKategori() {
 // ===============================
 // RENDER TABLE
 // ===============================
-function renderKategori(list) {
-    const tbody = document.getElementById("tabel_kategori");
+function renderKategori(list){
 
-    if (!list.length) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center text-muted py-3">
-                    Tidak ada data
-                </td>
-            </tr>`;
-        return;
-    }
+const tbody = document.getElementById("tabel_kategori");
 
-tbody.innerHTML = list.map(k => `
-<tr class="barisdata">
-  <td>${k.kode_kategori || ""}</td>
-  <td>${k.nama_kategori}</td>
+if(!list.length){
+tbody.innerHTML = `
+<tr>
+<td colspan="3" class="text-center text-muted py-3">
+Tidak ada data
+</td>
+</tr>`;
+return;
+}
 
-  <!-- STATUS AKTIF -->
-  <td class="text-center">
-    <span class="${k.aktif ? 'text-primary' : 'text-danger'}"
-          title="${k.aktif ? 'Aktif' : 'Nonaktif'}">
-      ${k.aktif ? ICON_CHECK : ICON_SILANG}
-    </span>
-  </td>
+tbody.innerHTML = list.map(k=>`
 
-  <!-- AKSI -->
-  <td class="text-center">
-    <span class="text-dark action-icon mr-2"
-          title="Edit"
-          onclick="goEdit('${k.id_kategori}')">
-      ${ICON_EDIT}
-    </span>
+<tr class="barisdata"
+data-id="${k.id_kategori}"
+data-aktif="${k.aktif}">
 
-    <span class="text-dark action-icon"
-          title="Hapus"
-          onclick="hapusKategori('${k.id_kategori}')">
-      ${ICON_DELETE}
-    </span>
-  </td>
+<td>${k.kode_kategori || ""}</td>
+
+<td title="${k.nama_kategori}">
+${k.nama_kategori}
+</td>
+
+<td class="text-center ${k.aktif ? 'text-primary' : 'text-danger'}">
+${k.aktif ? ICON_CHECK : ICON_SILANG}
+</td>
+
 </tr>
+
 `).join("");
 
 }
@@ -475,6 +526,71 @@ window.addEventListener("offline", updateOfflineBadge);
 updateOfflineBadge();
 
 // ===============================
+const menu = document.getElementById("contextMenu");
+
+document.addEventListener("contextmenu",function(e){
+const row = e.target.closest(".barisdata");
+    if(row){
+    e.preventDefault();
+    if(selectedRow){
+        selectedRow.classList.remove("baris-aktif");
+    }
+    selectedRow = row;
+    selectedRow.classList.add("baris-aktif");
+    selectedKategoriId = row.dataset.id;
+    selectedKategoriAktif = row.dataset.aktif === "true";
+    const menuToggle = document.getElementById("menuToggleAktif");
+    menuToggle.innerText =
+    selectedKategoriAktif ? "Nonaktifkan" : "Aktifkan";
+    menu.style.top = e.clientY + "px";
+    menu.style.left = e.clientX + "px";
+    menu.style.display = "block";
+    }else{
+    menu.style.display = "none";
+    }
+});
+
+document.addEventListener("click",function(e){
+const row = e.target.closest(".barisdata");
+    if(row){
+    if(selectedRow){
+        selectedRow.classList.remove("baris-aktif");
+    }
+    selectedRow = row;
+    selectedRow.classList.add("baris-aktif");
+    selectedKategoriId = row.dataset.id;
+    selectedKategoriAktif = row.dataset.aktif === "true";
+    }
+    menu.style.display="none";
+});
+function menuEdit(){
+goEdit(selectedKategoriId);
+}
+
+function menuHapus(){
+hapusKategori(selectedKategoriId);
+}
+
+async function menuToggleAktif(){
+    const statusBaru = !selectedKategoriAktif;
+    const { error } = await db
+        .from("tb_kategori")
+        .update({aktif:statusBaru})
+        .eq("id_kategori",selectedKategoriId);
+    if(error){
+        alert("Gagal mengubah status");
+    return;
+    }
+    selectedKategoriAktif = statusBaru;
+    selectedRow.dataset.aktif = statusBaru;
+    const cell = selectedRow.children[2];
+    cell.className =
+    "text-center " +
+    (statusBaru ? "text-primary":"text-danger");
+    cell.innerHTML =
+    statusBaru ? ICON_CHECK : ICON_SILANG;
+    clearCacheKategori();
+}
 loadKategori();
 </script>
 
